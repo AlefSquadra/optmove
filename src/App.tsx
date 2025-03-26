@@ -1,17 +1,12 @@
-import { Login } from '@optmove/design-system'
-import './App.css'
+import { RouterProvider } from "react-router-dom";
+import './App.css';
+import { router } from "./routes/Routes";
+
+
 
 function App() {
 
-  return (
-    <>
-    <div className='bg-white'>
-
-      <Login/>
-      {/* <Input label='Label'/> */}
-    </div>
-    </>
-  )
+   return <RouterProvider router={router} />;
 }
 
 export default App
