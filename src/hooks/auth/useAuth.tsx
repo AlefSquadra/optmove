@@ -1,48 +1,64 @@
-import { InteractionRequiredAuthError } from "@azure/msal-browser";
-import { useMsal } from "@azure/msal-react";
-import { useEffect, useState } from "react";
+import { AccountInfo, AuthenticationResult } from "@azure/msal-browser";
+import { createContext, useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { msalInstance } from "./msalConfig";
 
-export const useAuth = () => {
-  const { instance, accounts } = useMsal();
+interface AuthContextType {
+  user: AccountInfo | null;
+  accessToken: string | null;
+  login: () => void;
+  logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<AccountInfo | null>(msalInstance.getActiveAccount());
+  const navigate = useNavigate();
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
-  const login = () => {
-    instance
-      .loginPopup({
-        scopes: ["User.Read"], // Defina os escopos necessários
-      })
-      .catch((e) => console.error(e));
-  };
-
-  const logout = () => {
-    instance.logoutPopup();
-  };
-
-  useEffect(() => {
-    if (accounts.length > 0) {
-      instance
-        .acquireTokenSilent({
-          scopes: ["User.Read"],
-          account: accounts[0],
-        })
-        .then((response) => {
-          setAccessToken(response.accessToken);
-        })
-        .catch((error) => {
-          if (error instanceof InteractionRequiredAuthError) {
-            instance
-              .acquireTokenPopup({
-                scopes: ["User.Read"],
-              })
-              .then((response) => {
-                setAccessToken(response.accessToken);
-              });
-          } else {
-            console.error(error);
-          }
-        });
+  const handleAuthResponse = async (response: AuthenticationResult) => {
+    if (response.account) {
+      msalInstance.setActiveAccount(response.account);
+      setUser(response.account);
+      await getToken(response.account);
+      navigate("/");
     }
-  }, [accounts, instance]);
+  };
 
-  return { login, logout, accessToken, accounts };
+  const getToken = async (account: AccountInfo) => {
+    try {
+      const response = await msalInstance.acquireTokenSilent({
+        scopes: ["User.Read"],
+        account,
+      });
+      setAccessToken(response.accessToken);
+    } catch (error) {
+      console.error("Token acquisition failed:", error);
+    }
+  };
+
+  const login = async () => {
+    try {
+      const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
+      await handleAuthResponse(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const logout = async () => {
+    await msalInstance.logoutPopup();
+    setUser(null);
+    setAccessToken(null);
+    window.location.href = "/login"; // Redireciona manualmente
+  };
+
+  return <AuthContext.Provider value={{ user, accessToken, login, logout }}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
+  return context;
 };

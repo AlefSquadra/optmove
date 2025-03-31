@@ -1,5 +1,5 @@
 // src/auth/authConfig.ts
-import { PublicClientApplication } from "@azure/msal-browser";
+import { AccountInfo, EventType, LogLevel, PublicClientApplication } from "@azure/msal-browser";
 
 export const msalConfig = {
   auth: {
@@ -11,6 +11,15 @@ export const msalConfig = {
   },
   cache: {
     cacheLocation: "sessionStorage",
+  },
+  system: {
+    loggerOptions: {
+      loggerCallback: (level, message) => {
+        if (level === LogLevel.Error) console.error(message);
+      },
+      logLevel: LogLevel.Info,
+      piiLoggingEnabled: false,
+    },
   },
 };
 
@@ -29,3 +38,10 @@ export const loginRequest = {
 };
 
 export const msalInstance = new PublicClientApplication(msalConfig);
+
+msalInstance.addEventCallback((event) => {
+  if (event.eventType === EventType.LOGIN_SUCCESS && event.payload) {
+    const account = event.payload as AccountInfo;
+    msalInstance.setActiveAccount(account);
+  }
+});
