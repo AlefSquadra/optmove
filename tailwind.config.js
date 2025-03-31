@@ -1,57 +1,96 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./lib/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
-        white_background: "#F5F7FA",
-        blue_primary_light: "#3B5E88",
-        blue_light: "#1F8CEB",
-        blue_dark: "#292D32",
-        blue_primary_dark: "#000E31",
-        blue: "#3B5E88",
-        blue_dark_700: "#00355B",
-        gray_blue: "#ABBED1",
+        white: {
+          DEFAULT: "#FFFFFF",
+          background: "#F5F7FA",
+        },
+        blue: {
+          primary: {
+            DEFAULT: "#3B5E88",
+            100: "#3B5E88",
+            200: "#000E31",
+          },
+          light: {
+            100: "#1F8CEB",
+          },
+          dark: {
+            100: "#292D32",
+            700: "#00355B",
+          },
+          DEFAULT: "#3B5E88",
+          gray: {
+            100: "#ABBED1",
+            opacity: {
+              20: "rgba(171, 190, 209, 0.2)",
+            },
+          },
+        },
+        gray: {
+          40: "#666666",
+          100: "#F2F2F2",
+          150: "#ABBED1",
+          200: "#D9D9D9",
+          300: "#BABFD1",
+          400: "#717171",
+          blue: "#ABBED1",
+          dark: "#273444",
+          light: {
+            DEFAULT: "#717171",
+            100: "#F2F2F2",
+          },
+          philippine: "#909090",
+          opacity: {
+            50: "rgba(137, 147, 158, 0.5)",
+            60: "rgba(113, 113, 113, 0.6)",
+          },
+          status: {
+            inactive: {
+              opacity10: "rgba(113, 113, 113, 0.1)",
+            },
+          },
+        },
+        green: {
+          100: "#E7F7E8",
+          500: "#13ce66",
+          active: "#44AE12",
+          success: "#009262",
+          opacity: {
+            13: "rgba(36, 172, 2, 0.13)",
+            10: "rgba(36, 172, 2, 0.1)",
+          },
+        },
+        black: {
+          400: "#4D4D4D",
+          500: "#212121",
+          600: "#080917",
+          opacity: {
+            50: "rgba(0, 0, 0, 0.5)",
+          },
+        },
         purple: "#7e5bef",
         pink: "#ff49db",
-        orange: "#ff7849",
-        green: "#13ce66",
-        green_100: "#E7F7E8",
-        green_active: "#44AE12",
-        yellow: "#ffc82c",
-        gray_dark: "#273444",
-        gray_200: "#D9D9D9",
-        gray: "#8492a6",
-        gray_light: "#717171",
-        gray_40: "#666666",
-        gray_light_150: "#ABBED1",
-        gray_light_100: "#F2F2F2",
-        gray_light_200: "#616161",
-        gray_light_300: "#BABFD1",
-        gray_light_400: "#717171",
-        oragen_opacity: "rgba(240, 152, 21, 0.1)",
-        gray_opacity_6: "rgba(113, 113, 113, 0.6)",
-        orange_400: "#F09815",
-        black_500: "#212121",
-        black_400: "#4D4D4D",
-        neutral_grey: "#717171",
-        red_500: "#C33025",
-        red_100: "#F0857D",
-        gray_philippine: "#909090",
-        black_opacity_5: "rgba(0, 0, 0, 0.5)",
-        black_600: "#080917",
-        green_success: "#009262",
-        yellow_alert: "#FFA826",
-        "yellow-opacity-0.39": "rgba(255, 209, 90, 0.39)",
-        "green-opacity-0.13": "rgba(36, 172, 2, 0.13)",
-        "red-opacity-0.4": "rgba(215, 69, 50, 0.4)",
-        "gray-blue-opacity-0.2": "rgba(171, 190, 209, 0.2)",
-        "gray-opacity-0.5": "rgba(137, 147, 158, 0.5)",
-        green_status_active_opacity_1: "rgba(36, 172, 2, 0.1)",
-        gray_status_inactive_opacity_1: "rgba(113, 113, 113, 0.1)",
+        orange: {
+          400: "#F09815",
+          DEFAULT: "#ff7849",
+          opacity10: "rgba(240, 152, 21, 0.1)",
+        },
+        yellow: {
+          DEFAULT: "#ffc82c",
+          alert: "#FFA826",
+          opacity39: "rgba(255, 209, 90, 0.39)",
+        },
+        neutral: {
+          grey: "#717171",
+        },
+        red: {
+          100: "#F0857D",
+          500: "#C33025",
+          opacity40: "rgba(215, 69, 50, 0.4)",
+        },
       },
       fontFamily: {
         sans: ["Graphik", "sans-serif"],
@@ -90,5 +129,4 @@ export default {
     },
   },
   plugins: [],
-}
-
+};

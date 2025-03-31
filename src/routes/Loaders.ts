@@ -1,15 +1,14 @@
-// src/routes/loaders.ts
 import { LoaderFunctionArgs, redirect } from "react-router-dom";
-import { authService } from "../services/auth/AuthService";
+import { AuthService } from "../services/auth/AuthService";
 
 export const authLoader = async () => {
-  const user = authService.getUser();
+  const user = AuthService.getUser();
   return { user };
 };
 
-export const protectedLoader = async ({  }: LoaderFunctionArgs) => {
-  const user = authService.getUser();
-  
+export const protectedLoader = async ({}: LoaderFunctionArgs) => {
+  const user = await AuthService.getUser();
+
   if (!user) {
     throw redirect(`/login`);
   }

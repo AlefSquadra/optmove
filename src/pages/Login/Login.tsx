@@ -1,28 +1,33 @@
-import { Login } from '@optmove/design-system';
-import { useNavigate } from 'react-router-dom';
-import { authService } from '../../services/auth/AuthService';
+import { Login } from "@optmove/design-system";
+import { useNavigate } from "react-router-dom";
+import { AuthService } from "../../services/auth/AuthService";
+
 interface ILoginProps {}
 
 const LoginPage = (props: ILoginProps) => {
-const {} = props;
+  const {} = props;
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleLogin = async ({ email, password }: { email: string; password: string }) => {
     try {
-      await authService.login("admin", "1234");
+      await AuthService.login({ email, password });
       navigate("/");
     } catch (error) {
       alert("Erro ao fazer login");
     }
   };
 
-
-    return (
-        <><Login
-        onClickLoginMicrosoft={handleLogin}
-        /></>
-    )
+  return (
+    <Login.Root>
+      <Login.Banner />
+      <Login.Main>
+        <Login.Header title="Login" />
+        <Login.Form onSubmit={handleLogin} />
+        <Login.SocialButtons onClickLoginMicrosoft={async () => AuthService.loginAzureAD()} />
+        <Login.Footer />
+      </Login.Main>
+    </Login.Root>
+  );
 };
 
-export { LoginPage as Login };
-
+export { LoginPage };

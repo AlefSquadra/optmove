@@ -1,13 +1,9 @@
-
 interface IHomeProps {}
 
 const Home = (props: IHomeProps) => {
-const {} = props;
+  const {} = props;
 
-    return (
-        <>Home</>
-    )
+  return <>Home</>;
 };
 
 export { Home };
-
