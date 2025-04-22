@@ -10,4 +10,12 @@ export default defineConfig({
   // optimizeDeps: {
   //     include: ['@optmove/design-system'], // Garanta que a dependência local esteja otimizando.
   // },
+  // resolve: {
+  //   alias: {
+  //     "@optmove/design-system": path.resolve(__dirname, "./node_modules/@optmove/design-system/lib"),
+  //   },
+  // },
+  ssr: {
+    noExternal: ["@optmove/design-system"],
+  },
 });

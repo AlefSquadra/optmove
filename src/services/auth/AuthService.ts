@@ -1,11 +1,11 @@
-import { AxiosApi } from "../config/Axios";
-export class AuthService {
-  public static async login(data: { email: string; password: string }): Promise<any> {
-    return AxiosApi.post(`/auth/login`, data);
-  }
+import { ILoginPayloadRequest } from "../../models/dtos/payloads/Auth/ILoginPayloadRequest";
+import { ILoginPayloadResponse } from "../../models/dtos/payloads/Auth/ILoginPayloadResponse";
+import { apiClient } from "../config";
 
-  public static async getUser(): Promise<any> {
-    const token = localStorage.getItem("token");
-    return token || null;
-  }
-}
+export const AuthService = {
+  login(payload: ILoginPayloadRequest) {
+    return apiClient.post<ILoginPayloadResponse>("/auth/login", payload, {
+      notRequiresAuth: false,
+    });
+  },
+};

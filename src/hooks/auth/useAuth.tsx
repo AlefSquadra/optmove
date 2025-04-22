@@ -1,12 +1,15 @@
 import { AccountInfo, AuthenticationResult } from "@azure/msal-browser";
 import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ILoginPayloadRequest } from "../../models/dtos/payloads/Auth/ILoginPayloadRequest";
+import { AuthService } from "../../services/auth/AuthService";
 import { msalInstance } from "./msalConfig";
 
 interface AuthContextType {
   user: AccountInfo | null;
   accessToken: string | null;
-  login: () => void;
+  handleDefaultLogin: (data: ILoginPayloadRequest) => void;
+  handleMsalLogin: () => void;
   logout: () => void;
 }
 
@@ -38,13 +41,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const login = async () => {
+  const handleMsalLogin = async () => {
     try {
       const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
       await handleAuthResponse(response);
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleDefaultLogin = async (credentials: ILoginPayloadRequest) => {
+    AuthService.login(credentials).then((response) => {
+      setAccessToken(response.token);
+    });
   };
 
   const logout = async () => {
@@ -54,7 +63,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     window.location.href = "/login"; // Redireciona manualmente
   };
 
-  return <AuthContext.Provider value={{ user, accessToken, login, logout }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, accessToken, handleDefaultLogin, handleMsalLogin, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
