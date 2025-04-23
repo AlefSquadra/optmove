@@ -4,9 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { SelectZoneService } from "../../services/selectZones/SelectZoneService";
+import { useApplicationContext } from "../../store/ApplicationProvider";
 import { SelectZoneFormSchemaZod, SelectZoneFormValuesZod, SpecialProfiles } from "./SelectZoneFormZod";
 
 const SelectZonePage = () => {
+  const { setSelectZoneParams } = useApplicationContext();
   const { control, handleSubmit, setValue, watch } = useForm<SelectZoneFormValuesZod>({
     resolver: zodResolver(SelectZoneFormSchemaZod),
     defaultValues: {
@@ -40,8 +42,11 @@ const SelectZonePage = () => {
   }, [perfilSelecionado, setValue]);
 
   const onSubmit = (data: SelectZoneFormValuesZod) => {
-    console.log("✔️ Dados válidos:", data);
-    // TODO: Ativar parâmetros de exibição, hints, etc.
+    setSelectZoneParams({
+      profileZone: data.perfilMesa.id,
+      mesaZone: data.mesa.map((i) => i.id).join(","),
+      mesaZoneId: data.mesa.map((i) => i.id).join(","),
+    });
   };
 
   return (
@@ -70,7 +75,7 @@ const SelectZonePage = () => {
               }
               onChange={(items: TransferItem[]) => field.onChange(items.map((i) => ({ id: i.key, name: i.title })))}
             >
-              <div className="flex w-full flex-row gap-4">
+              <div className="flex w-full flex-row items-center gap-4">
                 <Transfer.List direction="left" className="w-[100%]" />
                 <Transfer.Actions />
                 <Transfer.List direction="right" className="w-[100%]" />

@@ -2,9 +2,9 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/auth/useAuth";
 
 export function ProtectedRoute({ isPrivate }) {
-  const { user } = useAuth();
+  const { apiAccessToken } = useAuth();
 
-  if (isPrivate && !user) {
+  if (isPrivate && !apiAccessToken) {
     return <Navigate to="/login" replace />;
   }
 

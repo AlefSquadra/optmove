@@ -1,13 +1,16 @@
-import { AccountInfo, AuthenticationResult } from "@azure/msal-browser";
-import { createContext, useContext, useState } from "react";
+import { AccountInfo } from "@azure/msal-browser";
+import { useQuery } from "@tanstack/react-query";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ILoginPayloadRequest } from "../../models/dtos/payloads/Auth/ILoginPayloadRequest";
 import { AuthService } from "../../services/auth/AuthService";
+import { setBackendToken } from "../../services/config";
 import { msalInstance } from "./msalConfig";
 
 interface AuthContextType {
   user: AccountInfo | null;
-  accessToken: string | null;
+  apiAccessToken: string | null;
+  msalAccessToken: string | null;
   handleDefaultLogin: (data: ILoginPayloadRequest) => void;
   handleMsalLogin: () => void;
   logout: () => void;
@@ -18,16 +21,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AccountInfo | null>(msalInstance.getActiveAccount());
   const navigate = useNavigate();
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [msalAccessToken, setMsalAccessToken] = useState<string | null>(null);
+  const [apiAccessToken, setApiAccessToken] = useState<string | null>(localStorage.getItem("apiAccessToken"));
 
-  const handleAuthResponse = async (response: AuthenticationResult) => {
-    if (response.account) {
-      msalInstance.setActiveAccount(response.account);
-      setUser(response.account);
-      await getToken(response.account);
-      navigate("/");
-    }
-  };
+  const { data: apiToken, isSuccess } = useQuery({
+    queryKey: ["getApiAccessToken"],
+    queryFn: () => AuthService.getToken({ token: msalAccessToken || "" }),
+    enabled: !!msalAccessToken, // só roda quando msalAccessToken estiver disponível
+  });
 
   const getToken = async (account: AccountInfo) => {
     try {
@@ -35,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         scopes: ["User.Read"],
         account,
       });
-      setAccessToken(response.accessToken);
+      setMsalAccessToken(response.accessToken);
     } catch (error) {
       console.error("Token acquisition failed:", error);
     }
@@ -44,7 +45,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const handleMsalLogin = async () => {
     try {
       const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
-      await handleAuthResponse(response);
+      if (response.account) {
+        msalInstance.setActiveAccount(response.account);
+        setUser(response.account);
+        await getToken(response.account);
+        navigate("/");
+      }
     } catch (error) {
       console.error(error);
     }
@@ -52,19 +58,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const handleDefaultLogin = async (credentials: ILoginPayloadRequest) => {
     AuthService.login(credentials).then((response) => {
-      setAccessToken(response.token);
+      setMsalAccessToken(response.token);
     });
   };
 
   const logout = async () => {
     await msalInstance.logoutPopup();
     setUser(null);
-    setAccessToken(null);
+    setMsalAccessToken(null);
     window.location.href = "/login"; // Redireciona manualmente
   };
 
+  useEffect(() => {
+    if (isSuccess && apiToken?.accessToken) {
+      setApiAccessToken(apiToken.accessToken);
+      setBackendToken(apiToken.accessToken);
+    }
+  }, [isSuccess, apiToken]);
+
   return (
-    <AuthContext.Provider value={{ user, accessToken, handleDefaultLogin, handleMsalLogin, logout }}>
+    <AuthContext.Provider
+      value={{ user, apiAccessToken, msalAccessToken, handleDefaultLogin, handleMsalLogin, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

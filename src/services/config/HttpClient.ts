@@ -16,10 +16,11 @@ export class HttpClient {
     this.axiosInstance.interceptors.request.use((config) => {
       const customConfig = config as CustomAxiosRequestConfig;
 
-      const isAuthRequired = !customConfig.notRequiresAuth;
+      const isAuthRequired = !customConfig.notRequiresAuth || true;
 
       if (isAuthRequired) {
         const token = this.getToken();
+
         if (token) {
           customConfig.headers = {
             ...customConfig.headers,
