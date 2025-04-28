@@ -3,6 +3,7 @@ import { Button, FieldControl, InputSelect, Transfer, TransferItem } from "@optm
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { SelectZoneService } from "../../services/selectZones/SelectZoneService";
 import { useApplicationContext } from "../../store/ApplicationProvider";
 import { SelectZoneFormSchemaZod, SelectZoneFormValuesZod, SpecialProfiles } from "./SelectZoneFormZod";
@@ -17,6 +18,7 @@ const SelectZonePage = () => {
       zona: { id: "", name: "" },
     },
   });
+  const navigate = useNavigate();
 
   const { data: zonasData } = useQuery({
     queryKey: ["select-zone-profile-planner"],
@@ -47,6 +49,7 @@ const SelectZonePage = () => {
       mesaZone: data.mesa.map((i) => i.id).join(","),
       mesaZoneId: data.mesa.map((i) => i.id).join(","),
     });
+    navigate("home");
   };
 
   return (
