@@ -49,7 +49,7 @@ const SelectZonePage = () => {
       mesaZone: data.mesa.map((i) => i.id).join(","),
       mesaZoneId: data.mesa.map((i) => i.id).join(","),
     });
-    navigate("home");
+    navigate("/home");
   };
 
   return (

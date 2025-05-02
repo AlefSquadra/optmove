@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         msalInstance.setActiveAccount(response.account);
         setUser(response.account);
         await getToken(response.account);
-        navigate("/");
+        navigate("/select-zone");
       }
     } catch (error) {
       console.error(error);

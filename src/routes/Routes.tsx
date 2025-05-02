@@ -1,7 +1,7 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import { AuthProvider } from "../hooks/auth/useAuth";
-import { FTP } from "../pages/ftp/FTP";
+import { Home } from "../pages/home/Home";
 import { LoginPage } from "../pages/login/Login";
 import { NotFound } from "../pages/notFound/NotFound";
 import { SelectZonePage } from "../pages/selectZone/SelectZonePage";
@@ -13,10 +13,12 @@ export function AppRoutes() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/home" element={<FTP />} />
+          <Route path="/" element={<Navigate to="/select-zone" />} />
 
+          {/* Public routes */}
           <Route element={<ProtectedRoute isPrivate />}>
-            <Route path="/" element={<SelectZonePage />} />
+            <Route path="/select-zone" element={<SelectZonePage />} />
+            <Route path="/home" element={<Home />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
