@@ -4,18 +4,29 @@ import { createContext, useContext, useState } from "react";
 interface FTLayoutContext {
   isOpenPanelTabBarLeft: boolean;
   setIsOpenPanelTabBarLeft: React.Dispatch<React.SetStateAction<boolean>>;
+  isOpenPanelTabBarDown: boolean;
+  setIsPanelOpenDown: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const FtlContext = createContext<FTLayoutContext>(undefined);
 
 const FTLayoutProvider = ({ children }: { children: React.ReactNode }) => {
   const [isOpenPanelTabBarLeft, setIsPanelOpen] = useState(false);
+  const [isOpenPanelTabBarDown, setIsPanelOpenDown] = useState(false);
   return (
-    <FtlContext.Provider value={{ isOpenPanelTabBarLeft, setIsOpenPanelTabBarLeft: setIsPanelOpen }}>
+    <FtlContext.Provider
+      value={{
+        isOpenPanelTabBarLeft,
+        setIsOpenPanelTabBarLeft: setIsPanelOpen,
+        isOpenPanelTabBarDown,
+        setIsPanelOpenDown,
+      }}
+    >
       {children}
     </FtlContext.Provider>
   );
 };
+
 export const useFTLayout = () => {
   const context = useContext(FtlContext);
   if (!context) {
@@ -25,8 +36,14 @@ export const useFTLayout = () => {
 };
 
 const FTLayoutRoot = (props: { children?: React.ReactNode }) => {
+  const { isOpenPanelTabBarDown } = useFTLayout();
   return (
-    <div className="grid h-screen grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] grid-rows-[auto_1fr_40px]">
+    <div
+      className={clsx(
+        "grid h-screen grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr]",
+        isOpenPanelTabBarDown ? "grid-rows-[auto_1fr_40px_40px]" : "grid-rows-[auto_1fr_40px]",
+      )}
+    >
       {props?.children}
     </div>
   );
@@ -70,6 +87,21 @@ const FTLayoutTabPanelLeft = (props: { children?: React.ReactNode; className?: s
   );
 };
 
+const FTLayoutTabPanelDown = (props: { children?: React.ReactNode; className?: string }) => {
+  const { isOpenPanelTabBarDown: isPanelOpen } = useFTLayout();
+  return (
+    isPanelOpen && (
+      <div
+        className={clsx(
+          "relative z-50 col-span-12 col-start-1 row-span-3 row-start-4 flex w-full bg-transparent",
+          props.className,
+        )}
+      >
+        {props.children}
+      </div>
+    )
+  );
+};
 export const FTLayout = {
   Provider: FTLayoutProvider,
   Root: FTLayoutRoot,
@@ -77,4 +109,5 @@ export const FTLayout = {
   Content: FTLayoutContent,
   Footer: FTLayoutFooter,
   TabPanelLeft: FTLayoutTabPanelLeft,
+  TabPanelDown: FTLayoutTabPanelDown,
 };

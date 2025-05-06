@@ -1,6 +1,9 @@
-import { Button, GHTChart, GHTChartMock, Input, OptMoveIcon, Select, Text } from "@optmove/design-system";
+import { Button, GHTChart, GHTChartMock, OptMoveIcon, Select, Text } from "@optmove/design-system";
 import { GroupBoxFieldset } from "../../../../shared/components/GroupBoxFieldset/GroupBoxFieldset";
 import { FTLayout } from "../../../../shared/layouts/FTLayout";
+import { ControlFieldsetGroupBox } from "../../components/ftpFieldsetGroupbox/ControlFieldsetGroupBox";
+import { FilterFieldsetGroupBox } from "../../components/ftpFieldsetGroupbox/FilterFieldsetGroupBox";
+import { SearchFieldsetGroupBox } from "../../components/ftpFieldsetGroupbox/SearchFieldsetGroupBox";
 
 interface IFTVProps {}
 
@@ -27,78 +30,13 @@ const FTVLayout = (props: IFTVProps) => {
             </div>
 
             {/* "teste" ao lado */}
-            <div className="absolute left-full top-0 h-full w-80 bg-red-100 p-2">teste</div>
+            <div className="absolute left-full top-0 h-full w-full bg-red-100 p-2">teste</div>
           </div>
         </FTLayout.TabPanelLeft>
         <FTLayout.Header className="z-20 grid grid-cols-[auto_auto_auto_auto_1fr_auto_auto] grid-rows-1 items-center gap-4 px-2 pb-2">
-          {/** Filtros */}
-          <GroupBoxFieldset.Root className="flex min-h-20 items-center justify-start gap-2 p-2">
-            <GroupBoxFieldset.Legend>Ações</GroupBoxFieldset.Legend>
-            <Input type="datetime-local" />
-            <Button variant="outlined" className="h-6 border-none p-0">
-              <OptMoveIcon name="FTPRefresh" height={24} width={24} />
-            </Button>
-          </GroupBoxFieldset.Root>
-          {/** Fim Filtros */}
-          {/** Busca */}
-          <GroupBoxFieldset.Root className="flex min-h-20 items-center justify-start gap-2 p-2">
-            <GroupBoxFieldset.Legend>Busca</GroupBoxFieldset.Legend>
-            <Select label="Pátio destino">
-              <option selected value={null}>
-                Prefixo / Tabela
-              </option>
-            </Select>
-            <Button variant="outlined" className="h-6 border-none p-0">
-              <OptMoveIcon name="FTPSearchEyeIcon" height={24} width={24} />
-            </Button>
-            <Button variant="outlined" className="h-6 border-none p-0">
-              <OptMoveIcon name="FTPBinocularsIcon" height={24} width={24} />
-            </Button>
-            <Button variant="outlined" className="h-6 border-none p-0">
-              <OptMoveIcon name="FTPFormPageTerminalIcon" height={24} width={24} />
-            </Button>
-          </GroupBoxFieldset.Root>
-          {/** Fim Busca */}
-          {/** Controles */}
-          <GroupBoxFieldset.Root className="flex min-h-20 items-center justify-start gap-4 p-2">
-            <GroupBoxFieldset.Legend>Controles</GroupBoxFieldset.Legend>
-            <Button variant="outlined" className="h-6 border-none p-0">
-              <OptMoveIcon name="FTPGraphProgress" height={24} width={24} />
-            </Button>
-            <Button variant="outlined" className="h-6 border-none p-0">
-              <img src="/optmove-icons-svg/tile034.svg" alt="tile034" width={24} />
-            </Button>
-            <Button variant="outlined" className="h-6 border-none p-0">
-              <img src="/optmove-icons-svg/tile031.svg" alt="tile031" width={24} />
-            </Button>
-            <Button variant="outlined" className="h-6 border-none p-0">
-              <img src="/optmove-icons-svg/tile035.svg" alt="tile035" width={24} />
-            </Button>
-            <Text.Label
-              variant="1"
-              className="flex w-auto cursor-pointer items-center justify-start gap-1 whitespace-nowrap"
-            >
-              <input type="checkbox" name="viewTrainInfo" className="w-[20px]" />
-              Visualizar info's do trem
-            </Text.Label>
-
-            <Text.Label
-              variant="1"
-              className="flex w-auto cursor-pointer items-center justify-start gap-1 whitespace-nowrap"
-            >
-              <input type="checkbox" name="viewRealized" className="w-[20px]" />
-              Exibir realizados
-            </Text.Label>
-
-            <Text.Label
-              variant="1"
-              className="flex w-auto cursor-pointer items-center justify-start gap-1 whitespace-nowrap"
-            >
-              <input type="checkbox" name="viewTimeLine" className="w-[20px]" />
-              Ate a linha do tempo
-            </Text.Label>
-          </GroupBoxFieldset.Root>
-          {/** Fim Controles */}
+          <FilterFieldsetGroupBox />
+          <SearchFieldsetGroupBox />
+          <ControlFieldsetGroupBox />
           {/** Plano */}
           <GroupBoxFieldset.Root className="flex min-h-20 items-center justify-start gap-4 p-2">
             <GroupBoxFieldset.Legend>Planos</GroupBoxFieldset.Legend>
@@ -156,6 +94,24 @@ const FTVLayout = (props: IFTVProps) => {
             | Saída: ISN-230/04/2025 10:07 Destino: IPG
           </Text.Body>
         </FTLayout.Footer>
+        <FTLayout.TabPanelDown>
+          <div className="relative">
+            {/* Lista de labels */}
+            <div className="flex flex-row gap-0">
+              {["Monitoramento de planos", "Atividades alteradas"].map((label, index) => (
+                <div
+                  key={index}
+                  className="group relative flex cursor-pointer items-center justify-center rounded-t-2xl border-2 border-gray-200 bg-white p-3"
+                >
+                  <div className="text-black text-sm">{label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* "teste" abaixo */}
+            <div className="absolute left-0 top-full w-full bg-red-100 p-2">teste</div>
+          </div>
+        </FTLayout.TabPanelDown>
       </FTLayout.Root>
     </>
   );

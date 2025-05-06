@@ -13,7 +13,7 @@ const SelectZonePage = () => {
   const { control, handleSubmit, setValue, watch } = useForm<SelectZoneFormValuesZod>({
     resolver: zodResolver(SelectZoneFormSchemaZod),
     defaultValues: {
-      perfilMesa: { id: "", name: "" },
+      perfilMesa: { id: "PlanejadorCCO", name: "Planejador CCO" },
       mesa: [],
       zona: { id: "", name: "" },
     },
@@ -25,7 +25,7 @@ const SelectZonePage = () => {
     queryFn: SelectZoneService.getZonePlanner,
   });
 
-  const { data: perfilData } = useQuery({
+  const { data: perfilData, isFetched } = useQuery({
     queryKey: ["select-profile-planner"],
     queryFn: SelectZoneService.getProfilePlanner,
   });
@@ -36,12 +36,33 @@ const SelectZonePage = () => {
   });
 
   const perfilSelecionado = watch("perfilMesa");
+  const zonaSelected = watch("zona");
+  const mesaSelected = watch("mesa");
 
   useEffect(() => {
     if (SpecialProfiles.includes(perfilSelecionado.id)) {
-      setValue("mesa", [{ id: "AUTOMACAO", name: "AUTOMACAO" }]);
+      setValue("mesa", [{ id: "BaixadaSantista", name: "Baixada Santista" }]);
     }
   }, [perfilSelecionado, setValue]);
+
+  useEffect(() => {
+    if (zonaSelected.id.includes("Mesa4")) {
+      setValue("mesa", [{ id: "BaixadaSantista", name: "Baixada Santista" }]);
+    }
+    if (zonaSelected.id.includes("Automacao")) {
+      setValue("mesa", []);
+    }
+  }, [zonaSelected, setValue]);
+
+  useEffect(() => {
+    if (
+      mesaSelected?.find((x) => {
+        if (x.id == "BaixadaSantista") return x;
+      })?.name
+    ) {
+      setValue("zona", { id: "Mesa4", name: "Mesa 4" });
+    }
+  }, [mesaSelected?.length, setValue]);
 
   const onSubmit = (data: SelectZoneFormValuesZod) => {
     setSelectZoneParams({
@@ -91,8 +112,9 @@ const SelectZonePage = () => {
           <Button className="h-[52px]" type="submit">
             Ok
           </Button>
-
-          <InputSelect name="perfilMesa" control={control} required label="Perfil" options={perfilData} />
+          {isFetched && (
+            <InputSelect name="perfilMesa" control={control} required label="Perfil" options={perfilData} />
+          )}
         </div>
       </div>
     </form>
