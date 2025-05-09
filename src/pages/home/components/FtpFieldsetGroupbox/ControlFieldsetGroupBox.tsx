@@ -102,18 +102,12 @@ const ControlFieldsetGroupBox = (props: IControlFieldsetGroupBoxProps) => {
           <Button variant="outlined" className="h-6 border-none p-0">
             <OptMoveIcon name="FTPGraphProgress" height={24} width={24} />
           </Button>
-          <Button variant="outlined" className="h-6 border-none p-0">
-            <img src="/optmove-icons-svg/tile034.svg" alt="tile034" width={24} />
-          </Button>
-          <Button variant="outlined" className="h-6 border-none p-0">
-            <img src="/optmove-icons-svg/tile031.svg" alt="tile031" width={24} />
-          </Button>
-          <Button variant="outlined" className="h-6 border-none p-0">
-            <img src="/optmove-icons-svg/tile035.svg" alt="tile035" width={24} />
-          </Button>
+          <img src="/optmove-icons-svg/tile034.svg" alt="tile034" className="h-6 w-6" />
+          <img src="/optmove-icons-svg/tile031.svg" alt="tile031" className="h-6 w-6" />
+          <img src="/optmove-icons-svg/tile035.svg" alt="tile035" className="h-6 w-6" />
           <Text.Label
             variant="1"
-            className="flex !w-auto cursor-pointer items-center justify-start gap-1 whitespace-nowrap"
+            className="flex !w-auto cursor-pointer items-center justify-start gap-1 whitespace-nowrap xl:text-xs"
           >
             <input type="checkbox" name="viewTrainInfo" className="w-[20px]" />
             Visualizar info's do trem
@@ -121,7 +115,7 @@ const ControlFieldsetGroupBox = (props: IControlFieldsetGroupBoxProps) => {
 
           <Text.Label
             variant="1"
-            className="flex !w-auto cursor-pointer items-center justify-start gap-1 whitespace-nowrap"
+            className="flex !w-auto cursor-pointer items-center justify-start gap-1 whitespace-nowrap xl:text-xs"
           >
             <input type="checkbox" name="viewRealized" className="w-[20px]" />
             Exibir realizados
@@ -129,7 +123,7 @@ const ControlFieldsetGroupBox = (props: IControlFieldsetGroupBoxProps) => {
 
           <Text.Label
             variant="1"
-            className="flex !w-auto cursor-pointer items-center justify-start gap-1 whitespace-nowrap"
+            className="flex !w-auto cursor-pointer items-center justify-start gap-1 whitespace-nowrap xl:text-xs"
           >
             <input type="checkbox" name="viewTimeLine" className="w-[20px]" />
             Ate a linha do tempo

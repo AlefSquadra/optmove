@@ -15,7 +15,7 @@ const Home = (props: IHomeProps) => {
   const { selectZoneParams } = useApplicationContext();
   const profileZone = selectZoneParams?.profileZone;
 
-  return zoneComponents[profileZone] || <Navigate to="/select-zone" />;
+  return zoneComponents[profileZone] || <Navigate to="/home" />;
 };
 
 export { Home };
