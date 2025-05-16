@@ -13,11 +13,11 @@ interface IFTVProps {}
 
 const FTVLayout = (props: IFTVProps) => {
   const {} = props;
-  const { setCursorPointer } = useGHTChartContext();
+  const { setCursorPointer, selectedElementClickable: lineTrainSelected } = useGHTChartContext();
   const FTContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setCursorPointer("grab");
+    setCursorPointer("auto");
   }, [setCursorPointer]);
 
   return (
@@ -86,12 +86,11 @@ const FTVLayout = (props: IFTVProps) => {
             </Text.Label>
           </div>
           <div className="h-full w-full overflow-hidden">
-            {/* {FTContentRef.current?.offsetHeight} */}
             {FTContentRef.current?.offsetHeight && (
               <GHTChart
                 data={GHTChartMock.data}
                 database={GHTChartMock.database}
-                restricoes={GHTChartMock.restricts}
+                restrictions={GHTChartMock.restricts}
                 yLabels={GHTChartMock.yLabels}
                 dataOfficialization={dataOfficialization}
                 defaultHeight={FTContentRef.current?.offsetHeight - 47}
@@ -99,11 +98,13 @@ const FTVLayout = (props: IFTVProps) => {
             )}
           </div>
         </FTLayout.Content>
+
         <FTLayout.Footer className="row-auto flex items-center justify-center">
-          <Text.Body variant="2" className="text-center text-red-700">
-            CNY0159 (CARGA GERAL NAO PREFERENCIAL | Peso = 390 | Comprimento = 0,068) | Chegada: ISN-2-30/04/2025 10:00
-            | Saída: ISN-230/04/2025 10:07 Destino: IPG
-          </Text.Body>
+          {lineTrainSelected.name && (
+            <Text.Body variant="2" className="text-center text-red-700">
+              {`${lineTrainSelected.name} (${lineTrainSelected.data.type}) | Chegada: ${lineTrainSelected.data?.xi} | Saída: ${lineTrainSelected?.data?.xf} Destino: ${lineTrainSelected.data?.info.find((x) => x?.label === "Destino")?.value}`}
+            </Text.Body>
+          )}
         </FTLayout.Footer>
         <FTLayout.TabPanelDown>
           <div className="relative">

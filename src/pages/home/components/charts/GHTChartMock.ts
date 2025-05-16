@@ -1,4 +1,4 @@
-import { IDataGHT, IYLabelsGHT } from "./GHTChart.types";
+import { IDataGHT, IRestrictionsGHT, IYLabelsGHT } from "./GHTChart.types";
 
 const yLabels: IYLabelsGHT[] = [
   {
@@ -163,724 +163,862 @@ const database = new Date("2025-05-07T02:32:00-03:00");
 export const dataOfficialization = new Date("2025-05-07T07:50:00-03:00");
 
 const data: IDataGHT[] = [
+  // TREM 1: HUP0131 - Com parada no meio do trajeto (cruza oficialização)
   {
+    id: "1",
     name: "HUP0131",
     color: "#800000",
+    type: "Carga",
     segments: [
+      // Movimento inicial
       {
+        id: "1",
         xi: "2025-05-07T02:16:59-03:00",
         xf: "2025-05-07T07:18:51-03:00",
         yi: 0,
         yf: 10.997,
         dash: false,
+        color: "#800000",
         info: [
-          {
-            label: "SB",
-            value: "IBA-1",
-          },
-          {
-            label: "Data trem pronto",
-            value: "2025-05-07T07:15-03:00[America/Sao_Paulo]",
-          },
-          {
-            label: "Destino",
-            value: "IBA",
-          },
+          { label: "SB", value: "IBA-1" },
+          { label: "Destino", value: "IBA" },
         ],
       },
+      // Parada para atividade
       {
+        id: "2",
         xi: "2025-05-07T07:18:51-03:00",
-        xf: "2025-05-07T08:27:22-03:00",
+        xf: "2025-05-07T08:18:51-03:00",
         yi: 10.997,
-        yf: 15.5,
+        yf: 10.997, // PARADO - com atividade
         dash: false,
+        color: "#800000",
         info: [
+          { label: "SB", value: "IBA-PARADA" },
+          { label: "Status", value: "Parado para operação" },
+        ],
+        activities: [
           {
-            label: "SB",
-            value: "IBA-IUF-1",
-          },
-          {
-            label: "Data trem pronto",
-            value: "2025-05-07T07:15-03:00[America/Sao_Paulo]",
-          },
-          {
-            label: "Destino",
-            value: "IBA-IUF",
+            id: "act1",
+            type: "parada",
+            position: 0.5, // Centralizada
+            info: [
+              { label: "Tipo", value: "Parada para acoplamento" },
+              { label: "Duração", value: "60min" },
+              { label: "Responsável", value: "CCO" },
+            ],
+            color: "#FF6347",
           },
         ],
       },
+      // Continuação do movimento
       {
-        xi: "2025-05-07T08:27:22-03:00",
-        xf: "2025-05-07T08:30:53-03:00",
-        yi: 15.5,
-        yf: 30.0,
-        dash: false,
-        info: [
-          {
-            label: "SB",
-            value: "IUF-2",
-          },
-          {
-            label: "Data trem pronto",
-            value: "2025-05-07T07:15-03:00[America/Sao_Paulo]",
-          },
-          {
-            label: "Destino",
-            value: "IUF",
-          },
-        ],
-      },
-      {
-        xi: "2025-05-07T08:30:53-03:00",
-        xf: "2025-05-07T09:30:53-03:00",
-        yi: 30,
-        yf: 32.304,
-        dash: false,
-        info: [
-          {
-            label: "SB",
-            value: "IUF-IPG-1",
-          },
-          {
-            label: "Data trem pronto",
-            value: "2025-05-07T07:15-03:00[America/Sao_Paulo]",
-          },
-          {
-            label: "Destino",
-            value: "IUF-IPG",
-          },
-        ],
-      },
-      {
-        xi: "2025-05-07T09:30:53-03:00",
+        id: "3",
+        xi: "2025-05-07T08:18:51-03:00",
         xf: "2025-05-07T11:30:53-03:00",
-        yi: 32.304,
+        yi: 10.997,
         yf: 32.304,
         dash: false,
+        color: "#800000",
         info: [
+          { label: "SB", value: "IPG-2-16" },
+          { label: "Destino", value: "IPG-2" },
+        ],
+      },
+    ],
+  },
+
+  // TREM 2: HUP0132 - Trem tracejado com parada
+  {
+    id: "2",
+    name: "HUP0132",
+    color: "#800000",
+    type: "Carga",
+    segments: [
+      // Movimento inicial
+      {
+        id: "1",
+        xi: "2025-05-07T09:12:59-03:00",
+        xf: "2025-05-07T10:30:00-03:00",
+        yi: 0,
+        yf: 8.5,
+        dash: true,
+        color: "#800000",
+        info: [
+          { label: "SB", value: "IBA-MOVIMENTO" },
+          { label: "Status", value: "Planejado" },
+        ],
+      },
+      // Parada
+      {
+        id: "2",
+        xi: "2025-05-07T10:30:00-03:00",
+        xf: "2025-05-07T11:00:00-03:00",
+        yi: 8.5,
+        yf: 8.5, // PARADO - com atividade
+        dash: true,
+        color: "#800000",
+        info: [
+          { label: "SB", value: "IBA-PARADA" },
+          { label: "Status", value: "Parado planejado" },
+        ],
+        activities: [
           {
-            label: "SB",
-            value: "IPG-2-16",
+            id: "act2",
+            type: "parada",
+            position: 0.5, // Centralizada
+            info: [
+              { label: "Tipo", value: "Parada para inspeção" },
+              { label: "Duração", value: "30min" },
+              { label: "Motivo", value: "Verificação planejada" },
+            ],
+            color: "#FF4500",
           },
+        ],
+      },
+      // Continuação
+      {
+        id: "3",
+        xi: "2025-05-07T11:00:00-03:00",
+        xf: "2025-05-07T11:18:51-03:00",
+        yi: 8.5,
+        yf: 10.997,
+        dash: true,
+        color: "#800000",
+        info: [
+          { label: "SB", value: "IBA-FINAL" },
+          { label: "Status", value: "Finalização" },
+        ],
+      },
+    ],
+  },
+
+  // TREM 3: EMU0245 - Passageiros com parada comercial
+  {
+    id: "3",
+    name: "EMU0245",
+    color: "#0066CC",
+    type: "Passageiro",
+    segments: [
+      // Movimento inicial
+      {
+        id: "1",
+        xi: "2025-05-07T03:00:00-03:00",
+        xf: "2025-05-07T04:30:00-03:00",
+        yi: 5.5,
+        yf: 12.0,
+        dash: false,
+        color: "#0066CC",
+        info: [
+          { label: "SB", value: "PASSENGER-1" },
+          { label: "Composição", value: "EMU-8 carros" },
+        ],
+      },
+      // Parada comercial
+      {
+        id: "2",
+        xi: "2025-05-07T04:30:00-03:00",
+        xf: "2025-05-07T04:33:00-03:00",
+        yi: 12.0,
+        yf: 12.0, // PARADO - com atividade
+        dash: false,
+        color: "#0066CC",
+        info: [
+          { label: "SB", value: "PASSENGER-STOP" },
+          { label: "Status", value: "Parada comercial" },
+        ],
+        activities: [
           {
-            label: "Data trem pronto",
-            value: "2025-05-07T07:15-03:00[America/Sao_Paulo]",
+            id: "act3",
+            type: "parada",
+            position: 0.5, // Centralizada
+            info: [
+              { label: "Tipo", value: "Parada para embarque" },
+              { label: "Duração", value: "3min" },
+              { label: "Passageiros", value: "Embarque/Desembarque" },
+            ],
+            color: "#0066FF",
           },
+        ],
+      },
+      // Continuação
+      {
+        id: "3",
+        xi: "2025-05-07T04:33:00-03:00",
+        xf: "2025-05-07T06:30:00-03:00",
+        yi: 12.0,
+        yf: 18.5,
+        dash: false,
+        color: "#0066CC",
+        info: [
+          { label: "SB", value: "PASSENGER-FINAL" },
+          { label: "Destino", value: "Terminal" },
+        ],
+      },
+    ],
+  },
+
+  // TREM 4: HFV0583 - Minério com parada para abastecimento
+  {
+    id: "4",
+    name: "HFV0583",
+    color: "#228B22",
+    type: "Minério",
+    segments: [
+      // Movimento inicial
+      {
+        id: "1",
+        xi: "2025-05-07T08:45:00-03:00",
+        xf: "2025-05-07T11:00:00-03:00",
+        yi: 20.5,
+        yf: 28.0,
+        dash: false,
+        color: "#228B22",
+        info: [
+          { label: "SB", value: "MINE-TRANSPORT" },
+          { label: "Tonnage", value: "14.500 ton" },
+        ],
+      },
+      // Parada para abastecimento
+      {
+        id: "2",
+        xi: "2025-05-07T11:00:00-03:00",
+        xf: "2025-05-07T11:20:00-03:00",
+        yi: 28.0,
+        yf: 28.0, // PARADO - com atividade
+        dash: false,
+        color: "#228B22",
+        info: [
+          { label: "SB", value: "MINE-REFUEL" },
+          { label: "Status", value: "Abastecimento" },
+        ],
+        activities: [
           {
-            label: "Destino",
-            value: "IPG-2",
+            id: "act4",
+            type: "parada",
+            position: 0.5, // Centralizada
+            info: [
+              { label: "Tipo", value: "Parada para abastecimento" },
+              { label: "Duração", value: "20min" },
+              { label: "Combustível", value: "Diesel" },
+            ],
+            color: "#32CD32",
+          },
+        ],
+      },
+      // Continuação
+      {
+        id: "3",
+        xi: "2025-05-07T11:20:00-03:00",
+        xf: "2025-05-07T14:30:00-03:00",
+        yi: 28.0,
+        yf: 42.0,
+        dash: false,
+        color: "#228B22",
+        info: [
+          { label: "SB", value: "MINE-FINAL" },
+          { label: "Destino", value: "Porto" },
+        ],
+      },
+    ],
+  },
+
+  // TREM 5: EXP0101 - Expresso SEM ATIVIDADES (movimento direto)
+  {
+    id: "5",
+    name: "EXP0101",
+    color: "#DC143C",
+    type: "Expresso",
+    segments: [
+      {
+        id: "1",
+        xi: "2025-05-07T10:30:00-03:00",
+        xf: "2025-05-07T11:15:00-03:00",
+        yi: 0,
+        yf: 42.0,
+        dash: false,
+        color: "#DC143C",
+        info: [
+          { label: "SB", value: "EXPRESS-DIRECT" },
+          { label: "Velocidade Média", value: "120 km/h" },
+          { label: "Prioridade", value: "Máxima" },
+        ],
+      },
+    ],
+  },
+
+  // TREM 6: MAN0777 - Manutenção com parada prolongada
+  {
+    id: "6",
+    name: "MAN0777",
+    color: "#8A2BE2",
+    type: "Manutenção",
+    segments: [
+      {
+        id: "1",
+        xi: "2025-05-07T14:00:00-03:00",
+        xf: "2025-05-07T16:00:00-03:00",
+        yi: 14.5,
+        yf: 14.5, // PARADO - com atividade
+        dash: false,
+        color: "#8A2BE2",
+        info: [
+          { label: "SB", value: "MAINT-OPERATION" },
+          { label: "Status", value: "Manutenção ativa" },
+        ],
+        activities: [
+          {
+            id: "act5",
+            type: "parada",
+            position: 0.5, // Centralizada
+            info: [
+              { label: "Tipo", value: "Parada para manutenção" },
+              { label: "Duração", value: "2h" },
+              { label: "Equipamento", value: "Via Permanente" },
+            ],
+            color: "#FF8C00",
           },
         ],
       },
     ],
   },
-  // {
-  //   name: "HPU1132",
-  //   color: "#800000",
-  //   segments: [
-  //     {
-  //       xi: "2025-05-07T07:00:42-03:00",
-  //       xf: "2025-05-07T07:02:05-03:00",
-  //       yi: 23.142,
-  //       yf: 23.142,
-  //       dash: false,
-  //       info: [
-  //         {
-  //           label: "SB",
-  //           value: "IPG-2-16",
-  //         },
-  //         {
-  //           label: "Data trem pronto",
-  //           value: "2025-05-07T07:00-03:00[America/Sao_Paulo]",
-  //         },
-  //         {
-  //           label: "Destino",
-  //           value: "IPG-2",
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       xi: "2025-05-07T07:02:05-03:00",
-  //       xf: "2025-05-07T07:01:38-03:00",
-  //       yi: 23.142,
-  //       yf: 28.304,
-  //       dash: false,
-  //       info: [
-  //         {
-  //           label: "SB",
-  //           value: "IUF-IPG-1",
-  //         },
-  //         {
-  //           label: "Data trem pronto",
-  //           value: "2025-05-07T07:00-03:00[America/Sao_Paulo]",
-  //         },
-  //         {
-  //           label: "Destino",
-  //           value: "IUF-IPG",
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       xi: "2025-05-07T07:01:38-03:00",
-  //       xf: "2025-05-07T07:07:05-03:00",
-  //       yi: 28.304,
-  //       yf: 28.417,
-  //       dash: false,
-  //       info: [
-  //         {
-  //           label: "SB",
-  //           value: "IUF-2",
-  //         },
-  //         {
-  //           label: "Data trem pronto",
-  //           value: "2025-05-07T07:00-03:00[America/Sao_Paulo]",
-  //         },
-  //         {
-  //           label: "Destino",
-  //           value: "IUF",
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       xi: "2025-05-07T07:07:05-03:00",
-  //       xf: "2025-05-07T07:23:55-03:00",
-  //       yi: 28.417,
-  //       yf: 29.982,
-  //       dash: false,
-  //       info: [
-  //         {
-  //           label: "SB",
-  //           value: "IBA-IUF-1",
-  //         },
-  //         {
-  //           label: "Data trem pronto",
-  //           value: "2025-05-07T07:00-03:00[America/Sao_Paulo]",
-  //         },
-  //         {
-  //           label: "Destino",
-  //           value: "IBA-IUF",
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       xi: "2025-05-07T07:23:55-03:00",
-  //       xf: "2025-05-07T07:27:00-03:00",
-  //       yi: 29.982,
-  //       yf: 35.997,
-  //       dash: false,
-  //       info: [
-  //         {
-  //           label: "SB",
-  //           value: "IBA-SUZ-1",
-  //         },
-  //         {
-  //           label: "Data trem pronto",
-  //           value: "2025-05-07T07:00-03:00[America/Sao_Paulo]",
-  //         },
-  //         {
-  //           label: "Destino",
-  //           value: "IBA",
-  //         },
-  //       ],
-  //     },
-  //   ],
-  // },
-  // {
-  //   name: "HPU0132",
-  //   color: "#800000",
-  //   segments: [
-  //     {
-  //       xi: "2025-05-07T07:10:42-03:00",
-  //       xf: "2025-05-07T07:12:05-03:00",
-  //       yi: 23.142,
-  //       yf: 23.142,
-  //       dash: false,
-  //       info: [
-  //         {
-  //           label: "SB",
-  //           value: "IPG-2-16",
-  //         },
-  //         {
-  //           label: "Data trem pronto",
-  //           value: "2025-05-07T07:00-03:00[America/Sao_Paulo]",
-  //         },
-  //         {
-  //           label: "Destino",
-  //           value: "IPG-2",
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       xi: "2025-05-07T07:12:05-03:00",
-  //       xf: "2025-05-07T07:11:38-03:00",
-  //       yi: 23.142,
-  //       yf: 28.304,
-  //       dash: false,
-  //       info: [
-  //         {
-  //           label: "SB",
-  //           value: "IUF-IPG-1",
-  //         },
-  //         {
-  //           label: "Data trem pronto",
-  //           value: "2025-05-07T07:00-03:00[America/Sao_Paulo]",
-  //         },
-  //         {
-  //           label: "Destino",
-  //           value: "IUF-IPG",
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       xi: "2025-05-07T07:11:38-03:00",
-  //       xf: "2025-05-07T07:17:05-03:00",
-  //       yi: 28.304,
-  //       yf: 28.417,
-  //       dash: false,
-  //       info: [
-  //         {
-  //           label: "SB",
-  //           value: "IUF-2",
-  //         },
-  //         {
-  //           label: "Data trem pronto",
-  //           value: "2025-05-07T07:00-03:00[America/Sao_Paulo]",
-  //         },
-  //         {
-  //           label: "Destino",
-  //           value: "IUF",
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       xi: "2025-05-07T07:17:05-03:00",
-  //       xf: "2025-05-07T07:33:55-03:00",
-  //       yi: 28.417,
-  //       yf: 29.982,
-  //       dash: false,
-  //       info: [
-  //         {
-  //           label: "SB",
-  //           value: "IBA-IUF-1",
-  //         },
-  //         {
-  //           label: "Data trem pronto",
-  //           value: "2025-05-07T07:00-03:00[America/Sao_Paulo]",
-  //         },
-  //         {
-  //           label: "Destino",
-  //           value: "IBA-IUF",
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       xi: "2025-05-07T07:33:55-03:00",
-  //       xf: "2025-05-07T07:37:00-03:00",
-  //       yi: 29.982,
-  //       yf: 35.997,
-  //       dash: false,
-  //       info: [
-  //         {
-  //           label: "SB",
-  //           value: "IBA-SUZ-1",
-  //         },
-  //         {
-  //           label: "Data trem pronto",
-  //           value: "2025-05-07T07:00-03:00[America/Sao_Paulo]",
-  //         },
-  //         {
-  //           label: "Destino",
-  //           value: "IBA",
-  //         },
-  //       ],
-  //     },
-  //   ],
-  // },
-  // {
-  //   name: "HPU0130",
-  //   color: "#800000",
-  //   segments: [
-  //     {
-  //       xi: "2025-05-07T07:31:23-03:00",
-  //       xf: "2025-05-07T07:36:35-03:00",
-  //       yi: 23.142,
-  //       yf: 23.142,
-  //       dash: false,
-  //       info: [
-  //         {
-  //           label: "SB",
-  //           value: "IPG-2-16",
-  //         },
-  //         {
-  //           label: "Data trem pronto",
-  //           value: "2025-05-07T07:00-03:00[America/Sao_Paulo]",
-  //         },
-  //         {
-  //           label: "Destino",
-  //           value: "IPG-2",
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       xi: "2025-05-07T07:36:35-03:00",
-  //       xf: "2025-05-07T07:36:43-03:00",
-  //       yi: 23.142,
-  //       yf: 28.304,
-  //       dash: false,
-  //       info: [
-  //         {
-  //           label: "SB",
-  //           value: "IUF-IPG-1",
-  //         },
-  //         {
-  //           label: "Data trem pronto",
-  //           value: "2025-05-07T07:00-03:00[America/Sao_Paulo]",
-  //         },
-  //         {
-  //           label: "Destino",
-  //           value: "IUF-IPG",
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       xi: "2025-05-07T07:37:35-03:00",
-  //       xf: "2025-05-07T08:10:51-03:00",
-  //       yi: 28.304,
-  //       yf: 28.304,
-  //       dash: false,
-  //       info: [
-  //         {
-  //           label: "SB",
-  //           value: "IUF-1",
-  //         },
-  //         {
-  //           label: "Data trem pronto",
-  //           value: "2025-05-07T07:00-03:00[America/Sao_Paulo]",
-  //         },
-  //         {
-  //           label: "Destino",
-  //           value: "IUF-IPG",
-  //         },
-  //       ],
-  //     },
-  //   ],
-  // },
-] as IDataGHT[];
 
-const restricts = [
+  // TREM 7: NOT0888 - Noturno com parada para cruzamento
   {
-    name: "INTERDICAO ",
+    id: "7",
+    name: "NOT0888",
+    color: "#191970",
+    type: "Noturno",
+    segments: [
+      // Movimento inicial
+      {
+        id: "1",
+        xi: "2025-05-07T02:45:00-03:00",
+        xf: "2025-05-07T05:30:00-03:00",
+        yi: 25.0,
+        yf: 30.0,
+        dash: false,
+        color: "#191970",
+        info: [
+          { label: "SB", value: "NIGHT-FREIGHT-1" },
+          { label: "Cargas", value: "Frigoríficas" },
+        ],
+      },
+      // Parada para cruzamento
+      {
+        id: "2",
+        xi: "2025-05-07T05:30:00-03:00",
+        xf: "2025-05-07T05:38:00-03:00",
+        yi: 30.0,
+        yf: 30.0, // PARADO - com atividade
+        dash: false,
+        color: "#191970",
+        info: [
+          { label: "SB", value: "NIGHT-CROSSING" },
+          { label: "Status", value: "Aguardando cruzamento" },
+        ],
+        activities: [
+          {
+            id: "act6",
+            type: "parada",
+            position: 0.5, // Centralizada
+            info: [
+              { label: "Tipo", value: "Parada para cruzamento" },
+              { label: "Duração", value: "8min" },
+              { label: "Aguardo", value: "Trem prioritário" },
+            ],
+            color: "#FF69B4",
+          },
+        ],
+      },
+      // Continuação
+      {
+        id: "3",
+        xi: "2025-05-07T05:38:00-03:00",
+        xf: "2025-05-07T09:15:00-03:00",
+        yi: 30.0,
+        yf: 35.5,
+        dash: false,
+        color: "#191970",
+        info: [
+          { label: "SB", value: "NIGHT-FINAL" },
+          { label: "Destino", value: "Terminal noturno" },
+        ],
+      },
+    ],
+  },
+
+  // TREM 8: MUL0456 - Multimodal SEM ATIVIDADES (movimento contínuo)
+  {
+    id: "8",
+    name: "MUL0456",
+    color: "#8B4513",
+    type: "Multimodal",
+    segments: [
+      {
+        id: "1",
+        xi: "2025-05-07T12:00:00-03:00",
+        xf: "2025-05-07T13:30:00-03:00",
+        yi: 8.5,
+        yf: 15.2,
+        dash: false,
+        color: "#8B4513",
+        info: [
+          { label: "SB", value: "MULTI-1" },
+          { label: "Cargas", value: "Mista" },
+        ],
+      },
+      {
+        id: "2",
+        xi: "2025-05-07T13:30:00-03:00",
+        xf: "2025-05-07T15:45:00-03:00",
+        yi: 15.2,
+        yf: 28.0,
+        dash: false,
+        color: "#8B4513",
+        info: [{ label: "SB", value: "MULTI-2" }],
+      },
+      {
+        id: "3",
+        xi: "2025-05-07T15:45:00-03:00",
+        xf: "2025-05-07T17:00:00-03:00",
+        yi: 28.0,
+        yf: 38.5,
+        dash: false,
+        color: "#8B4513",
+        info: [{ label: "SB", value: "MULTI-3-FINAL" }],
+      },
+    ],
+  },
+
+  // TREM 9: TST0001 - Teste com parada para teste completo
+  {
+    id: "9",
+    name: "TST0001",
+    color: "#FF1493",
+    type: "Teste",
+    segments: [
+      {
+        id: "1",
+        xi: "2025-05-07T13:00:00-03:00",
+        xf: "2025-05-07T15:00:00-03:00",
+        yi: 12.0,
+        yf: 12.0, // PARADO - com atividade
+        dash: false,
+        color: "#FF1493",
+        info: [
+          { label: "SB", value: "TEST-COMPLETE" },
+          { label: "Status", value: "Teste em andamento" },
+        ],
+        activities: [
+          {
+            id: "act7",
+            type: "parada",
+            position: 0.5, // Centralizada
+            info: [
+              { label: "Tipo", value: "Parada para teste completo" },
+              { label: "Duração", value: "2h" },
+              { label: "Sistema", value: "ATC/ATP + Freios" },
+            ],
+            color: "#FF0000",
+          },
+        ],
+      },
+    ],
+  },
+
+  // TREM 10: HOR0123 - Horizontal com parada para manobra
+  {
+    id: "10",
+    name: "HOR0123",
+    color: "#9370DB",
+    type: "Horizontal",
+    segments: [
+      {
+        id: "1",
+        xi: "2025-05-07T15:00:00-03:00",
+        xf: "2025-05-07T16:00:00-03:00",
+        yi: 25.5,
+        yf: 25.5, // PARADO - com atividade
+        dash: false,
+        color: "#9370DB",
+        info: [
+          { label: "SB", value: "HORIZONTAL-MANEUVER" },
+          { label: "Status", value: "Manobra de pátio" },
+        ],
+        activities: [
+          {
+            id: "act8",
+            type: "parada",
+            position: 0.5, // Centralizada
+            info: [
+              { label: "Tipo", value: "Parada para manobra" },
+              { label: "Duração", value: "1h" },
+              { label: "Operação", value: "Formação de comboio" },
+            ],
+            color: "#BA55D3",
+          },
+        ],
+      },
+    ],
+  },
+
+  // TREM 11: LNG0999 - Longa distância com parada noturna
+  {
+    id: "11",
+    name: "LNG0999",
+    color: "#2E8B57",
+    type: "Longa_Distância",
+    segments: [
+      // Movimento D
+      {
+        id: "1",
+        xi: "2025-05-07T18:00:00-03:00",
+        xf: "2025-05-07T23:00:00-03:00",
+        yi: 2.0,
+        yf: 20.0,
+        dash: false,
+        color: "#2E8B57",
+        info: [
+          { label: "SB", value: "LONG-DIST-D" },
+          { label: "Distância", value: "400 km" },
+        ],
+      },
+      // Parada noturna
+      {
+        id: "2",
+        xi: "2025-05-07T23:00:00-03:00",
+        xf: "2025-05-08T01:00:00-03:00",
+        yi: 20.0,
+        yf: 20.0, // PARADO - com atividade
+        dash: false,
+        color: "#2E8B57",
+        info: [
+          { label: "SB", value: "LONG-NIGHT-STOP" },
+          { label: "Status", value: "Parada noturna" },
+        ],
+        activities: [
+          {
+            id: "act9",
+            type: "parada",
+            position: 0.5, // Centralizada
+            info: [
+              { label: "Tipo", value: "Parada para descanso" },
+              { label: "Duração", value: "2h" },
+              { label: "Motivo", value: "Troca de maquinista" },
+            ],
+            color: "#32CD32",
+          },
+        ],
+      },
+      // Continuação D+1
+      {
+        id: "3",
+        xi: "2025-05-08T01:00:00-03:00",
+        xf: "2025-05-08T06:00:00-03:00",
+        yi: 20.0,
+        yf: 40.0,
+        dash: false,
+        color: "#2E8B57",
+        info: [
+          { label: "SB", value: "LONG-DIST-D1" },
+          { label: "Destino", value: "Terminal final" },
+        ],
+      },
+    ],
+  },
+
+  // TREM 12: MAT0555 - Matutino SEM ATIVIDADES
+  {
+    id: "12",
+    name: "MAT0555",
+    color: "#FF6347",
+    type: "Matutino",
+    segments: [
+      {
+        id: "1",
+        xi: "2025-05-08T05:30:00-03:00",
+        xf: "2025-05-08T09:45:00-03:00",
+        yi: 10.0,
+        yf: 30.0,
+        dash: false,
+        color: "#FF6347",
+        info: [
+          { label: "SB", value: "MORNING-SERVICE" },
+          { label: "Horário", value: "Pico matutino" },
+        ],
+      },
+    ],
+  },
+
+  // TREM 13: SHT0111 - Shuttle com parada operacional
+  {
+    id: "13",
+    name: "SHT0111",
+    color: "#4169E1",
+    type: "Shuttle",
+    segments: [
+      {
+        id: "1",
+        xi: "2025-05-08T16:00:00-03:00",
+        xf: "2025-05-08T17:00:00-03:00",
+        yi: 18.0,
+        yf: 18.0, // PARADO - com atividade
+        dash: false,
+        color: "#4169E1",
+        info: [
+          { label: "SB", value: "SHUTTLE-OPERATION" },
+          { label: "Status", value: "Operação shuttle" },
+        ],
+        activities: [
+          {
+            id: "act10",
+            type: "parada",
+            position: 0.5, // Centralizada
+            info: [
+              { label: "Tipo", value: "Parada para operação shuttle" },
+              { label: "Duração", value: "1h" },
+              { label: "Serviço", value: "Transporte interno" },
+            ],
+            color: "#1E90FF",
+          },
+        ],
+      },
+    ],
+  },
+
+  // TREM 14: ULT1000 - Ultra longa distância SEM ATIVIDADES
+  {
+    id: "14",
+    name: "ULT1000",
+    color: "#20B2AA",
+    type: "Ultra_Longa_Distância",
+    segments: [
+      {
+        id: "1",
+        xi: "2025-05-08T20:00:00-03:00",
+        xf: "2025-05-09T08:00:00-03:00",
+        yi: 5.0,
+        yf: 38.0,
+        dash: false,
+        color: "#20B2AA",
+        info: [
+          { label: "SB", value: "ULTRA-LONG-1" },
+          { label: "Distância", value: "1200 km" },
+          { label: "Tipo", value: "Transcontinental" },
+        ],
+      },
+    ],
+  },
+
+  // TREM 15: AFT0666 - Apoio com parada logística
+  {
+    id: "15",
+    name: "AFT0666",
+    color: "#B22222",
+    type: "Apoio",
+    segments: [
+      {
+        id: "1",
+        xi: "2025-05-08T08:00:00-03:00",
+        xf: "2025-05-08T09:00:00-03:00",
+        yi: 35.0,
+        yf: 35.0, // PARADO - com atividade
+        dash: false,
+        color: "#B22222",
+        info: [
+          { label: "SB", value: "SUPPORT-LOGISTICS" },
+          { label: "Status", value: "Apoio logístico" },
+        ],
+        activities: [
+          {
+            id: "act11",
+            type: "parada",
+            position: 0.5, // Centralizada
+            info: [
+              { label: "Tipo", value: "Parada para apoio logístico" },
+              { label: "Duração", value: "1h" },
+              { label: "Operação", value: "Carregamento equipamentos" },
+            ],
+            color: "#DC143C",
+          },
+        ],
+      },
+    ],
+  },
+];
+
+const restricts: IRestrictionsGHT[] = [
+  // Restrição 1: Original - cruza oficialização
+  {
+    id: "1",
+    name: "INTERDIÇÃO IPG-1",
     color: "#008000CC",
     xi: "2025-05-07T02:32:00-03:00",
     xf: "2025-05-07T05:32:00-03:00",
     yi: 26.642,
     yf: 28.304,
     info: [
-      {
-        label: "SB",
-        value: "IPG-1",
-      },
+      { label: "SB", value: "IPG-1" },
+      { label: "Motivo", value: "Manutenção preventiva" },
     ],
   },
-  //   {
-  //     name: "INTERDICAO ",
-  //     color: "#008000CC",
-  //     xi: "2024-02-15T08:38:03-03:00",
-  //     xf: "2024-02-15T16:00:00-03:00",
-  //     yi: 26.642,
-  //     yf: 28.304,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "IPG-1, IPG-2",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "INTERDICAO ",
-  //     color: "#008000CC",
-  //     xi: "2024-02-15T08:38:03-03:00",
-  //     xf: "2024-02-15T14:34:06-03:00",
-  //     yi: 9.935,
-  //     yf: 7.965,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "ICB-KM10-1, ICB-KM8-1, ICB-KM8-IQA-1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "INTERDICAO ",
-  //     color: "#008000CC",
-  //     xi: "2024-02-15T14:09:00-03:00",
-  //     xf: "2024-02-15T15:00:00-03:00",
-  //     yi: 3.957,
-  //     yf: 4.12,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "IQA-1, IQA-2",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-15T18:30:00-03:00",
-  //     xf: "2024-02-15T19:00:00-03:00",
-  //     yi: 26.642,
-  //     yf: 28.304,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "IPG-1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "INTERDICAO ",
-  //     color: "#FF8000CC",
-  //     xi: "2024-02-16T04:00:00-03:00",
-  //     xf: "2024-02-16T20:00:00-03:00",
-  //     yi: 12.243,
-  //     yf: 13.751,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "ZPG-ICB-1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-16T05:00:00-03:00",
-  //     xf: "2024-02-16T05:30:00-03:00",
-  //     yi: 12.243,
-  //     yf: 13.751,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "ZPG-ICB-1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-16T05:00:00-03:00",
-  //     xf: "2024-02-16T06:00:00-03:00",
-  //     yi: 20.86,
-  //     yf: 22.642,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "IPG-IAA-1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-16T06:00:00-03:00",
-  //     xf: "2024-02-16T06:15:00-03:00",
-  //     yi: 35.997,
-  //     yf: 37.657,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "IBA-1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-16T06:00:00-03:00",
-  //     xf: "2024-02-16T06:30:00-03:00",
-  //     yi: 16.935,
-  //     yf: 18.704,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "IAA-3",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-16T06:00:00-03:00",
-  //     xf: "2024-02-16T06:30:00-03:00",
-  //     yi: 35.997,
-  //     yf: 37.657,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "IBA-1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-16T06:00:00-03:00",
-  //     xf: "2024-02-16T06:30:00-03:00",
-  //     yi: 16.935,
-  //     yf: 18.704,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "IAA-1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-16T06:00:00-03:00",
-  //     xf: "2024-02-16T06:30:00-03:00",
-  //     yi: 12.057,
-  //     yf: 12.243,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "ICB-2",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-16T06:00:00-03:00",
-  //     xf: "2024-02-16T06:30:00-03:00",
-  //     yi: 3.957,
-  //     yf: 4.12,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "IQA-1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-16T06:00:00-03:00",
-  //     xf: "2024-02-16T06:30:00-03:00",
-  //     yi: 29.287,
-  //     yf: 29.882,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "IUF-1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-16T06:00:00-03:00",
-  //     xf: "2024-02-16T07:00:00-03:00",
-  //     yi: 29.882,
-  //     yf: 35.997,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "IBA-IUF-1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-16T07:00:00-03:00",
-  //     xf: "2024-02-16T07:30:00-03:00",
-  //     yi: 13.751,
-  //     yf: 16.3,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "ZPG-1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-16T07:00:00-03:00",
-  //     xf: "2024-02-16T07:30:00-03:00",
-  //     yi: 42.896,
-  //     yf: 45.304,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "ICZ-1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-16T07:00:00-03:00",
-  //     xf: "2024-02-16T08:00:00-03:00",
-  //     yi: 29.882,
-  //     yf: 35.997,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "IBA-IUF-1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-16T07:00:00-03:00",
-  //     xf: "2024-02-16T08:30:00-03:00",
-  //     yi: 12.243,
-  //     yf: 13.751,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "ZPG-ICB-2",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "INTERDICAO ",
-  //     color: "#FF8000CC",
-  //     xi: "2024-02-16T07:00:00-03:00",
-  //     xf: "2024-02-16T10:00:00-03:00",
-  //     yi: 35.997,
-  //     yf: 37.657,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "IBA-3, IBA-SUZ-1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: "CONDICIONAL ",
-  //     color: "#FFFF00CC",
-  //     xi: "2024-02-16T08:00:00-03:00",
-  //     xf: "2024-02-16T08:15:00-03:00",
-  //     yi: 16.935,
-  //     yf: 18.704,
-  //     info: [
-  //       {
-  //         label: "SB",
-  //         value: "IAA-1",
-  //       },
-  //     ],
-  //   },
+
+  // Restrição 2: Depois da oficialização
+  {
+    id: "2",
+    name: "OBRAS ICB-3",
+    color: "#FF4500CC",
+    xi: "2025-05-07T08:00:00-03:00",
+    xf: "2025-05-07T12:00:00-03:00",
+    yi: 5.0,
+    yf: 8.5,
+    info: [
+      { label: "SB", value: "ICB-3" },
+      { label: "Motivo", value: "Obras de sinalização" },
+      { label: "Responsável", value: "Engenharia" },
+    ],
+  },
+
+  // Restrição 3: Longa duração cruzando oficialização
+  {
+    id: "3",
+    name: "MANUTENÇÃO ZPG-GERAL",
+    color: "#8B0000CC",
+    xi: "2025-05-07T06:00:00-03:00",
+    xf: "2025-05-07T18:00:00-03:00",
+    yi: 15.0,
+    yf: 20.0,
+    info: [
+      { label: "SB", value: "ZPG-ALL" },
+      { label: "Motivo", value: "Manutenção de subestação" },
+      { label: "Duração", value: "12 horas" },
+      { label: "Status", value: "Crítica" },
+    ],
+  },
+
+  // Restrição 4: Antes da oficialização
+  {
+    id: "4",
+    name: "BLOQUEIO IQA-2",
+    color: "#FFD700CC",
+    xi: "2025-05-07T04:30:00-03:00",
+    xf: "2025-05-07T06:00:00-03:00",
+    yi: 3.5,
+    yf: 4.2,
+    info: [
+      { label: "SB", value: "IQA-2" },
+      { label: "Motivo", value: "Passagem de trem especial" },
+      { label: "Tipo", value: "Bloqueio temporário" },
+    ],
+  },
+
+  // Restrição 5: Velocidade reduzida
+  {
+    id: "5",
+    name: "VELOCIDADE REDUZIDA IAA-1",
+    color: "#FFA500CC",
+    xi: "2025-05-07T07:00:00-03:00",
+    xf: "2025-05-07T10:00:00-03:00",
+    yi: 22.5,
+    yf: 25.0,
+    info: [
+      { label: "SB", value: "IAA-1" },
+      { label: "Motivo", value: "Geometria da via" },
+      { label: "Velocidade Máxima", value: "40 km/h" },
+    ],
+  },
+
+  // Restrição 6: Manutenção noturna
+  {
+    id: "6",
+    name: "MANUTENÇÃO NOTURNA IBA",
+    color: "#2F4F4FCC",
+    xi: "2025-05-07T22:00:00-03:00",
+    xf: "2025-05-08T06:00:00-03:00",
+    yi: 33.0,
+    yf: 37.0,
+    info: [
+      { label: "SB", value: "IBA-YARD" },
+      { label: "Motivo", value: "Renovação de AMVs" },
+      { label: "Período", value: "Janela noturna" },
+      { label: "Equipe", value: "Via Permanente - Turno C" },
+    ],
+  },
+
+  // Restrição 7: Zona de trabalho D+1
+  {
+    id: "7",
+    name: "RENOVAÇÃO IPG-COMPLEX",
+    color: "#8B4513CC",
+    xi: "2025-05-08T08:00:00-03:00",
+    xf: "2025-05-08T17:00:00-03:00",
+    yi: 30.5,
+    yf: 35.5,
+    info: [
+      { label: "SB", value: "IPG-WORK-ZONE" },
+      { label: "Motivo", value: "Renovação completa de via" },
+      { label: "Equipamentos", value: "RGR, Socadora, Regularizadora" },
+      { label: "Duração", value: "9 horas" },
+    ],
+  },
+
+  // Restrição 8: Múltiplas restrições sobrepostas
+  {
+    id: "8",
+    name: "BLOQUEIO TOTAL ZPG-NORTE",
+    color: "#800080CC",
+    xi: "2025-05-07T16:00:00-03:00",
+    xf: "2025-05-07T20:00:00-03:00",
+    yi: 16.5,
+    yf: 19.0,
+    info: [
+      { label: "SB", value: "ZPG-NORTH" },
+      { label: "Motivo", value: "Substituição de trilhos" },
+      { label: "Tipo", value: "Bloqueio total" },
+    ],
+  },
+
+  // Restrição 9: Obra especial D+1/D+2
+  {
+    id: "9",
+    name: "OBRA ESPECIAL ICB-EXTENSÃO",
+    color: "#B22222CC",
+    xi: "2025-05-08T12:00:00-03:00",
+    xf: "2025-05-09T06:00:00-03:00",
+    yi: 7.0,
+    yf: 12.0,
+    info: [
+      { label: "SB", value: "ICB-EXTENSION" },
+      { label: "Motivo", value: "Construção de nova linha" },
+      { label: "Duração", value: "18 horas" },
+      { label: "Complexidade", value: "Alto" },
+      { label: "Equipes", value: "3 turnos" },
+    ],
+  },
+
+  // Restrição 10: D+2 início
+  {
+    id: "10",
+    name: "PREPARAÇÃO NOVA OPERAÇÃO",
+    color: "#20B2AACC",
+    xi: "2025-05-09T02:00:00-03:00",
+    xf: "2025-05-09T08:00:00-03:00",
+    yi: 1.0,
+    yf: 5.0,
+    info: [
+      { label: "SB", value: "SYSTEM-PREP" },
+      { label: "Motivo", value: "Preparação novo horário operacional" },
+      { label: "Tipo", value: "Sistêmica" },
+      { label: "Prioridade", value: "Estratégica" },
+    ],
+  },
 ];
 
 export const GHTChartMock = {
   yLabels,
   database,
+  dataOfficialization,
   restricts,
   data,
 };

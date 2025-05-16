@@ -1,6 +1,14 @@
-import { IRestrictionsGHT } from "../GHTChart.types";
+/**
+ * Arquivo responsável por desenhar restrições no gráfico GHT.
+ *
+ * As restrições são representadas como retângulos semi-transparentes que cobrem
+ * períodos de tempo e trechos ferroviários onde há limitações operacionais
+ * (como interdições, manutenções, etc.).
+ */
+
+import { IClickableElement, IRestrictionsGHT } from "../GHTChart.types";
 import { getCanvasXFromTime } from "../utils/getCanvasXFromTime";
-import { getCanvasYFromYardValue, IGetCanvasYFromYardValueProps } from "../utils/getCanvasYFromYardValue";
+import { IGetCanvasYFromYardValueProps, getCanvasYFromYardValue } from "../utils/getCanvasYFromYardValue";
 
 export interface IDrawRestrictions {
   ctxChart: CanvasRenderingContext2D;
@@ -13,6 +21,7 @@ export interface IDrawRestrictions {
   padding: number;
   height: number;
   paddingRight: number;
+  selectedElementClickable?: IClickableElement;
 }
 
 export const drawRestrictions = (props: IDrawRestrictions) => {
@@ -27,12 +36,17 @@ export const drawRestrictions = (props: IDrawRestrictions) => {
     height,
     canvasYFromYardValue,
     paddingRight,
+    selectedElementClickable,
   } = props;
 
   restrictions.forEach((restricao) => {
-    const { xi, xf, yi, yf, color } = restricao;
+    const { xi, xf, yi, yf, color, id } = restricao;
+    const restrictionId = id || "";
 
-    // Calcular posições X e Y com base nas datas e valores fornecidos
+    /* 
+      Converte datas de início/fim e valores de pátio em coordenadas do canvas.
+      Calcular posições X e Y com base nas datas e valores fornecidos.
+    */
     let xPosStart = getCanvasXFromTime({
       time: new Date(xi),
       canvasWidth,
@@ -56,20 +70,31 @@ export const drawRestrictions = (props: IDrawRestrictions) => {
       yValue: yf,
     });
 
-    // Limitar as posições X dentro dos limites do gráfico
+    // Clamp: garante que as restrições não ultrapassem os limites visíveis do gráfico
     if (xPosStart < paddingLeft) xPosStart = paddingLeft;
     if (xPosEnd > canvasWidth - paddingRight) xPosEnd = canvasWidth - paddingRight;
-
-    // Limitar as posições Y dentro dos limites do gráfico
     if (yPosStart < padding) yPosStart = padding;
     if (yPosEnd > height - padding) yPosEnd = height - padding;
 
-    // Definir a cor do retângulo
-    ctxChart.fillStyle = color || "rgba(0, 0, 255, 0.3)"; // Use a cor passada ou uma cor padrão com transparência
+    // Desenha retângulo com transparência para não sobrepor completamente os trens
+    ctxChart.fillStyle = color || "rgba(0, 0, 255, 0.3)";
     ctxChart.globalAlpha = 0.3;
-    // Desenhar o retângulo
     ctxChart.beginPath();
     ctxChart.fillRect(xPosStart, yPosStart, xPosEnd - xPosStart, yPosEnd - yPosStart);
     ctxChart.globalAlpha = 1;
+
+    // Aplica borda azul se a restrição estiver selecionada
+    const isSelected =
+      selectedElementClickable &&
+      selectedElementClickable.elementType === "restriction" &&
+      selectedElementClickable.id === restrictionId;
+
+    if (isSelected) {
+      // Desenhar borda azul
+      ctxChart.strokeStyle = "#0066FF"; // Azul brilhante
+      ctxChart.lineWidth = 2;
+      ctxChart.setLineDash([]);
+      ctxChart.strokeRect(xPosStart, yPosStart, xPosEnd - xPosStart, yPosEnd - yPosStart);
+    }
   });
 };

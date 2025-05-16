@@ -1,3 +1,12 @@
+/**
+ * Desenha os eixos do gráfico principal no canvas central (ctxChart).
+ *
+ * Esse método é responsável por:
+ * - Renderizar as linhas verticais do eixo X com as horas
+ * - Renderizar as labels de hora nos extremos inferior e superior
+ * - Renderizar as linhas horizontais do eixo Y baseadas nas posições acumuladas (proporções dos labels)
+ */
+
 import { IAccumulatedYPositions } from "../GHTChart.types";
 
 interface DrawAxesParams {
@@ -13,14 +22,6 @@ interface DrawAxesParams {
   accumulatedYPositions: IAccumulatedYPositions[];
 }
 
-/**
- * Desenha os eixos do gráfico principal no canvas central (ctxChart).
- *
- * Esse método é responsável por:
- * - Renderizar as linhas verticais do eixo X com as horas
- * - Renderizar as labels de hora nos extremos inferior e superior
- * - Renderizar as linhas horizontais do eixo Y baseadas nas posições acumuladas (proporções dos labels)
- */
 export const drawAxesAndGuides = (props: DrawAxesParams) => {
   const {
     ctxChart,
