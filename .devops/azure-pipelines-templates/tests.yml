@@ -1,0 +1,76 @@
+steps:
+- checkout: self
+
+- task: UseNode@1
+  inputs:
+    version: '20.x'
+
+- script: |
+    node --version
+    npm cache clean -f
+    npm install -g n
+    export PATH=/usr/local/bin:$PATH
+    node --version
+    npm cache clean -f
+  displayName: 'Install Node.js'
+
+- script: |
+    npm cache clean -f
+    npm install --legacy-peer-deps
+  displayName: 'Install NPM Dependencies'
+
+# - task: SonarQubePrepare@6
+#   displayName: 'Prepare analysis on SonarQube'
+#   inputs:
+#     SonarQube: '$(SonarQube)'
+#     scannerMode: 'Other'
+#     configMode: 'manual'
+#     projectKey: '$(Build.Repository.Name)-$(Build.SourceBranchName)'
+#     projectName: '$(Build.Repository.Name)-$(Build.SourceBranchName)'
+#     extraProperties: |
+#       sonar.projectVersion=$(Build.BuildId)
+#       sonar.sources=src
+#       sonar.tests=src
+#       sonar.javascript.lcov.reportPaths=$(System.DefaultWorkingDirectory)/coverage/lcov.info
+#       sonar.verbose=true
+      
+- script: |
+    npm test -- --coverage
+  displayName: 'Run Tests with Coverage'
+  env:
+    VITE_REACT_APP_NODE_ENV: $(VITE_REACT_APP_NODE_ENV)
+    VITE_REACT_APP_REDIR_URI: $(VITE_REACT_APP_REDIR_URI)
+    VITE_REACT_APP_ENV: $(VITE_REACT_APP_ENV)
+    VITE_REACT_APP_URL: $(VITE_REACT_APP_URL)
+    VITE_CSP_APP_URL: $(VITE_CSP_APP_URL)
+    VITE_POWERBI_ENVIRONMENT: $(VITE_POWERBI_ENVIRONMENT)
+  continueOnError: true 
+
+- script: |
+    ls -ilhas $(System.DefaultWorkingDirectory)/coverage/
+  displayName: 'List Coverage Report'
+  continueOnError: true
+
+- task: UseDotNet@2
+  displayName: 'InstallDotNetCoreForPublishing'
+  inputs:
+    version: 7.0.x
+
+- task: PublishCodeCoverageResults@2
+  displayName: 'Publish Code Coverage Results'
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/lcov.info'
+    reportDirectory: '$(System.DefaultWorkingDirectory)/coverage'
+    pathToSources: '$(System.DefaultWorkingDirectory)/src'
+    failIfCoverageEmpty: false
+
+# - task: SonarQubeAnalyze@6
+#   displayName: 'Run SonarQube Analysis'
+#   inputs:
+#     jdkversion: 'JAVA_HOME_17_X64'
+
+# - task: SonarQubePublish@6
+#   displayName: 'Publish Quality Gate Result'
+#   inputs:
+#     pollingTimeoutSec: '300'

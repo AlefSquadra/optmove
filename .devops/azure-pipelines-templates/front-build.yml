@@ -1,0 +1,63 @@
+steps:
+- checkout: self
+
+- task: UseNode@1
+  inputs:
+    version: '20.x'
+
+- script: |
+    node --version
+    npm cache clean -f
+    npm install -g n
+    export PATH=/usr/local/bin:$PATH
+    node --version
+    npm cache clean -f
+  displayName: 'Install Node.js'
+
+- script: |
+    npm cache clean -f
+    npm install
+  displayName: 'Install NPM Dependencies'
+
+# - script: |
+#     npm install react-scripts@3.4.1 -g --silent
+#   displayName: 'Install Global React Scripts'
+
+- script: |
+    echo "Building application with the following environment variables:"
+    echo "VITE_REACT_APP_NODE_ENV=$(VITE_REACT_APP_NODE_ENV)"
+    echo "VITE_REACT_APP_REDIR_URI=$(VITE_REACT_APP_REDIR_URI)"
+    echo "VITE_REACT_APP_ENV=$(VITE_REACT_APP_ENV)"
+    echo "VITE_REACT_APP_URL=$(VITE_REACT_APP_URL)"
+    echo "VITE_CSP_APP_URL=$(VITE_CSP_APP_URL)"
+    npm run build
+  displayName: 'Build Application'
+  env:
+    VITE_REACT_APP_NODE_ENV: $(VITE_REACT_APP_NODE_ENV)
+    VITE_REACT_APP_REDIR_URI: $(VITE_REACT_APP_REDIR_URI)
+    VITE_REACT_APP_ENV: $(VITE_REACT_APP_ENV)
+    VITE_REACT_APP_URL: $(VITE_REACT_APP_URL)
+    VITE_CSP_APP_URL: $(VITE_CSP_APP_URL)
+    VITE_POWERBI_ENVIRONMENT: $(VITE_POWERBI_ENVIRONMENT)
+
+- task: PublishPipelineArtifact@1
+  displayName: 'publish build artifact'
+  inputs:
+    targetPath: '$(System.DefaultWorkingDirectory)/build/'
+    artifact: 'build'
+    publishLocation: 'pipeline'
+
+- task: CopyFiles@2
+  displayName: copy static app
+  inputs:
+    SourceFolder: '$(System.DefaultWorkingDirectory)/build/'
+    Contents: '**'
+    TargetFolder: '$(build.artifactstagingdirectory)'
+    CleanTargetFolder: true
+
+- task: PublishPipelineArtifact@1
+  displayName: publish static app
+  inputs:
+    targetPath: '$(build.artifactstagingdirectory)'
+    artifact: 'publish'
+    publishLocation: 'pipeline'

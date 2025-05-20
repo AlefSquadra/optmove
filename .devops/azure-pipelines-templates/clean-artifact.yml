@@ -1,0 +1,14 @@
+steps:
+- checkout: self
+
+- task: DeleteFiles@1
+  displayName: 'Clean Artifacts'
+  inputs:
+    SourceFolder: '$(Build.ArtifactStagingDirectory)'
+    Contents: '**/*'
+    CleanTargetFolder: true
+
+- script: |
+    docker image prune -a -f
+    rm -rf $(System.DefaultWorkingDirectory)/*
+  displayName: 'Clean docker images'
