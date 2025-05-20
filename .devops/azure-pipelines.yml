@@ -23,7 +23,7 @@ variables:
     - group: optmove-front-build-dev
 
 pool:
-  name: $(selfHosted)
+  vmImage: $(poolVmImage)
 
 stages:
   - stage: TESTS
