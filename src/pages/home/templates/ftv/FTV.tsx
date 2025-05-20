@@ -1,6 +1,10 @@
-import { Button, GHTChart, GHTChartMock, OptMoveIcon, Select, Text } from "@optmove/design-system";
+import { Text } from "@optmove/design-system";
+import { useEffect, useRef } from "react";
 import { GroupBoxFieldset } from "../../../../shared/components/GroupBoxFieldset/GroupBoxFieldset";
 import { FTLayout } from "../../../../shared/layouts/FTLayout";
+import { GHTChart } from "../../components/charts";
+import { dataOfficialization, GHTChartMock } from "../../components/charts/GHTChartMock";
+import { GHTChartProvider, useGHTChartContext } from "../../components/charts/provider/GHTChartProvider";
 import { ControlFieldsetGroupBox } from "../../components/ftpFieldsetGroupbox/ControlFieldsetGroupBox";
 import { FilterFieldsetGroupBox } from "../../components/ftpFieldsetGroupbox/FilterFieldsetGroupBox";
 import { SearchFieldsetGroupBox } from "../../components/ftpFieldsetGroupbox/SearchFieldsetGroupBox";
@@ -9,13 +13,18 @@ interface IFTVProps {}
 
 const FTVLayout = (props: IFTVProps) => {
   const {} = props;
+  const { setCursorPointer, selectedElementClickable: lineTrainSelected } = useGHTChartContext();
+  const FTContentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setCursorPointer("auto");
+  }, [setCursorPointer]);
 
   return (
     <>
       <FTLayout.Root>
         <FTLayout.TabPanelLeft>
           <div className="relative">
-            {/* Lista de labels */}
             <div className="flex flex-col gap-0">
               {["Monitoramento de planos", "Atividades alteradas"].map((label, index) => (
                 <div
@@ -28,8 +37,6 @@ const FTVLayout = (props: IFTVProps) => {
                 </div>
               ))}
             </div>
-
-            {/* "teste" ao lado */}
             <div className="absolute left-full top-0 h-full w-full bg-red-100 p-2">teste</div>
           </div>
         </FTLayout.TabPanelLeft>
@@ -38,17 +45,17 @@ const FTVLayout = (props: IFTVProps) => {
           <SearchFieldsetGroupBox />
           <ControlFieldsetGroupBox />
           {/** Plano */}
-          <GroupBoxFieldset.Root className="flex min-h-20 items-center justify-start gap-4 p-2">
+          {/* <GroupBoxFieldset.Root className="flex min-h-20 items-center justify-start gap-4 p-2">
             <GroupBoxFieldset.Legend>Planos</GroupBoxFieldset.Legend>
             <Select label="Pátio destino">
               <option selected value={null}>
                 30/04/2025 10:00
               </option>
             </Select>
-          </GroupBoxFieldset.Root>
+          </GroupBoxFieldset.Root> */}
           {/** Fim Plano */}
           {/** Oficialização */}
-          <GroupBoxFieldset.Root className="col-start-6 min-h-20 items-center justify-start p-2">
+          {/* <GroupBoxFieldset.Root className="col-start-6 min-h-20 items-center justify-start p-2">
             <GroupBoxFieldset.Legend>Oficialização</GroupBoxFieldset.Legend>
             <Text.Label variant="1">16/04/2025 17:39:23</Text.Label>
             <div className="flex items-center justify-between gap-2">
@@ -60,39 +67,44 @@ const FTVLayout = (props: IFTVProps) => {
                 <OptMoveIcon name="FTPSearchEyeIcon" height={24} width={24} />
               </Button>
             </div>
-          </GroupBoxFieldset.Root>
+          </GroupBoxFieldset.Root> */}
           {/** Fim Oficialização */}
           {/** Coordenadas gráfico */}
-          <GroupBoxFieldset.Root className="col-start-7 h-full min-h-20 items-center justify-start">
+          <GroupBoxFieldset.Root className="col-start-7 flex min-h-20 items-center justify-start gap-2 p-2">
             <GroupBoxFieldset.Legend>Coordenadas gráfico</GroupBoxFieldset.Legend>
-            SB: Fora do painel
+            <p>SB: Fora do painel</p>
           </GroupBoxFieldset.Root>
           {/** Fim gráfico */}
         </FTLayout.Header>
-        <FTLayout.Content>
+        <FTLayout.Content ref={FTContentRef} className="flex flex-col">
           <div className="grid w-full grid-cols-12 grid-rows-[32px] bg-yellow-50">
             <Text.Label
               variant="1"
               className="col-span-12 col-start-1 row-start-1 flex items-center justify-center !font-bold text-blue-primary"
             >
-              ICZ_ISN Baixada conceição santos
+              ICZ_ISN Baixada conceição santos {FTContentRef.current?.offsetHeight}
             </Text.Label>
           </div>
           <div className="h-full w-full overflow-hidden">
-            <GHTChart
-              data={GHTChartMock.data}
-              database={GHTChartMock.database}
-              restricoes={GHTChartMock.restricts}
-              yLabels={GHTChartMock.yLabels}
-              defaultHeight={800}
-            />
+            {FTContentRef.current?.offsetHeight && (
+              <GHTChart
+                data={GHTChartMock.data}
+                database={GHTChartMock.database}
+                restrictions={GHTChartMock.restricts}
+                yLabels={GHTChartMock.yLabels}
+                dataOfficialization={dataOfficialization}
+                defaultHeight={FTContentRef.current?.offsetHeight - 47}
+              />
+            )}
           </div>
         </FTLayout.Content>
+
         <FTLayout.Footer className="row-auto flex items-center justify-center">
-          <Text.Body variant="2" className="text-center text-red-700">
-            CNY0159 (CARGA GERAL NAO PREFERENCIAL | Peso = 390 | Comprimento = 0,068) | Chegada: ISN-2-30/04/2025 10:00
-            | Saída: ISN-230/04/2025 10:07 Destino: IPG
-          </Text.Body>
+          {lineTrainSelected.name && (
+            <Text.Body variant="2" className="text-center text-red-700">
+              {`${lineTrainSelected.name} (${lineTrainSelected.data.type}) | Chegada: ${lineTrainSelected.data?.xi} | Saída: ${lineTrainSelected?.data?.xf} Destino: ${lineTrainSelected.data?.info.find((x) => x?.label === "Destino")?.value}`}
+            </Text.Body>
+          )}
         </FTLayout.Footer>
         <FTLayout.TabPanelDown>
           <div className="relative">
@@ -120,7 +132,9 @@ const FTVLayout = (props: IFTVProps) => {
 const FTV = () => {
   return (
     <FTLayout.Provider>
-      <FTVLayout />
+      <GHTChartProvider>
+        <FTVLayout />
+      </GHTChartProvider>
     </FTLayout.Provider>
   );
 };

@@ -11,9 +11,9 @@ export const ApplicationContext = createContext<IApplicationContext | null>(null
 
 export const ApplicationProvider = ({ children }: { children: React.ReactNode }) => {
   const [selectZoneParams, setSelectZoneParams] = useState<ISelectZoneConfig>({
-    profileZone: "defaultProfileZone",
-    mesaZone: "defaultMesaZone",
-    mesaZoneId: "defaultMesaZoneId",
+    profileZone: "Visualizador",
+    mesaZone: "BaixadaSantista",
+    mesaZoneId: "BaixadaSantista",
   });
 
   return (

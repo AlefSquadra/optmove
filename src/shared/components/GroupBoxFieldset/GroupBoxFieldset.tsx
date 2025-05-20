@@ -25,7 +25,7 @@ const GroupBoxFieldsetLegend = (props: IGroupBoxFieldsetLegendProps) => {
   const {} = props;
   return (
     <>
-      <legend className="fieldset-legend">{props?.children}</legend>
+      <legend className="fieldset-legend xl:text-xs">{props?.children}</legend>
     </>
   );
 };

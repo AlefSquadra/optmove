@@ -1,5 +1,5 @@
 import { clsx } from "clsx/lite";
-import { createContext, useContext, useState } from "react";
+import { createContext, forwardRef, useContext, useState } from "react";
 
 interface FTLayoutContext {
   isOpenPanelTabBarLeft: boolean;
@@ -53,19 +53,23 @@ const FTLayoutHeader = (props: { children?: React.ReactNode; className?: string 
   return <div className={clsx("z-10 col-span-12 col-start-1 row-start-1", props?.className)}>{props?.children}</div>;
 };
 
-const FTLayoutContent = (props: { children?: React.ReactNode }) => {
-  const { isOpenPanelTabBarLeft } = useFTLayout();
-  return (
-    <div
-      className={clsx(
-        "z-10 col-span-12 col-start-1 row-start-2",
-        isOpenPanelTabBarLeft ? "col-start-2" : "col-start-1",
-      )}
-    >
-      {props?.children}
-    </div>
-  );
-};
+const FTLayoutContent = forwardRef<HTMLDivElement, { children?: React.ReactNode; className?: string }>(
+  ({ children, className }, ref) => {
+    const { isOpenPanelTabBarLeft } = useFTLayout();
+    return (
+      <div
+        ref={ref}
+        className={clsx(
+          "z-10 col-span-12 col-start-1 row-start-2",
+          isOpenPanelTabBarLeft ? "col-start-2" : "col-start-1",
+          className,
+        )}
+      >
+        {children}
+      </div>
+    );
+  },
+);
 
 const FTLayoutFooter = (props: { children?: React.ReactNode; className?: string }) => {
   return <div className={clsx("z-10 col-span-12 col-start-1 row-start-3", props?.className)}>{props?.children}</div>;
