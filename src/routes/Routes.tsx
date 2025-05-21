@@ -2,8 +2,8 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import { AuthProvider } from "../hooks/auth/useAuth";
 import { Home } from "../pages/home/Home";
-import { LoginPage } from "../pages/login/Login";
-import { NotFound } from "../pages/notFound/NotFound";
+import { LoginPage } from "../pages/login";
+import { NotFound } from "../pages/notFound";
 import { SelectZonePage } from "../pages/selectZone/SelectZonePage";
 import { ProtectedRoute } from "./ProtectedRoute";
 
