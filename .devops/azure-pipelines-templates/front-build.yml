@@ -19,10 +19,6 @@ steps:
     npm install
   displayName: 'Install NPM Dependencies'
 
-# - script: |
-#     npm install react-scripts@3.4.1 -g --silent
-#   displayName: 'Install Global React Scripts'
-
 - script: |
     echo "Building application with the following environment variables:"
     echo "VITE_APP_API_POWER_BI=$(VITE_APP_API_POWER_BI)"
@@ -45,9 +41,14 @@ steps:
     VITE_APP_ENVIRONMENT:         $(VITE_APP_ENVIRONMENT)
     VITE_APP_REDIRECT_URI:        $(VITE_APP_REDIRECT_URI)
 
+- script: |
+    ls $(System.DefaultWorkingDirectory)
+  displayName: 'Dir list'
+
+
 - task: PublishPipelineArtifact@1
-  displayName: publish static app
+  displayName: 'publish build artifact'
   inputs:
-    targetPath: '$(build.artifactstagingdirectory)'
+    targetPath: '$(System.DefaultWorkingDirectory)/build/'
     artifact: 'publish'
     publishLocation: 'pipeline'
