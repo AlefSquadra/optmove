@@ -1,10 +1,12 @@
 import { GHTChart, GHTChartMock, Text } from "@optmove/design-system";
 import { FTLayout, useFTLayout } from "../../../../shared/layouts/FTLayout";
-import { ControlFieldsetGroupBox } from "../../components/ftpFieldsetGroupBox/ControlFieldsetGroupBox";
-import { FilterFieldsetGroupBox } from "../../components/ftpFieldsetGroupBox/FilterFieldsetGroupBox";
-import { GraphicCoordinatesFieldsetGroupBox } from "../../components/ftpFieldsetGroupBox/GraphicCoordinatesFieldsetGroupBox";
-import { OfficializationFieldsetGroupBox } from "../../components/ftpFieldsetGroupBox/OffiializationFieldsetGroupBox";
-import { SearchFieldsetGroupBox } from "../../components/ftpFieldsetGroupBox/SearchFieldsetGroupBox";
+import {
+  ControlFieldsetGroupBox,
+  FilterFieldsetGroupBox,
+  GraphicCoordinatesFieldsetGroupBox,
+  OfficializationFieldsetGroupBox,
+  SearchFieldsetGroupBox,
+} from "../../components/ftpFieldsetGroupBox";
 import { TabBar } from "../../components/ftpTabBar/FTPTabBar";
 import { HeaderContentGHTBox } from "../../components/headerContentGHTBox/HeaderContentGHTBox";
 
