@@ -6,7 +6,7 @@ import {
   GraphicCoordinatesFieldsetGroupBox,
   OfficializationFieldsetGroupBox,
   SearchFieldsetGroupBox,
-} from "../../components/ftpFieldsetGroupBox";
+} from "../../components/ftFieldsetGroupBox";
 import { TabBar } from "../../components/ftpTabBar/FTPTabBar";
 import { HeaderContentGHTBox } from "../../components/headerContentGHTBox/HeaderContentGHTBox";
 
