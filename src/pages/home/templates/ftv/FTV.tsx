@@ -9,7 +9,7 @@ import {
   ControlFieldsetGroupBox,
   FilterFieldsetGroupBox,
   SearchFieldsetGroupBox,
-} from "../../components/ftpFieldsetGroupBox";
+} from "../../components/ftFieldsetGroupBox";
 
 interface IFTVProps {}
 
