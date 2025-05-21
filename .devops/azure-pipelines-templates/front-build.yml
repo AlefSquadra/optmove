@@ -46,21 +46,6 @@ steps:
     VITE_APP_REDIRECT_URI:        $(VITE_APP_REDIRECT_URI)
 
 - task: PublishPipelineArtifact@1
-  displayName: 'publish build artifact'
-  inputs:
-    targetPath: '$(System.DefaultWorkingDirectory)/build/'
-    artifact: 'build'
-    publishLocation: 'pipeline'
-
-- task: CopyFiles@2
-  displayName: copy static app
-  inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)/build/'
-    Contents: '**'
-    TargetFolder: '$(build.artifactstagingdirectory)'
-    CleanTargetFolder: true
-
-- task: PublishPipelineArtifact@1
   displayName: publish static app
   inputs:
     targetPath: '$(build.artifactstagingdirectory)'
