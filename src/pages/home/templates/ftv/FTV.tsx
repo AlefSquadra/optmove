@@ -5,9 +5,9 @@ import { FTLayout } from "../../../../shared/layouts/FTLayout";
 import { GHTChart } from "../../components/charts";
 import { dataOfficialization, GHTChartMock } from "../../components/charts/GHTChartMock";
 import { GHTChartProvider, useGHTChartContext } from "../../components/charts/provider/GHTChartProvider";
-import { ControlFieldsetGroupBox } from "../../components/ftpFieldsetGroupbox/ControlFieldsetGroupBox";
-import { FilterFieldsetGroupBox } from "../../components/ftpFieldsetGroupbox/FilterFieldsetGroupBox";
-import { SearchFieldsetGroupBox } from "../../components/ftpFieldsetGroupbox/SearchFieldsetGroupBox";
+import { ControlFieldsetGroupBox } from "../../components/ftpFieldsetGroupBox/ControlFieldsetGroupBox";
+import { FilterFieldsetGroupBox } from "../../components/ftpFieldsetGroupBox/FilterFieldsetGroupBox";
+import { SearchFieldsetGroupBox } from "../../components/ftpFieldsetGroupBox/SearchFieldsetGroupBox";
 
 interface IFTVProps {}
 
