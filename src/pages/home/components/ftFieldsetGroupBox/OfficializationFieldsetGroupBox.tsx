@@ -1,4 +1,4 @@
-import { Button, OptMoveIcon, Text } from "@optmove/design-system";
+import { OptButton, OptMoveIcon, Text } from "@optmoves/index";
 import { GroupBoxFieldset } from "../../../../shared/components/GroupBoxFieldset/GroupBoxFieldset";
 
 interface IOfficializationFieldsetGroupBoxProps {}
@@ -16,9 +16,9 @@ const OfficializationFieldsetGroupBox = (props: IOfficializationFieldsetGroupBox
             <Text.Label variant="1">Mesa 4</Text.Label>
             <Text.Label variant="1">100%</Text.Label>
           </div>
-          <Button variant="outlined" className="h-6 border-none p-0">
+          <OptButton variant="outlined" className="h-6 border-none p-0">
             <OptMoveIcon name="FTPSearchEyeIcon" height={24} width={24} />
-          </Button>
+          </OptButton>
         </div>
       </GroupBoxFieldset.Root>
     </>

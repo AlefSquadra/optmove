@@ -1,4 +1,4 @@
-import { Button, Dropdown, OptMoveIcon, Text } from "@optmove/design-system";
+import { Dropdown, OptButton, OptMoveIcon, Text } from "@optmoves/index";
 import { useState } from "react";
 import { GroupBoxFieldset } from "../../../../shared/components/GroupBoxFieldset/GroupBoxFieldset";
 import { SecurityComponent } from "../../../../shared/components/securityComponent/SecurityComponent";
@@ -35,12 +35,12 @@ const ControlFieldsetGroupBox = (props: IControlFieldsetGroupBoxProps) => {
               </Dropdown.Item>
             </Dropdown.Content>
           </Dropdown.Root>
-          <Button variant="outlined" className="h-6 border-none p-0" onClick={() => setIsOpen(true)}>
+          <OptButton variant="outlined" className="h-6 border-none p-0" onClick={() => setIsOpen(true)}>
             <img src="/optmove-icons-svg/tile020.svg" width={24} />
-          </Button>
-          <Button variant="outlined" className="h-6 border-none p-0">
+          </OptButton>
+          <OptButton variant="outlined" className="h-6 border-none p-0">
             <OptMoveIcon name="FTPBarrierYellowIcon" height={24} width={24} />
-          </Button>
+          </OptButton>
           <Dropdown.Root placement="bottom">
             <Dropdown.Trigger>
               <OptMoveIcon name="FTPEoCircleMinus" height={24} width={24} />
@@ -50,38 +50,38 @@ const ControlFieldsetGroupBox = (props: IControlFieldsetGroupBoxProps) => {
               <Dropdown.Item onClick={() => setIsOpenPanelTabBarLeft((prev) => !prev)}>Criar retenção</Dropdown.Item>
             </Dropdown.Content>
           </Dropdown.Root>
-          <Button variant="outlined" className="h-6 border-none p-0">
+          <OptButton variant="outlined" className="h-6 border-none p-0">
             <img src="/optmove-icons-svg/tile015.svg" width={24} />
-          </Button>
-          <Button variant="outlined" className="h-6 border-none p-0">
+          </OptButton>
+          <OptButton variant="outlined" className="h-6 border-none p-0">
             <OptMoveIcon name="FTPGraphProgress" height={24} width={24} />
-          </Button>
-          <Button variant="outlined" className="h-6 border-none p-0">
+          </OptButton>
+          <OptButton variant="outlined" className="h-6 border-none p-0">
             <img src="/optmove-icons-svg/tile035.svg" width={24} />
-          </Button>
-          <Button variant="outlined" className="h-6 border-none p-0">
+          </OptButton>
+          <OptButton variant="outlined" className="h-6 border-none p-0">
             <img src="/optmove-icons-svg/tile008.svg" width={24} />
-          </Button>
+          </OptButton>
           {/** Ocupação de patios */}
-          <Button
+          <OptButton
             variant="outlined"
             className="h-6 border-none p-0"
             onClick={() => setIsPanelOpenDown((prev) => !prev)}
           >
             <img src="/optmove-icons-svg/tile031.svg" width={24} />
-          </Button>
-          <Button variant="outlined" className="h-6 border-none p-0">
+          </OptButton>
+          <OptButton variant="outlined" className="h-6 border-none p-0">
             <OptMoveIcon name="FTPSaveDisk" height={24} width={24} />
-          </Button>
-          <Button variant="outlined" className="h-6 border-none p-0">
+          </OptButton>
+          <OptButton variant="outlined" className="h-6 border-none p-0">
             <OptMoveIcon name="FTPClosedLockIcon" height={24} width={24} color="red" />
-          </Button>
-          <Button variant="outlined" className="h-6 border-none p-0">
+          </OptButton>
+          <OptButton variant="outlined" className="h-6 border-none p-0">
             <OptMoveIcon name="FTPHandGivingBeauty" height={24} width={24} />
-          </Button>
-          <Button variant="outlined" className="h-6 border-none p-0">
+          </OptButton>
+          <OptButton variant="outlined" className="h-6 border-none p-0">
             <OptMoveIcon name="FTPExcel" height={24} width={24} />
-          </Button>
+          </OptButton>
           <Dropdown.Root placement="bottom">
             <Dropdown.Trigger>
               <img src={"/optmove-icons-svg/tile025.svg"} height={24} width={24} />
@@ -99,9 +99,9 @@ const ControlFieldsetGroupBox = (props: IControlFieldsetGroupBoxProps) => {
         </SecurityComponent>
 
         <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("Visualizador").result}>
-          <Button variant="outlined" className="h-6 border-none p-0">
+          <OptButton variant="outlined" className="h-6 border-none p-0">
             <OptMoveIcon name="FTPGraphProgress" height={24} width={24} />
-          </Button>
+          </OptButton>
           <img src="/optmove-icons-svg/tile034.svg" alt="tile034" className="h-6 w-6" />
           <img src="/optmove-icons-svg/tile031.svg" alt="tile031" className="h-6 w-6" />
           <img src="/optmove-icons-svg/tile035.svg" alt="tile035" className="h-6 w-6" />

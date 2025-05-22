@@ -7,4 +7,7 @@ export const setBackendToken = (token: string) => {
   localStorage.setItem("apiAccessToken", token);
 };
 
-export const apiClient = new HttpClient(import.meta.env.VITE_APP_BASE_URL_BACKEND, () => backendToken);
+export const apiClient = new HttpClient(
+  import.meta.env.VITE_APP_BASE_URL_BACKEND ?? import.meta.env.VITE_APP_BASE_URL_BACKEND_LOCAL,
+  () => backendToken,
+);

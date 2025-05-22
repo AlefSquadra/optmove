@@ -1,4 +1,4 @@
-import { Text } from "@optmove/design-system";
+import { Text } from "@optmoves/index";
 
 interface IHeaderContentGHTBoxProps {}
 
