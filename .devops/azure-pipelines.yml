@@ -1,84 +1,55 @@
 trigger:
-  - $(branch)
-
+  - develop
+  - main
+  - homolog
+  - hotfix/*
+  - fetuare/*
+  - devops/*
+  
 resources:
   - repo: self
 
 variables:
-  - name: JAVA_HOME_17_X64
-    value: /usr/lib/jvm/java-17-openjdk-amd64/
+  - name: 'JAVA_HOME_17_X64'
+    value: '/usr/lib/jvm/java-17-openjdk-amd64/'
+  - name: DOCKER_BUILDKIT
+    value: '1'
+  - group: general-pipeline
+  - ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/homolog') }}:
+    - group: optmove-front-build-hom
+  - ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+    - group: optmove-front-build-prd
+  - ${{ else }}:
+    - group: optmove-front-build-dev
+
+pool:
+  vmImage: $(poolVmImage)
 
 stages:
-  - stage: CI
-    displayName: Continuous Integration
+  - stage: TESTS
+    displayName: 'CI Tests'
     jobs:
-      - job: Build
-        displayName: Build and Package
-        pool:
-          name: $(self-hosted)
-
+      - job: Tests
+        displayName: 'Unit Test and SAST'
         steps:
-          # - task: SonarQubePrepare@5
-          #   inputs:
-          #     SonarQube: '$(sc-sonar)'
-          #     scannerMode: 'CLI'
-          #     configMode: 'manual'
-          #     cliProjectKey: 'OPTMOVE-FRONTEND'
-          #     cliProjectName: 'OPTMOVE-FRONTEND'
-          #     cliSources: '.'
-          #     extraProperties: |
-          #       # Additional properties that will be passed to the scanner,
-          #       # Put one key=value per line, example:
-          #       # sonar.exclusions=**/*.bin
-          #       sonar.projectVersion=1.0
-          #       sonar.sources=src
-          #       sonar.tests=tests
-          #       sonar.test.inclusions=/*.spec.ts
-          #       sonar.exclusions='$(SONAR_EXCLUSIONS)'
-          #       sonar.sourceEncoding=UTF-8
-          #       sonar.qualitygate.wait='$(qualitygate)'
-          #       sonar.cs.opencover.reportsPaths=coverage/cobertura-final.json
-          #       sonar.javascript.lcov.reportPaths=coverage/lcov.info
+          - template: azure-pipelines-templates/tests.yml
 
-          # - script: |
-          #     FILTERED_PARAMS=$(echo $SONARQUBE_SCANNER_PARAMS | sed 's/"sonar.branch.name":"[^"]*"\,//g')
-          #     echo "##vso[task.setvariable variable=SONARQUBE_SCANNER_PARAMS]$FILTERED_PARAMS"
-          #   displayName: Filter out non-CE sonar parameters
+  - stage: FRONT_BUILD
+    displayName: 'Building FRONT'
+    jobs:
+      - job: BuildingFront
+        displayName: 'Build and Package FRONT'
+        condition: |
+          or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'),
+             eq(variables['Build.SourceBranch'], 'refs/heads/homolog'),
+             eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+        steps:
+          - template: azure-pipelines-templates/front-build.yml
 
-          # - task: SonarQubeAnalyze@4
-          #   displayName: 'SonarQube code analyze'
-
-          # - task: SonarQubePublish@4
-          #   displayName: Publish Quality Gate Result
-
-          - task: Docker@2
-            displayName: build and push a docker image
-            inputs:
-              containerRegistry: $(sc-registry)
-              repository: $(repository)
-              command: "build"
-              Dockerfile: "$(dockerfile)"
-              buildContext: "."
-              arguments: "--build-arg VITE_APP_API_PTB=$(VITE_APP_API_PTB) --build-arg VITE_APP_AUTHORITY=$(VITE_APP_AUTHORITY) --build-arg VITE_APP_CLIENT_ID=$(VITE_APP_CLIENT_ID)  --build-arg VITE_APP_ENVIRONMENT=$(VITE_APP_ENVIRONMENT)  --build-arg VITE_APP_POST_LOGOUT_REDIRECT_URI=$(VITE_APP_POST_LOGOUT_REDIRECT_URI)  --build-arg VITE_APP_REDIRECT_URI=$(VITE_APP_REDIRECT_URI)  --build-arg VITE_APP_TENANT_ID=$(VITE_APP_TENANT_ID) --build-arg VITE_APP_SCOPE_PORTALBAXAIDA=$(VITE_APP_SCOPE_PORTALBAXAIDA) --build-arg VITE_APP_AUTHORITY=$(VITE_APP_AUTHORITY) --build-arg VITE_APP_POWER_BI_WORKSPACE_ID_GERAL=$(VITE_APP_POWER_BI_WORKSPACE_ID_GERAL) --build-arg VITE_APP_POWER_BI_DATASETS_ID_GERAL=$(VITE_APP_POWER_BI_DATASETS_ID_GERAL) --build-arg VITE_APP_POWER_BI_REPORT_ID_GERAL=$(VITE_APP_POWER_BI_REPORT_ID_GERAL) --build-arg VITE_APP_POWER_BI_WORKSPACE_ID_ANTT=$(VITE_APP_POWER_BI_WORKSPACE_ID_ANTT) --build-arg VITE_APP_POWER_BI_DATASETS_ID_ANTT=$(VITE_APP_POWER_BI_DATASETS_ID_ANTT) --build-arg VITE_APP_POWER_BI_REPORT_ID_ANTT=$(VITE_APP_POWER_BI_REPORT_ID_ANTT) --build-arg VITE_APP_API_POWER_BI=$(VITE_APP_API_POWER_BI)"
-
-          - task: Docker@2
-            displayName: push a docker image
-            inputs:
-              containerRegistry: $(sc-registry)
-              repository: $(repository)
-              command: "push"
-
-          - task: CopyFiles@2
-            displayName: copy Helm Chart
-            inputs:
-              SourceFolder: "./.devops/helm"
-              Contents: "**"
-              TargetFolder: "$(build.artifactstagingdirectory)"
-              CleanTargetFolder: true
-
-          - task: PublishPipelineArtifact@1
-            displayName: publish Helm Chart
-            inputs:
-              targetPath: "$(build.artifactstagingdirectory)"
-              artifact: "helm"
-              publishLocation: "pipeline"
+  # - stage: CLEANING
+  #   displayName: 'Stage cleaning'
+  #   jobs:
+  #     - job: DeleteFiles
+  #       displayName: 'Cleaning ArtifactStagingDirectory'
+  #       steps:
+  #         - template: azure-pipelines-templates/clean-artifact.yml

@@ -1,0 +1,54 @@
+steps:
+- checkout: self
+
+- task: UseNode@1
+  inputs:
+    version: '20.x'
+
+- script: |
+    node --version
+    npm cache clean -f
+    npm install -g n
+    export PATH=/usr/local/bin:$PATH
+    node --version
+    npm cache clean -f
+  displayName: 'Install Node.js'
+
+- script: |
+    npm cache clean -f
+    npm install
+  displayName: 'Install NPM Dependencies'
+
+- script: |
+    echo "Building application with the following environment variables:"
+    echo "VITE_APP_API_POWER_BI=$(VITE_APP_API_POWER_BI)"
+    echo "VITE_APP_API_PTB=$(VITE_APP_API_PTB)"
+    echo "VITE_APP_API_PTB_HOM=$(VITE_APP_API_PTB_HOM)"
+    echo "VITE_APP_AUTHORITY=$(VITE_APP_AUTHORITY)"
+    echo "VITE_APP_BASE_URL_BACKEND=$(VITE_APP_BASE_URL_BACKEND)"
+    echo "VITE_APP_CLIENT_ID=$(VITE_APP_CLIENT_ID)"
+    echo "VITE_APP_ENVIRONMENT=$(VITE_APP_ENVIRONMENT)"
+    echo "VITE_APP_REDIRECT_URI=$(VITE_APP_REDIRECT_URI)"
+    npm run build
+  displayName: 'Build Application'
+  env:
+    VITE_APP_API_POWER_BI:        $(VITE_APP_API_POWER_BI)
+    VITE_APP_API_PTB:             $(VITE_APP_API_PTB)
+    VITE_APP_API_PTB_HOM:         $(VITE_APP_API_PTB_HOM)
+    VITE_APP_AUTHORITY:           $(VITE_APP_AUTHORITY)
+    VITE_APP_BASE_URL_BACKEND:    $(VITE_APP_BASE_URL_BACKEND)
+    VITE_APP_CLIENT_ID:           $(VITE_APP_CLIENT_ID)
+    VITE_APP_ENVIRONMENT:         $(VITE_APP_ENVIRONMENT)
+    VITE_APP_REDIRECT_URI:        $(VITE_APP_REDIRECT_URI)
+
+- script: |
+    ls $(System.DefaultWorkingDirectory)
+  displayName: 'Dir list'
+
+
+- task: PublishPipelineArtifact@1
+  displayName: 'publish build artifact'
+  inputs:
+    targetPath: '$(System.DefaultWorkingDirectory)/dist/'
+    artifact: 'publish'
+    publishLocation: 'pipeline'
