@@ -1,4 +1,4 @@
-import { Login } from "@optmove/design-system";
+import { Login } from "@optmoves/index";
 import { useAuth } from "../../hooks/auth/useAuth";
 
 interface ILoginProps {}

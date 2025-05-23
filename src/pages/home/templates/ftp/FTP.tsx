@@ -1,4 +1,4 @@
-import { GHTChart, GHTChartMock, Text } from "@optmove/design-system";
+import { GHTChart, GHTChartMock, Text } from "@optmoves/index";
 import { FTLayout, useFTLayout } from "../../../../shared/layouts/FTLayout";
 import {
   ControlFieldsetGroupBox,

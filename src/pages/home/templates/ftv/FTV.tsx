@@ -1,5 +1,9 @@
-import { Text } from "@optmove/design-system";
-import { useEffect, useRef } from "react";
+import { LoadingOutlined } from "@ant-design/icons";
+import { OptMoveIcon, Text } from "@optmoves/index";
+import { useQuery } from "@tanstack/react-query";
+import { Button, Modal, Spin } from "antd";
+import { useEffect, useRef, useState } from "react";
+import { SelectZoneService } from "../../../../services/selectZones/SelectZoneService";
 import { GroupBoxFieldset } from "../../../../shared/components/GroupBoxFieldset/GroupBoxFieldset";
 import { FTLayout } from "../../../../shared/layouts/FTLayout";
 import { GHTChart } from "../../components/charts";
@@ -10,6 +14,7 @@ import {
   FilterFieldsetGroupBox,
   SearchFieldsetGroupBox,
 } from "../../components/ftFieldsetGroupBox";
+import { SelectOfficialization } from "../../components/modals/officialization/select-officialization";
 
 interface IFTVProps {}
 
@@ -17,10 +22,65 @@ const FTVLayout = (props: IFTVProps) => {
   const {} = props;
   const { setCursorPointer, selectedElementClickable: lineTrainSelected } = useGHTChartContext();
   const FTContentRef = useRef<HTMLDivElement>(null);
+  const [planParams, setPlanParams] = useState<any[]>([]);
+  const [loadingStage, setLoadingStage] = useState("");
+
+  const fetchDataGHT = useQuery({
+    queryKey: ["ghtData", planParams?.length],
+    queryFn: async () => {
+      setLoadingStage("Carregando trens da malha...");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      setLoadingStage("Processando dados...");
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      setLoadingStage("Plotando gráfico...");
+      const result = await SelectZoneService.getZonePlanner();
+
+      setLoadingStage("");
+      return result;
+    },
+    enabled: !!(planParams?.length && FTContentRef.current?.offsetHeight),
+  });
 
   useEffect(() => {
     setCursorPointer("auto");
   }, [setCursorPointer]);
+
+  const renderContent = () => {
+    if (fetchDataGHT.isLoading) {
+      return (
+        <Modal
+          open={true}
+          footer={null}
+          closable={false}
+          classNames={{
+            content: "p-0",
+          }}
+          width={300}
+          centered
+          maskClosable={false}
+          mask={false}
+        >
+          <div className="flex flex-col items-center p-1">
+            <Spin size="small" indicator={<LoadingOutlined style={{ fontSize: 32 }} spin />} />
+            <div className="mt-1 text-lg text-gray-600">{loadingStage || "Carregando..."}</div>
+          </div>
+        </Modal>
+      );
+    }
+
+    return (
+      <GHTChart
+        data={GHTChartMock.data}
+        database={GHTChartMock.database}
+        restrictions={GHTChartMock.restricts}
+        yLabels={GHTChartMock.yLabels}
+        dataOfficialization={dataOfficialization}
+        defaultHeight={FTContentRef.current?.offsetHeight - 47}
+      />
+    );
+  };
 
   return (
     <>
@@ -57,7 +117,7 @@ const FTVLayout = (props: IFTVProps) => {
           </GroupBoxFieldset.Root> */}
           {/** Fim Plano */}
           {/** Oficialização */}
-          {/* <GroupBoxFieldset.Root className="col-start-6 min-h-20 items-center justify-start p-2">
+          <GroupBoxFieldset.Root className="col-start-6 min-h-20 items-center justify-start p-2">
             <GroupBoxFieldset.Legend>Oficialização</GroupBoxFieldset.Legend>
             <Text.Label variant="1">16/04/2025 17:39:23</Text.Label>
             <div className="flex items-center justify-between gap-2">
@@ -69,7 +129,7 @@ const FTVLayout = (props: IFTVProps) => {
                 <OptMoveIcon name="FTPSearchEyeIcon" height={24} width={24} />
               </Button>
             </div>
-          </GroupBoxFieldset.Root> */}
+          </GroupBoxFieldset.Root>
           {/** Fim Oficialização */}
           {/** Coordenadas gráfico */}
           <GroupBoxFieldset.Root className="col-start-7 flex min-h-20 items-center justify-start gap-2 p-2">
@@ -88,16 +148,7 @@ const FTVLayout = (props: IFTVProps) => {
             </Text.Label>
           </div>
           <div className="h-full w-full overflow-hidden">
-            {FTContentRef.current?.offsetHeight && (
-              <GHTChart
-                data={GHTChartMock.data}
-                database={GHTChartMock.database}
-                restrictions={GHTChartMock.restricts}
-                yLabels={GHTChartMock.yLabels}
-                dataOfficialization={dataOfficialization}
-                defaultHeight={FTContentRef.current?.offsetHeight - 47}
-              />
-            )}
+            {planParams?.length && FTContentRef.current?.offsetHeight ? renderContent() : <></>}
           </div>
         </FTLayout.Content>
 
@@ -110,7 +161,6 @@ const FTVLayout = (props: IFTVProps) => {
         </FTLayout.Footer>
         <FTLayout.TabPanelDown>
           <div className="relative">
-            {/* Lista de labels */}
             <div className="flex flex-row gap-0">
               {["Monitoramento de planos", "Atividades alteradas"].map((label, index) => (
                 <div
@@ -121,12 +171,11 @@ const FTVLayout = (props: IFTVProps) => {
                 </div>
               ))}
             </div>
-
-            {/* "teste" abaixo */}
             <div className="absolute left-0 top-full w-full bg-red-100 p-2">teste</div>
           </div>
         </FTLayout.TabPanelDown>
       </FTLayout.Root>
+      <SelectOfficialization setPlanParams={setPlanParams} planParams={planParams} />
     </>
   );
 };
