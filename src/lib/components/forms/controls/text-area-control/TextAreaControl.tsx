@@ -44,7 +44,7 @@ const TextAreaControl: React.FC<ITextAreaControlProps> = (props) => {
                   const fieldValue = e.target.value;
                   const fieldObj = {};
                   fieldObj[name] = fieldValue;
-                  Form.useFormInstance().setFieldsValue(fieldObj);
+                  //Form.useFormInstance().setFieldsValue(fieldObj);
                 }}
                 {...textAreaProps}
               />

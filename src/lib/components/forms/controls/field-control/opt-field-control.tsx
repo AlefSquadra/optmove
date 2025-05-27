@@ -2,7 +2,8 @@ import { Form } from "antd";
 import type { Rule } from "antd/es/form";
 import { ReactNode } from "react";
 
-export interface IOptFieldControlProps {
+export interface IOptFieldControlProps
+  extends Omit<typeof Form.Item, "name" | "label" | "rules" | "children" | "useStatus"> {
   name: string;
   label?: string;
   className?: string;

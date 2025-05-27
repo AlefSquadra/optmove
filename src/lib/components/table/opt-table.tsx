@@ -1,8 +1,9 @@
 import type { TableProps } from "antd";
 import { Card, Radio, Switch, Table } from "antd";
-
 import { ColumnsType } from "antd/es/table";
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from "react";
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from "react";
+import { Resizable, ResizeCallbackData } from "react-resizable";
+import "react-resizable/css/styles.css";
 import {
   OptTableColumnsType,
   OptTableExpandableConfig,
@@ -12,6 +13,51 @@ import {
   OptTableRowSelection,
   OptTableSizeType,
 } from "./opt-table.types";
+
+// Componente customizado para o header redimensionável
+const ResizableTitle: React.FC<{
+  onResize: (e: React.SyntheticEvent<Element>, data: ResizeCallbackData) => void;
+  width: number;
+  minWidth?: number;
+  maxWidth?: number;
+  [key: string]: any;
+}> = ({ onResize, width, minWidth = 50, maxWidth = 1000, ...restProps }) => {
+  const [resizing, setResizing] = useState(false);
+
+  if (!width) {
+    return <th {...restProps} />;
+  }
+
+  return (
+    <Resizable
+      width={width}
+      height={0}
+      handle={
+        <span
+          className={`react-resizable-handle react-resizable-handle-se ${resizing ? "resizing" : ""}`}
+          style={{
+            position: "absolute",
+            right: -5,
+            bottom: 0,
+            width: 10,
+            height: "100%",
+            cursor: "col-resize",
+            zIndex: 1,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        />
+      }
+      onResize={onResize}
+      onResizeStart={() => setResizing(true)}
+      onResizeStop={() => setResizing(false)}
+      draggableOpts={{ enableUserSelectHack: false }}
+      minConstraints={[minWidth, 0]}
+      maxConstraints={[maxWidth, 0]}
+    >
+      <th {...restProps} style={{ ...restProps.style, userSelect: resizing ? "none" : "auto" }} />
+    </Resizable>
+  );
+};
 
 const ControlItem: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
   <div style={{ marginBottom: 8, marginRight: 16 }}>
@@ -27,6 +73,7 @@ const OptTable = forwardRef(<T extends object = any>(props: OptTableProps<T>, re
     onDataChange,
     onSelectionChange,
     showControls = true,
+    resizableColumns = false,
     defaultSettings = {},
     customTitle,
     customFooter,
@@ -37,6 +84,7 @@ const OptTable = forwardRef(<T extends object = any>(props: OptTableProps<T>, re
   const [columns, setColumnsState] = useState<ColumnsType<T>>(initialColumns);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
+  const [columnWidths, setColumnWidths] = useState<{ [key: string]: number }>({});
 
   const [bordered, setBordered] = useState(defaultSettings.bordered ?? false);
   const [loading, setLoading] = useState(defaultSettings.loading ?? false);
@@ -51,6 +99,37 @@ const OptTable = forwardRef(<T extends object = any>(props: OptTableProps<T>, re
   const [bottom, setBottom] = useState<OptTablePaginationPosition>(defaultSettings.paginationBottom ?? "bottomRight");
   const [yScroll, setYScroll] = useState(defaultSettings.yScroll ?? false);
   const [xScroll, setXScroll] = useState(defaultSettings.xScroll ?? "unset");
+  const [enableResize, setEnableResize] = useState(resizableColumns);
+
+  // Sincroniza as larguras quando as colunas mudam
+  useEffect(() => {
+    if (enableResize) {
+      setColumnWidths((prevWidths) => {
+        const newWidths = { ...prevWidths };
+        let hasNewColumns = false;
+
+        columns.forEach((col: any) => {
+          const key = col.dataIndex || col.key;
+          if (key && !newWidths[key]) {
+            newWidths[key] = col.width || 150;
+            hasNewColumns = true;
+          }
+        });
+
+        // Remove larguras de colunas que não existem mais
+        const currentKeys = columns.map((col: any) => col.dataIndex || col.key).filter(Boolean);
+
+        Object.keys(newWidths).forEach((key) => {
+          if (!currentKeys.includes(key)) {
+            delete newWidths[key];
+            hasNewColumns = true;
+          }
+        });
+
+        return hasNewColumns ? newWidths : prevWidths;
+      });
+    }
+  }, [columns.length, enableResize]); // Usa columns.length ao invés de columns para evitar comparações profundas
 
   const updateData = useCallback(
     (newData: T[]) => {
@@ -58,6 +137,42 @@ const OptTable = forwardRef(<T extends object = any>(props: OptTableProps<T>, re
       onDataChange?.(newData);
     },
     [onDataChange],
+  );
+
+  const handleResize = useCallback(
+    (columnKey: string) =>
+      (e: React.SyntheticEvent<Element>, { size }: ResizeCallbackData) => {
+        setColumnWidths((prev) => ({
+          ...prev,
+          [columnKey]: size.width,
+        }));
+      },
+    [],
+  );
+
+  const mergeColumns = useCallback(
+    (cols: ColumnsType<T>): ColumnsType<T> => {
+      if (!enableResize) {
+        return cols.map((item) => ({ ...item, ellipsis }));
+      }
+
+      return cols.map((col) => {
+        const column = col as any;
+        const key = column.dataIndex || column.key;
+        const width = key ? columnWidths[key] || column.width || 150 : column.width;
+
+        return {
+          ...column,
+          ellipsis,
+          width,
+          onHeaderCell: (col: any) => ({
+            width: width,
+            onResize: handleResize(key),
+          }),
+        };
+      });
+    },
+    [enableResize, ellipsis, columnWidths, handleResize],
   );
 
   useImperativeHandle(
@@ -134,11 +249,14 @@ const OptTable = forwardRef(<T extends object = any>(props: OptTableProps<T>, re
     scroll.x = "100vw";
   }
 
-  const processedColumns = columns.map((item) => ({ ...item, ellipsis }));
-  if (xScroll === "fixed" && processedColumns.length > 0) {
-    processedColumns[0].fixed = true;
-    processedColumns[processedColumns.length - 1].fixed = "right";
-  }
+  const processedColumns = useMemo(() => {
+    const merged = mergeColumns(columns);
+    if (xScroll === "fixed" && merged.length > 0) {
+      merged[0].fixed = true;
+      merged[merged.length - 1].fixed = "right";
+    }
+    return merged;
+  }, [columns, mergeColumns, xScroll]);
 
   const rowSelection: OptTableRowSelection<T> | undefined =
     hasRowSelection ?
@@ -160,6 +278,13 @@ const OptTable = forwardRef(<T extends object = any>(props: OptTableProps<T>, re
       }
     : undefined;
 
+  // Limpa as larguras quando o resize é desabilitado
+  useEffect(() => {
+    if (!enableResize) {
+      setColumnWidths({});
+    }
+  }, [enableResize]);
+
   useEffect(() => {
     setDataState(initialData);
   }, [initialData]);
@@ -179,10 +304,40 @@ const OptTable = forwardRef(<T extends object = any>(props: OptTableProps<T>, re
     pagination: { position: [top, bottom] },
     columns: processedColumns,
     dataSource: data,
+    ...(enableResize && {
+      components: {
+        header: {
+          cell: ResizableTitle,
+        },
+      },
+    }),
   };
 
   return (
     <>
+      <style>
+        {`
+          .react-resizable {
+            position: relative;
+            background-clip: padding-box;
+          }
+          
+          .react-resizable-handle {
+            position: absolute;
+            background-color: transparent;
+            cursor: col-resize;
+          }
+          
+          .react-resizable-handle:hover,
+          .react-resizable-handle.resizing {
+            background-color: #1890ff;
+          }
+          
+          .custom-table-scrollbar .ant-table-header {
+            overflow: hidden !important;
+          }
+        `}
+      </style>
       {showControls && (
         <Card style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "16px 0" }}>
@@ -203,6 +358,9 @@ const OptTable = forwardRef(<T extends object = any>(props: OptTableProps<T>, re
             </ControlItem>
             <ControlItem label="Row Selection">
               <Switch checked={hasRowSelection} onChange={setHasRowSelection} />
+            </ControlItem>
+            <ControlItem label="Resizable Columns">
+              <Switch checked={enableResize} onChange={setEnableResize} />
             </ControlItem>
             <ControlItem label="Fixed Header">
               <Switch checked={yScroll} onChange={setYScroll} />

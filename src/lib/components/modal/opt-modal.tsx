@@ -39,7 +39,7 @@ const WindowHeader = ({ title, onMinimize, onMaximize, onClose }) => {
 
 const OptModal = forwardRef<IOptModalRefProps, IOptModalProps>((props, ref) => {
   const { children, modalTitle, ...modalProps } = props;
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [disabled, setDisabled] = useState(true);
   const [bounds, setBounds] = useState({ left: 0, top: 0, bottom: 0, right: 0 });
   const draggleRef = useRef<HTMLDivElement>(null!);

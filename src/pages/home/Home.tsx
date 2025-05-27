@@ -1,4 +1,3 @@
-import { Navigate } from "react-router-dom";
 import { useApplicationContext } from "../../store/ApplicationProvider";
 import { FTP } from "./templates/ftp/FTP";
 import { FTV } from "./templates/ftv/FTV";
@@ -6,8 +5,8 @@ import { FTV } from "./templates/ftv/FTV";
 interface IHomeProps {}
 
 const zoneComponents: Record<string, JSX.Element> = {
-  PlanejadorCCO: <FTP />,
-  Visualizador: <FTV />,
+  1: <FTP />,
+  2: <FTV />,
 };
 
 const Home = (props: IHomeProps) => {
@@ -15,7 +14,7 @@ const Home = (props: IHomeProps) => {
   const { selectZoneParams } = useApplicationContext();
   const profileZone = selectZoneParams?.profileZone;
 
-  return zoneComponents[profileZone] || <Navigate to="/home" />;
+  return zoneComponents[profileZone];
 };
 
 export { Home };

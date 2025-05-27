@@ -62,5 +62,8 @@ export const theme: ThemeConfig = {
     Menu: {
       itemBorderRadius: 6,
     },
+    Typography: {
+      fontFamily: "Roboto, Helvetica Neue, sans-serif",
+    },
   },
 };

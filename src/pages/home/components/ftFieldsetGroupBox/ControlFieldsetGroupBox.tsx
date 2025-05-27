@@ -20,7 +20,7 @@ const ControlFieldsetGroupBox = (props: IControlFieldsetGroupBoxProps) => {
       <GroupBoxFieldset.Root className="flex min-h-20 items-center justify-start gap-4 p-2">
         <GroupBoxFieldset.Legend>Controles</GroupBoxFieldset.Legend>
 
-        <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("PlanejadorCCO").result}>
+        <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("1").result}>
           <Dropdown.Root placement="bottom">
             <Dropdown.Trigger>
               <OptMoveIcon name="FTPEoCircleGreenLetterP" height={24} width={24} />
@@ -98,7 +98,7 @@ const ControlFieldsetGroupBox = (props: IControlFieldsetGroupBoxProps) => {
           </Dropdown.Root>
         </SecurityComponent>
 
-        <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("Visualizador").result}>
+        <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("2").result}>
           <OptButton variant="outlined" className="h-6 border-none p-0">
             <OptMoveIcon name="FTPGraphProgress" height={24} width={24} />
           </OptButton>

@@ -1,18 +1,21 @@
 /** @type {import('tailwindcss').Config} */
+
+
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
+        "primary-color": "#007fb5",
+        "primary-color-hover": "##016d9b",
         white: {
           DEFAULT: "#FFFFFF",
           background: "#F5F7FA",
         },
         blue: {
           primary: {
-            DEFAULT: "#3B5E88",
-            100: "#3B5E88",
-            200: "#000E31",
+            100: "#007fb5",
+            200: "#3B5E88"
           },
           light: {
             100: "#1F8CEB",
@@ -92,6 +95,7 @@ export default {
           opacity40: "rgba(215, 69, 50, 0.4)",
         },
       },
+
       fontFamily: {
         sans: ["Graphik", "sans-serif"],
         satisfy: ["Satisfy", "serif"],
@@ -100,15 +104,33 @@ export default {
         montserrat: ["Montserrat", "sans-serif"],
         manrope: ["Manrope", "sans-serif"],
         inter: ["Inter", "sans-serif"],
+        Raleway: ["Raleway", "sans-serif"]
       },
+
       boxShadow: {
+        sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+        DEFAULT: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+        md: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+        lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+        xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
         "2xl": "0px 4px 4px rgba(0, 0, 0, 0.05)",
         "3xl": "0px 2px 4px 0px rgba(216, 223, 231, 0.60)",
       },
+
       fontSize: {
+        xs: "0.75rem",
+        sm: "0.875rem",
+        base: "1rem",
+        lg: "1.125rem",
+        xl: "1.25rem",
+        "2xl": "1.5rem",
+        "3xl": "1.875rem",
+        "4xl": "2.25rem",
+        "5xl": "3rem",
         13: "0.8125rem",
         32: "2rem",
       },
+
       width: {
         81: "328px",
       },
@@ -117,12 +139,14 @@ export default {
         20: "20px",
         30: "30px",
       },
+
       padding: {
         14: "14px",
         18: "18px",
         26: "26px",
         34: "34px",
       },
+
       spacing: {
         30: "30px",
       },
