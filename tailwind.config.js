@@ -1,6 +1,5 @@
 /** @type {import('tailwindcss').Config} */
 
-
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
@@ -15,7 +14,7 @@ export default {
         blue: {
           primary: {
             100: "#007fb5",
-            200: "#3B5E88"
+            200: "#3B5E88",
           },
           light: {
             100: "#1F8CEB",
@@ -104,7 +103,7 @@ export default {
         montserrat: ["Montserrat", "sans-serif"],
         manrope: ["Manrope", "sans-serif"],
         inter: ["Inter", "sans-serif"],
-        Raleway: ["Raleway", "sans-serif"]
+        Raleway: ["Raleway", "sans-serif"],
       },
 
       boxShadow: {

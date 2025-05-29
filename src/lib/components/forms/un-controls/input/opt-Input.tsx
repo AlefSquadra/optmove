@@ -17,6 +17,7 @@ export interface IOptInputProps extends InputProps {
   value?: string;
   type?: string;
   className?: string;
+  isFloating?: boolean;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -37,6 +38,7 @@ const OptInput = forwardRef<HTMLInputElement, IOptInputProps>(
       maskPattern,
       onChange,
       onEnter,
+      isFloating = false,
       ...restProps
     }: IOptInputProps,
     ref,
@@ -45,7 +47,7 @@ const OptInput = forwardRef<HTMLInputElement, IOptInputProps>(
 
     const [focused, setFocused] = useState(false);
 
-    const isFloating = focused || maskedValue.length > 0;
+    const hasFloating = (isFloating && focused) || maskedValue.length > 0;
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
       const masked = e.target.value;
@@ -68,16 +70,16 @@ const OptInput = forwardRef<HTMLInputElement, IOptInputProps>(
       >
         <div
           className={clsx(
-            "relative rounded-md border",
+            "relative rounded-md",
 
             disabled && "cursor-not-allowed bg-gray-100",
           )}
         >
-          {label && (
+          {isFloating && label && (
             <label
               className={clsx(
                 "absolute left-3 z-10 bg-white px-1 transition-all",
-                isFloating ? "-top-2 text-xs text-primary-color" : "top-4 text-sm text-gray-400",
+                hasFloating ? "-top-2 text-xs text-primary-color" : "top-4 text-sm text-gray-400",
                 semiBoldLabel && "font-semibold",
                 disabled && "text-gray-400",
               )}
@@ -96,7 +98,10 @@ const OptInput = forwardRef<HTMLInputElement, IOptInputProps>(
             onBlur={() => setFocused(false)}
             onKeyDown={handleKeyDown}
             {...restProps}
-            className={clsx("bg-transparent px-3 py-2", "focus:outline-none focus:ring-0", restProps.classNames)}
+            className={clsx(
+              isFloating && "border bg-transparent px-3 py-2 focus:outline-none focus:ring-0",
+              restProps.classNames,
+            )}
           />
         </div>
         {error && <div className="mt-1 text-xs text-red-500">{error}</div>}

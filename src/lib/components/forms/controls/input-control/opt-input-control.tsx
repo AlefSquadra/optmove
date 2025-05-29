@@ -22,18 +22,18 @@ const OptInputControl = ({
   rules = [],
   ...props
 }: IOptInputControlProps) => {
-  const { inputProps, ...restProps } = props;
+  const { inputProps, isFloating, ...restProps } = props;
   return (
     <OptFieldControl
       name={name}
-      label={props.isFloating ? undefined : label}
+      label={isFloating ? undefined : label}
       className={className}
       fullWidth={fullWidth}
       required={required}
       rules={rules}
       {...restProps}
     >
-      <OptInput label={label} required={required} fullWidth={fullWidth} {...inputProps} />
+      <OptInput isFloating={isFloating} label={label} required={required} fullWidth={fullWidth} {...inputProps} />
     </OptFieldControl>
   );
 };

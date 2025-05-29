@@ -40,7 +40,7 @@ export const LoginMain = ({ children }: MainProps) => (
 
 export const LoginHeader = ({ title = "Service Monitor" }: HeaderProps) => (
   <div className="flex w-full flex-col items-start gap-1">
-    <Title level={2} className="!m-0 text-blue-primary">
+    <Title level={2} className="text-blue-primary !m-0">
       {title}
     </Title>
     <p className="text-gray-500">Bem-vindo(a)!</p>

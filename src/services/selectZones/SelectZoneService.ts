@@ -5,7 +5,7 @@ export const apiClient2 = new HttpClient(import.meta.env.VITE_APP_BASE_URL_BACKE
 
 export const SelectZoneService = {
   getProfilePlanner() {
-    return apiClient2.get<any>("/SelecaoZonas/ProfilePlanne");
+    return apiClient.get<any>("/select-profile-planner");
   },
   getZonePlanner() {
     return apiClient.get<any>("/select-zone-planner");
