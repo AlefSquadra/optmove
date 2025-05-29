@@ -142,7 +142,7 @@ const FTVLayout = (props: IFTVProps) => {
           <div className="grid w-full grid-cols-12 grid-rows-[32px] bg-yellow-50">
             <Text.Label
               variant="1"
-              className="col-span-12 col-start-1 row-start-1 flex items-center justify-center !font-bold text-blue-primary"
+              className="text-blue-primary col-span-12 col-start-1 row-start-1 flex items-center justify-center !font-bold"
             >
               ICZ_ISN Baixada conceição santos {FTContentRef.current?.offsetHeight}
             </Text.Label>
