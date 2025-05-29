@@ -1,4 +1,4 @@
-import { LoginBanner, LoginFooter, LoginForm, LoginHeader, LoginMain, LoginRoot, LoginSocialButtons } from "./Login";
+import { LoginBanner, LoginFooter, LoginForm, LoginHeader, LoginMain, LoginRoot } from "./Login";
 
 export const Login = {
   Root: LoginRoot,
@@ -6,6 +6,6 @@ export const Login = {
   Main: LoginMain,
   Header: LoginHeader,
   Form: LoginForm,
-  SocialButtons: LoginSocialButtons,
+  // SocialButtons: LoginSocialButtons,
   Footer: LoginFooter,
 };

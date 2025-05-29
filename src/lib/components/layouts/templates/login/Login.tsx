@@ -1,21 +1,15 @@
-import { Form } from "antd";
-import { OptButton, Text } from "../../..";
+import { Button, Card, Form, Input, Typography } from "antd";
 import { LoginBackground, MRSLogo } from "../../../../assets";
-import { OptInputControl } from "../../../forms";
-import {
-  BannerProps,
-  FooterProps,
-  FormProps,
-  HeaderProps,
-  MainProps,
-  RootProps,
-  SocialButtonsProps,
-} from "./Login.types"; // Importa as interfaces separadas
+import { BannerProps, FormProps, HeaderProps, MainProps, RootProps } from "./Login.types";
+
+const { Title } = Typography;
 
 export const LoginRoot = ({ children }: RootProps) => (
-  <section className="flex min-h-screen items-center justify-center bg-gray-blue">
-    <div className="flex max-h-[720px] max-w-[1750px] bg-white shadow-lg">{children}</div>
-  </section>
+  <div className="fixed inset-0 flex items-center justify-center bg-gray-100">
+    <div className="w-full max-w-lg">
+      <Card className="shadow-2xl">{children}</Card>
+    </div>
+  </div>
 );
 
 export const LoginBanner = ({
@@ -24,16 +18,16 @@ export const LoginBanner = ({
   logoImg = MRSLogo,
   title = "Seu lugar para planejar, programar e acompanhar!",
 }: BannerProps) => (
-  <div className="flex w-full items-center justify-center bg-cover lg:min-w-[60%]">
-    <div
-      className="flex h-full w-full flex-col items-center justify-center gap-2 px-4 py-6 text-white"
-      style={{ backgroundImage: `url(${background})` }}
-    >
+  <div
+    className="flex min-h-[200px] w-full items-center justify-center bg-cover"
+    style={{ backgroundImage: `url(${background})` }}
+  >
+    <div className="flex flex-col items-center justify-center gap-2 px-4 py-6 text-white">
       {children ?
         children
       : <>
-          <img src={logoImg} alt="Logo" style={{ width: "100px" }} />
-          <p className="text-center text-xl text-white">{title}</p>
+          <img src={logoImg} alt="Logo" className="w-24" />
+          <p className="text-center text-xl">{title}</p>
         </>
       }
     </div>
@@ -41,57 +35,58 @@ export const LoginBanner = ({
 );
 
 export const LoginMain = ({ children }: MainProps) => (
-  <main className="flex w-full flex-col items-center justify-center gap-4 bg-white p-4">{children}</main>
+  <main className="flex w-full flex-col items-center justify-center gap-6 bg-white p-6">{children}</main>
 );
 
-export const LoginHeader = ({ title }: HeaderProps) => (
-  <div className="flex w-full flex-col justify-start gap-0">
-    <Text.Headline variant="1" className="text-left font-montserrat text-4xl text-blue-primary">
+export const LoginHeader = ({ title = "Service Monitor" }: HeaderProps) => (
+  <div className="flex w-full flex-col items-start gap-1">
+    <Title level={2} className="text-blue-primary !m-0">
       {title}
-    </Text.Headline>
-    <p className="mb-1">Bem-vindo(a)!</p>
+    </Title>
+    <p className="text-gray-500">Bem-vindo(a)!</p>
   </div>
 );
 
 export const LoginForm = ({ onSubmit }: FormProps) => {
-  const [form] = Form.useForm<any>();
+  const [form] = Form.useForm();
 
   return (
-    <Form form={form} layout="vertical" onFinish={onSubmit} className="w-full">
-      <div className="align-center flex flex-col justify-center gap-2">
-        <OptInputControl name="email" label="Usuário" rules={[{ required: true, message: "Usuário obrigatório" }]} />
-        <OptInputControl name="password" label="Senha" rules={[{ required: true, message: "Senha obrigatório" }]} />
-        <OptButton htmlType="submit">Entrar</OptButton>
-      </div>
+    <Form form={form} layout="vertical" onFinish={onSubmit} className="flex w-full flex-col gap-4">
+      <Form.Item
+        label="E-mail"
+        name="email"
+        rules={[
+          { required: true, message: "E-mail é obrigatório" },
+          { type: "email", message: "Digite um e-mail válido" },
+        ]}
+      >
+        <Input placeholder="Digite seu e-mail" size="large" />
+      </Form.Item>
+
+      <Form.Item
+        label="Senha"
+        name="password"
+        rules={[
+          { required: true, message: "Senha é obrigatória" },
+          { min: 10, message: "A senha precisa ter pelo menos 10 caracteres" },
+        ]}
+      >
+        <Input.Password placeholder="Digite sua senha" size="large" />
+      </Form.Item>
+
+      <Form.Item>
+        <Button type="primary" htmlType="submit" className="!" size="large">
+          Login
+        </Button>
+      </Form.Item>
     </Form>
   );
 };
 
-export const LoginSocialButtons = ({ onClickLoginGoogle, onClickLoginMicrosoft }: SocialButtonsProps) => (
-  <div className="flex w-full gap-2">
-    {onClickLoginGoogle && (
-      <OptButton className="w-full bg-blue-primary-100" onClick={onClickLoginGoogle} variant="outlined">
-        <img src="https://img.icons8.com/color/48/000000/google.png" alt="Google" style={{ width: "24px" }} />
-        Entrar com Google
-      </OptButton>
-    )}
-    {onClickLoginMicrosoft && (
-      <OptButton className="w-full bg-blue-primary-100 text-white" onClick={onClickLoginMicrosoft} variant="outlined">
-        <img src="https://img.icons8.com/color/48/000000/microsoft.png" alt="Microsoft" style={{ width: "24px" }} />
-        Entrar com Microsoft
-      </OptButton>
-    )}
-  </div>
-);
-
-export const LoginFooter = ({ children }: FooterProps) => (
-  <div className="flex flex-col items-center pb-6">
-    {children ?
-      children
-    : <>
-        <p className="text-d-grey mb-0 text-sm">Não consegue acessar?</p>
-        <p className="text-d-grey mb-0 text-sm">Entre em contato com seu gestor.</p>
-      </>
-    }
+export const LoginFooter = () => (
+  <div className="flex flex-col items-center text-sm text-gray-500">
+    <p className="mb-0">
+      ©{new Date().getFullYear()} | Developed by <strong>Wabtec Corporation</strong>
+    </p>
   </div>
 );
