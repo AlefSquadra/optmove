@@ -1,3 +1,4 @@
+import { FilterOutlined } from "@ant-design/icons";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export interface IOptDataGridRow {
@@ -32,7 +33,8 @@ interface ResizeState {
   isResizing: boolean;
   columnIndex: number;
   startX: number;
-  startWidths: number[];
+  startWidths: (string | number)[];
+  tableWidth: number;
 }
 
 interface DataGridLabels {
@@ -264,6 +266,37 @@ export default function DataGrid({
     }
   }, [initialRows]);
 
+  // Função auxiliar para converter width para pixels
+  const convertWidthToPixels = useCallback((width: string | number, tableWidth: number): number => {
+    if (typeof width === "number") return width;
+
+    if (typeof width === "string") {
+      if (width.endsWith("%")) {
+        const percentage = parseFloat(width) / 100;
+        return tableWidth * percentage;
+      }
+      if (width.endsWith("px")) {
+        return parseFloat(width);
+      }
+      if (width === "auto") {
+        return 100; // valor padrão para auto
+      }
+      // Tenta converter string para número
+      const numValue = parseFloat(width);
+      return isNaN(numValue) ? 100 : numValue;
+    }
+
+    return 100; // valor padrão
+  }, []);
+
+  // Função auxiliar para obter a largura total da tabela
+  const getTableWidth = useCallback(() => {
+    if (tableRef.current) {
+      return tableRef.current.offsetWidth;
+    }
+    return 800; // valor padrão
+  }, []);
+
   // Função para agrupar os dados
   const groupData = useCallback(
     (data: IOptDataGridRow[], groupBy: string[]): IOptDataGridRow[] | GroupNode[] => {
@@ -397,16 +430,18 @@ export default function DataGrid({
 
       e.preventDefault();
       const startX = e.clientX;
-      const startWidths = columns.map((col) => (typeof col.width === "number" ? col.width : 100));
+      const tableWidth = getTableWidth();
+      const startWidths = columns.map((col) => col.width);
 
       setResizeState({
         isResizing: true,
         columnIndex,
         startX,
         startWidths,
+        tableWidth,
       });
     },
-    [internalResizable, columns],
+    [internalResizable, columns, getTableWidth],
   );
 
   // Função para processar o redimensionamento
@@ -417,28 +452,35 @@ export default function DataGrid({
       const deltaX = e.clientX - resizeState.startX;
       const newWidths = [...resizeState.startWidths];
       const minWidth = 50;
+      const tableWidth = resizeState.tableWidth;
 
       if (internalResizeMode === "fit") {
-        const currentWidth = resizeState.startWidths[resizeState.columnIndex];
-        const newWidth = Math.max(minWidth, currentWidth + deltaX);
-        const widthDiff = newWidth - currentWidth;
+        // No modo fit, mantemos a largura total da tabela fixa
+        const currentPixelWidth = convertWidthToPixels(resizeState.startWidths[resizeState.columnIndex], tableWidth);
+        const newPixelWidth = Math.max(minWidth, currentPixelWidth + deltaX);
+        const widthDiff = newPixelWidth - currentPixelWidth;
 
-        newWidths[resizeState.columnIndex] = newWidth;
+        // Ajusta a coluna sendo redimensionada
+        newWidths[resizeState.columnIndex] = newPixelWidth;
 
-        if (widthDiff !== 0) {
-          const otherColumns = columns.length - 1;
-          const adjustmentPerColumn = -widthDiff / otherColumns;
+        // Distribui a diferença entre as outras colunas
+        if (widthDiff !== 0 && columns.length > 1) {
+          const otherColumnsCount = columns.length - 1;
+          const adjustmentPerColumn = -widthDiff / otherColumnsCount;
 
           for (let i = 0; i < columns.length; i++) {
             if (i !== resizeState.columnIndex) {
-              const adjustedWidth = Math.max(minWidth, newWidths[i] + adjustmentPerColumn);
-              newWidths[i] = adjustedWidth;
+              const currentOtherWidth = convertWidthToPixels(newWidths[i], tableWidth);
+              const newOtherWidth = Math.max(minWidth, currentOtherWidth + adjustmentPerColumn);
+              newWidths[i] = newOtherWidth;
             }
           }
         }
       } else {
-        const currentWidth = resizeState.startWidths[resizeState.columnIndex];
-        newWidths[resizeState.columnIndex] = Math.max(minWidth, currentWidth + deltaX);
+        // No modo expand, apenas ajusta a coluna atual
+        const currentPixelWidth = convertWidthToPixels(resizeState.startWidths[resizeState.columnIndex], tableWidth);
+        const newPixelWidth = Math.max(minWidth, currentPixelWidth + deltaX);
+        newWidths[resizeState.columnIndex] = newPixelWidth;
       }
 
       const newColumns = columns.map((col, index) => ({
@@ -452,7 +494,7 @@ export default function DataGrid({
         setInternalColumns(newColumns);
       }
     },
-    [resizeState, internalResizeMode, columns, controlledColumnModel, onColumnResize],
+    [resizeState, internalResizeMode, columns, controlledColumnModel, onColumnResize, convertWidthToPixels],
   );
 
   // Função para finalizar o redimensionamento
@@ -522,9 +564,9 @@ export default function DataGrid({
                     : cellClassName
                   }`}
                   style={{
-                    width: column.width ?? "auto",
-                    minWidth: column.width ?? "auto",
-                    maxWidth: column.width ?? "auto",
+                    width: column.width,
+                    minWidth: typeof column.width === "number" ? `${column.width}px` : column.width,
+                    maxWidth: typeof column.width === "number" ? `${column.width}px` : column.width,
                   }}
                   onClick={(e) =>
                     onCellClick?.({ row: item, field: column.field, value: getCellValue(item, column), event: e })
@@ -890,16 +932,27 @@ export default function DataGrid({
         )}
 
         {/* Tabela */}
-        <div className="overflow-auto" style={{ height: typeof height === "number" ? `${height}px` : height }}>
+        <div
+          className="overflow-auto"
+          style={{
+            height: typeof height === "number" ? `${height}px` : height,
+            ...(internalResizeMode === "fit" ? { overflowX: "auto" } : {}),
+          }}
+        >
           <table
             ref={tableRef}
             className={`data-grid w-full ${headerClassName}`}
-            style={{ tableLayout: "fixed", borderCollapse: "separate", borderSpacing: 0 }}
+            style={{
+              tableLayout: internalResizeMode === "fit" ? "fixed" : "auto",
+              borderCollapse: "separate",
+              borderSpacing: 0,
+              width: internalResizeMode === "fit" ? "100%" : "auto",
+            }}
           >
             <thead className="sticky top-0 bg-gray-50">
               <tr>
                 {checkboxSelection && (
-                  <th className="w-12 border-b border-r border-gray-200 px-3 py-2">
+                  <th className="w-12 border-b border-r border-gray-200 px-3 py-2" style={{ width: "48px" }}>
                     <input
                       type="checkbox"
                       checked={allSelected}
@@ -915,11 +968,16 @@ export default function DataGrid({
                 {columns.map((column, columnIndex) => (
                   <th
                     key={column.field}
-                    className="group relative select-none border-b border-r border-gray-200 px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                    className="group relative select-none border-b border-r border-gray-200 p-1 text-left text-[0.675rem] font-medium uppercase tracking-wider text-gray-500"
                     style={{
-                      width: column.width ?? "auto",
-                      minWidth: column.width ?? "auto",
-                      maxWidth: column.width ?? "auto",
+                      width: column.width,
+                      minWidth: typeof column.width === "number" ? `${column.width}px` : column.width,
+                      maxWidth:
+                        internalResizeMode === "fit" ?
+                          typeof column.width === "number" ?
+                            `${column.width}px`
+                          : column.width
+                        : "none",
                     }}
                     draggable={!disableGrouping}
                     onDragStart={(e) => e.dataTransfer.setData("field", column.field)}
@@ -951,10 +1009,10 @@ export default function DataGrid({
                               setActiveFilterMenu(null);
                               setActiveColumnMenu(activeColumnMenu === column.field ? null : column.field);
                             }}
-                            className="rounded p-1 opacity-0 transition-opacity hover:bg-gray-200 hover:opacity-100 group-hover:opacity-100"
+                            className="flex items-center justify-center rounded p-1 opacity-0 transition-opacity hover:bg-gray-200 hover:opacity-100 group-hover:opacity-100"
                             title={mergedLabels.columnOptions}
                           >
-                            <span className="text-sm text-gray-600">⋯</span>
+                            <FilterOutlined className="text-sm text-gray-600" />
                           </button>
 
                           {/* Menu da coluna */}
@@ -1117,7 +1175,7 @@ export default function DataGrid({
                     onDoubleClick={(e) => onRowDoubleClick?.({ row, event: e })}
                   >
                     {checkboxSelection && (
-                      <td className="w-12 border-r border-gray-100 px-3 py-2">
+                      <td className="w-12 border-r border-gray-100 px-3 py-2" style={{ width: "48px" }}>
                         <input
                           type="checkbox"
                           checked={selectedRows?.has(row.id) || false}
@@ -1130,15 +1188,20 @@ export default function DataGrid({
                     {columns.map((column) => (
                       <td
                         key={column.field}
-                        className={`border-r border-gray-100 px-3 py-2 text-sm text-gray-900 ${
+                        className={`border-r border-gray-100 p-1 text-start text-[.675rem] text-gray-900 ${
                           typeof cellClassName === "function" ?
                             cellClassName({ row, field: column.field, value: getCellValue(row, column) })
                           : cellClassName
                         }`}
                         style={{
-                          width: column.width ?? "auto",
-                          minWidth: column.width ?? "auto",
-                          maxWidth: column.width ?? "auto",
+                          width: column.width,
+                          minWidth: typeof column.width === "number" ? `${column.width}px` : column.width,
+                          maxWidth:
+                            internalResizeMode === "fit" ?
+                              typeof column.width === "number" ?
+                                `${column.width}px`
+                              : column.width
+                            : "none",
                         }}
                         onClick={(e) =>
                           onCellClick?.({ row, field: column.field, value: getCellValue(row, column), event: e })

@@ -2,11 +2,10 @@ import { SearchOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Divider, Form, Space } from "antd";
 import dayjs from "dayjs";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { OptButton, OptInputControl, OptInputSelectControl, OptTimePickerControl } from "../../../../../lib";
 import { OptDatePickerControl } from "../../../../../lib/components/forms/controls/date-picker-control/opt-date-picker-control";
 import { IOptModalRefProps, OptModal } from "../../../../../lib/components/modal/opt-modal";
-import { OptTableRef } from "../../../../../lib/components/table";
 import DataGrid, { IOptDataGridColumn } from "../../../../../lib/components/table/opt-table2";
 import { OfficializationService } from "../../../../../services/officialization/OfficializationService";
 
@@ -27,47 +26,46 @@ interface ISelectOfficializationProps {
 }
 
 const COLUMNS: IOptDataGridColumn[] = [
-  { field: "id", headerName: "ID", width: 90 },
   {
     headerName: "Trens Oficializados",
     field: "trainsOfficialization",
-    width: 200,
+    width: "auto",
   },
   {
     headerName: "Usuário",
     field: "user",
-    width: 200,
+    width: "auto",
   },
   {
     headerName: "Data Oficialização",
     field: "dateOfficialization",
-    width: 200,
+    width: "auto",
   },
   {
     headerName: "Mesa",
     field: "mesa",
-    width: 200,
+    width: "auto",
   },
   {
     headerName: "Linha do tempo",
     field: "timeline",
-    width: 200,
+    width: "auto",
   },
   {
     headerName: "Tipo de Oficialização",
     field: "officializationType",
-    width: 200,
+    width: "auto",
   },
   {
     headerName: "Versão modelo",
     field: "versionModel",
-    width: 200,
+    width: "auto",
   },
 ];
 
 const SelectOfficialization = (props: ISelectOfficializationProps) => {
   const optModalOfficializationRef = useRef<IOptModalRefProps>(null);
-  const optTableRef = useRef<OptTableRef<DataType>>(null);
+  const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [form] = Form.useForm();
 
   const { data, isSuccess, refetch } = useQuery({
@@ -97,7 +95,6 @@ const SelectOfficialization = (props: ISelectOfficializationProps) => {
     });
 
     optModalOfficializationRef.current?.showModal();
-    optTableRef.current?.setEllipsis(true);
   }, []);
 
   return (
@@ -112,13 +109,13 @@ const SelectOfficialization = (props: ISelectOfficializationProps) => {
               <OptButton
                 className="bg-blue-primary-100 text-white"
                 onClick={() => {
-                  const hasSelectedRows = optTableRef.current?.getSelectedRows().length;
+                  const hasSelectedRows = selectedRows?.length > 0;
 
                   if (!hasSelectedRows) {
                     return alert("Selecione uma plano");
                   }
 
-                  props.setPlanParams(optTableRef.current.getSelectedRows());
+                  props.setPlanParams(selectedRows);
                   optModalOfficializationRef.current?.closeModal();
                 }}
               >
@@ -187,6 +184,7 @@ const SelectOfficialization = (props: ISelectOfficializationProps) => {
             columns={COLUMNS}
             onRowEdit={handleRowEdit}
             resizeMode="fit"
+            onRowSelect={(selectedIds) => setSelectedRows(selectedIds)}
           />
         </div>
       </OptModal>
