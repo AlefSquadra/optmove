@@ -1,8 +1,8 @@
-import { BorderOutlined, CloseOutlined, MinusOutlined } from "@ant-design/icons";
 import { Modal, ModalProps } from "antd";
 import React, { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import type { DraggableData, DraggableEvent } from "react-draggable";
 import Draggable from "react-draggable";
+import { TabWindowHeader } from "../../../pages/home/components/tabWindowHeader/TabWindowHeader";
 import LogoMrs from "../../assets/images/logo-mrs.png";
 
 export interface IOptModalProps extends ModalProps {
@@ -14,28 +14,6 @@ export interface IOptModalRefProps {
   showModal: () => void;
   closeModal: () => void;
 }
-
-const WindowHeader = ({ title, onMinimize, onMaximize, onClose }) => {
-  return (
-    <div className="rounded-t-mdpx-4 flex items-center justify-between bg-white px-4 py-1">
-      <div className="pointer-events-none flex select-none gap-2 text-sm text-zinc-950">
-        <img src={LogoMrs} className="object-contain" alt="OptMoveIcon" height={24} width={24} />
-        {title}
-      </div>
-      <div className="flex items-center space-x-2">
-        <button onClick={onMinimize} className="cursor-pointer rounded-sm">
-          <MinusOutlined className="text-[12px] !text-zinc-950" />
-        </button>
-        <button onClick={onMaximize} className="cursor-pointer rounded-sm">
-          <BorderOutlined className="text-[12px] !text-zinc-950" />
-        </button>
-        <button onClick={onClose} className="cursor-pointer rounded-sm">
-          <CloseOutlined className="text-[12px] !text-zinc-950" />
-        </button>
-      </div>
-    </div>
-  );
-};
 
 const OptModal = forwardRef<IOptModalRefProps, IOptModalProps>((props, ref) => {
   const { children, modalTitle, ...modalProps } = props;
@@ -98,7 +76,15 @@ const OptModal = forwardRef<IOptModalRefProps, IOptModalProps>((props, ref) => {
             onFocus={() => {}}
             onBlur={() => {}}
           >
-            <WindowHeader title={modalTitle} onClose={handleCancel} onMaximize={() => {}} onMinimize={() => {}} />
+            <TabWindowHeader
+              title={
+                <>
+                  <img src={LogoMrs} className="object-contain" alt="OptMoveIcon" height={24} width={24} />
+                  {modalTitle}
+                </>
+              }
+              onClose={handleCancel}
+            />
           </div>
         }
         wrapClassName="!bg-transparent"

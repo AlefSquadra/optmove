@@ -1,9 +1,14 @@
 import { clsx } from "clsx/lite";
 import { createContext, forwardRef, useContext, useState } from "react";
 
+export interface IOpenPanelTabBarLeft {
+  isOpen: boolean;
+  openTabName: string | "trens";
+}
+
 interface FTLayoutContext {
-  isOpenPanelTabBarLeft: boolean;
-  setIsOpenPanelTabBarLeft: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedPanelTabBarLeft: IOpenPanelTabBarLeft;
+  setSelectedPanelTabBarLeft: React.Dispatch<React.SetStateAction<IOpenPanelTabBarLeft>>;
   isOpenPanelTabBarDown: boolean;
   setIsPanelOpenDown: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -11,13 +16,16 @@ interface FTLayoutContext {
 const FtlContext = createContext<FTLayoutContext>(undefined);
 
 const FTLayoutProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isOpenPanelTabBarLeft, setIsPanelOpen] = useState(false);
+  const [selectedPanelTabBarLeft, setSelectedPanelTabBarLeft] = useState<IOpenPanelTabBarLeft>({
+    isOpen: false,
+    openTabName: "",
+  });
   const [isOpenPanelTabBarDown, setIsPanelOpenDown] = useState(false);
   return (
     <FtlContext.Provider
       value={{
-        isOpenPanelTabBarLeft,
-        setIsOpenPanelTabBarLeft: setIsPanelOpen,
+        selectedPanelTabBarLeft,
+        setSelectedPanelTabBarLeft,
         isOpenPanelTabBarDown,
         setIsPanelOpenDown,
       }}
@@ -55,7 +63,7 @@ const FTLayoutHeader = (props: { children?: React.ReactNode; className?: string 
 
 const FTLayoutContent = forwardRef<HTMLDivElement, { children?: React.ReactNode; className?: string }>(
   ({ children, className }, ref) => {
-    const { isOpenPanelTabBarLeft } = useFTLayout();
+    const { selectedPanelTabBarLeft: isOpenPanelTabBarLeft } = useFTLayout();
     return (
       <div
         ref={ref}
@@ -76,7 +84,7 @@ const FTLayoutFooter = (props: { children?: React.ReactNode; className?: string 
 };
 
 const FTLayoutTabPanelLeft = (props: { children?: React.ReactNode; className?: string }) => {
-  const { isOpenPanelTabBarLeft: isPanelOpen } = useFTLayout();
+  const { selectedPanelTabBarLeft: isPanelOpen } = useFTLayout();
   return (
     isPanelOpen && (
       <div
@@ -106,12 +114,13 @@ const FTLayoutTabPanelDown = (props: { children?: React.ReactNode; className?: s
     )
   );
 };
-export const FTLayout = {
-  Provider: FTLayoutProvider,
-  Root: FTLayoutRoot,
-  Header: FTLayoutHeader,
-  Content: FTLayoutContent,
-  Footer: FTLayoutFooter,
-  TabPanelLeft: FTLayoutTabPanelLeft,
-  TabPanelDown: FTLayoutTabPanelDown,
+
+export {
+  FTLayoutContent,
+  FTLayoutFooter,
+  FTLayoutHeader,
+  FTLayoutProvider,
+  FTLayoutRoot,
+  FTLayoutTabPanelDown,
+  FTLayoutTabPanelLeft,
 };

@@ -863,6 +863,7 @@ export default function DataGrid({
 
       <div
         className="w-full overflow-hidden rounded-lg border border-gray-200 bg-white"
+        style={{ height }}
         onClick={() => {
           setActiveColumnMenu(null);
           setActiveFilterMenu(null);
@@ -1145,7 +1146,7 @@ export default function DataGrid({
                         </div>
                       )}
                       {/* Handle de redimensionamento */}
-                      {internalResizable && (
+                      {internalResizable && column.field !== columns[columns.length - 1]?.field && (
                         <div
                           className="absolute right-0 top-0 z-10 h-full w-px cursor-col-resize bg-gray-200 transition-colors hover:bg-gray-400"
                           onMouseDown={(e) => handleResizeStart(e, columnIndex)}

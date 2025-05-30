@@ -1,7 +1,9 @@
 import { Form, Typography } from "antd";
+import { useAuth } from "../../hooks/auth/useAuth";
 import { OptButton, OptInputControl } from "../../lib";
 
 const LoginPage = () => {
+  const { handleDefaultLogin } = useAuth();
   const [form] = Form.useForm();
 
   return (
@@ -10,7 +12,12 @@ const LoginPage = () => {
         <img src="./wabtec-login2.png" alt="Background" className="h-full w-full object-contain xl:object-cover" />
       </div>
       <div className="flex w-[45%] items-center justify-center bg-white p-8">
-        <Form form={form} layout="vertical" className="w-full max-w-md" onFinish={(values) => console.log(values)}>
+        <Form
+          form={form}
+          layout="vertical"
+          className="w-full max-w-md"
+          onFinish={(values) => handleDefaultLogin(values)}
+        >
           <Typography.Title
             level={2}
             className="text-center text-[1.75rem] font-bold tracking-[8px] text-primary-color"

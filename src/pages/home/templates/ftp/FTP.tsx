@@ -1,5 +1,14 @@
 import { GHTChart, GHTChartMock, Text } from "@optmoves/index";
-import { FTLayout, useFTLayout } from "../../../../shared/layouts/FTLayout";
+import {
+  FTLayoutContent,
+  FTLayoutFooter,
+  FTLayoutHeader,
+  FTLayoutProvider,
+  FTLayoutRoot,
+  FTLayoutTabPanelDown,
+  FTLayoutTabPanelLeft,
+  useFTLayout,
+} from "../../../../shared/layouts/FTLayout";
 import {
   ControlFieldsetGroupBox,
   FilterFieldsetGroupBox,
@@ -18,8 +27,8 @@ const FTPLayout = (props: IFTPProps) => {
 
   return (
     <>
-      <FTLayout.Root>
-        <FTLayout.TabPanelLeft>
+      <FTLayoutRoot>
+        <FTLayoutTabPanelLeft>
           <TabBar
             direction="left"
             rtl
@@ -39,15 +48,15 @@ const FTPLayout = (props: IFTPProps) => {
               },
             ]}
           />
-        </FTLayout.TabPanelLeft>
-        <FTLayout.Header className="z-20 grid grid-cols-[auto_auto_auto__1fr_auto_auto] grid-rows-1 items-center gap-4 px-2 pb-2">
+        </FTLayoutTabPanelLeft>
+        <FTLayoutHeader className="z-20 grid grid-cols-[auto_auto_auto__1fr_auto_auto] grid-rows-1 items-center gap-4 px-2 pb-2">
           <FilterFieldsetGroupBox />
           <SearchFieldsetGroupBox />
           <ControlFieldsetGroupBox />
           <OfficializationFieldsetGroupBox />
           <GraphicCoordinatesFieldsetGroupBox />
-        </FTLayout.Header>
-        <FTLayout.Content>
+        </FTLayoutHeader>
+        <FTLayoutContent>
           <HeaderContentGHTBox />
           <div className="h-full w-full overflow-hidden">
             <GHTChart
@@ -58,14 +67,14 @@ const FTPLayout = (props: IFTPProps) => {
               defaultHeight={760}
             />
           </div>
-        </FTLayout.Content>
-        <FTLayout.Footer className="row-auto flex items-center justify-center">
+        </FTLayoutContent>
+        <FTLayoutFooter className="row-auto flex items-center justify-center">
           <Text.Body variant="2" className="text-center text-red-700">
             CNY0159 (CARGA GERAL NAO PREFERENCIAL | Peso = 390 | Comprimento = 0,068) | Chegada: ISN-2-30/04/2025 10:00
             | Saída: ISN-230/04/2025 10:07 Destino: IPG
           </Text.Body>
-        </FTLayout.Footer>
-        <FTLayout.TabPanelDown>
+        </FTLayoutFooter>
+        <FTLayoutTabPanelDown>
           <TabBar
             direction="down"
             items={[
@@ -84,17 +93,17 @@ const FTPLayout = (props: IFTPProps) => {
               },
             ]}
           />
-        </FTLayout.TabPanelDown>
-      </FTLayout.Root>
+        </FTLayoutTabPanelDown>
+      </FTLayoutRoot>
     </>
   );
 };
 
 const FTP = () => {
   return (
-    <FTLayout.Provider>
+    <FTLayoutProvider>
       <FTPLayout />
-    </FTLayout.Provider>
+    </FTLayoutProvider>
   );
 };
 

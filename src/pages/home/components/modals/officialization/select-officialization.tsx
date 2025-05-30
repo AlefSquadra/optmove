@@ -1,10 +1,7 @@
-import { SearchOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Divider, Form, Space } from "antd";
-import dayjs from "dayjs";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { OptButton, OptInputControl, OptInputSelectControl, OptTimePickerControl } from "../../../../../lib";
-import { OptDatePickerControl } from "../../../../../lib/components/forms/controls/date-picker-control/opt-date-picker-control";
+import { Divider, Space } from "antd";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { OptButton } from "../../../../../lib";
 import { IOptModalRefProps, OptModal } from "../../../../../lib/components/modal/opt-modal";
 import DataGrid, { IOptDataGridColumn } from "../../../../../lib/components/table/opt-table2";
 import { OfficializationService } from "../../../../../services/officialization/OfficializationService";
@@ -63,10 +60,88 @@ const COLUMNS: IOptDataGridColumn[] = [
   },
 ];
 
+import { SearchOutlined } from "@ant-design/icons";
+import { Form } from "antd";
+import dayjs from "dayjs";
+import { useEffect } from "react";
+import { OptInputControl, OptInputSelectControl, OptTimePickerControl } from "../../../../../lib";
+import { OptDatePickerControl } from "../../../../../lib/components/forms/controls/date-picker-control/opt-date-picker-control";
+
+interface IOfficializationFormProps {
+  onSearch: () => void;
+}
+
+const OfficializationForm = ({ onSearch }: IOfficializationFormProps) => {
+  const [form] = Form.useForm();
+
+  useEffect(() => {
+    form.setFieldsValue({
+      startDatePicker: dayjs("2025-01-01"),
+      endDatePicker: dayjs("2025-01-10"),
+      prefix: "",
+      line: { id: "1" },
+      timelineDate: dayjs("2025-01-05"),
+      timeLineHours: dayjs("08:00", "HH:mm"),
+    });
+  }, [form]);
+
+  return (
+    <Form
+      className="flex flex-col px-4 pt-4"
+      form={form}
+      onFinish={(_) => {
+        onSearch();
+      }}
+    >
+      <Space>
+        <OptDatePickerControl
+          label="Data Inicio"
+          name="startDatePicker"
+          datePickerProps={{ style: { width: "120px" }, placeholder: "__/__/__" }}
+        />
+        <OptDatePickerControl
+          label="Até"
+          name="endDatePicker"
+          datePickerProps={{ style: { width: "120px" }, placeholder: "__/__/__" }}
+        />
+        <OptInputControl isFloating={false} label="Prefixo" name="Prefix" />
+      </Space>
+      <Space align="start">
+        <OptInputSelectControl
+          label="Tipo"
+          name="line"
+          labelKey="name"
+          valueKey="id"
+          selectProps={{
+            placeholder: "Selecione",
+            style: { minWidth: "1px" },
+            options: [
+              { id: "1", name: "OFICIALIZADO" },
+              { id: "2", name: "PUBLICADO" },
+              { id: "3", name: "TODOS" },
+            ],
+          }}
+        />
+        <OptButton className="w-9 p-0">
+          <SearchOutlined onClick={() => form.submit()} />
+        </OptButton>
+        <OptDatePickerControl
+          label="Linha do tempo"
+          name="timelineDate"
+          datePickerProps={{ style: { width: "auto" }, type: "date", placeholder: "__/__/__" }}
+        />
+        <OptTimePickerControl
+          name="timeLineHours"
+          timePickerProps={{ style: { width: "auto" }, mode: undefined, placeholder: "__:__" }}
+        />
+      </Space>
+    </Form>
+  );
+};
+
 const SelectOfficialization = (props: ISelectOfficializationProps) => {
   const optModalOfficializationRef = useRef<IOptModalRefProps>(null);
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
-  const [form] = Form.useForm();
 
   const { data, isSuccess, refetch } = useQuery({
     queryKey: ["modalSelectOfficializationGHT"],
@@ -84,22 +159,14 @@ const SelectOfficialization = (props: ISelectOfficializationProps) => {
     console.log("Edited:", { id, field, value });
   }, []);
 
-  useEffect(() => {
-    form.setFieldsValue({
-      startDatePicker: dayjs("2025-01-01"),
-      endDatePicker: dayjs("2025-01-10"),
-      prefix: "",
-      line: { id: "1" },
-      timelineDate: dayjs("2025-01-05"),
-      timeLineHours: dayjs("08:00", "HH:mm"),
-    });
-
-    optModalOfficializationRef.current?.showModal();
-  }, []);
+  const handleSearch = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   return (
     <>
       <OptModal
+        open={false}
         modalTitle="Selecionar Oficializações"
         ref={optModalOfficializationRef}
         footer={() => {
@@ -126,56 +193,7 @@ const SelectOfficialization = (props: ISelectOfficializationProps) => {
         }}
       >
         <div className="flex flex-col">
-          <Form
-            className="flex flex-col px-4 pt-4"
-            form={form}
-            onFinish={(_) => {
-              refetch();
-            }}
-          >
-            <Space>
-              <OptDatePickerControl
-                label="Data Inicio"
-                name="startDatePicker"
-                datePickerProps={{ style: { width: "120px" }, placeholder: "__/__/__" }}
-              />
-              <OptDatePickerControl
-                label="Até"
-                name="endDatePicker"
-                datePickerProps={{ style: { width: "120px" }, placeholder: "__/__/__" }}
-              />
-              <OptInputControl isFloating={false} label="Prefixo" name="Prefix" />
-            </Space>
-            <Space align="start">
-              <OptInputSelectControl
-                label="Tipo"
-                name="line"
-                labelKey="name"
-                valueKey="id"
-                selectProps={{
-                  placeholder: "Selecione",
-                  style: { minWidth: "1px" },
-                  options: [
-                    { id: "1", name: "OFICIALIZADO" },
-                    { id: "2", name: "PUBLICADO" },
-                    { id: "3", name: "TODOS" },
-                  ],
-                }}
-              />
-              <OptButton className="w-9 p-0">
-                <SearchOutlined onClick={() => form.submit()} />
-              </OptButton>
-              <OptDatePickerControl
-                label="Linha do tempo"
-                name="timelineDate"
-                datePickerProps={{ style: { width: "auto" }, type: "date", placeholder: "__/__/__" }}
-              />
-              <OptTimePickerControl
-                name="timeLineHours"
-                timePickerProps={{ style: { width: "auto" }, mode: undefined, placeholder: "__:__" }}
-              />
-            </Space>
-          </Form>
+          <OfficializationForm onSearch={handleSearch} />
           <Divider className="pb-4" />
           <DataGrid
             className="m-auto w-[98%]"
