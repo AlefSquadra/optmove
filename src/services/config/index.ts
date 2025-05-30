@@ -8,6 +8,6 @@ export const setBackendToken = (token: string) => {
 };
 
 export const apiClient = new HttpClient(
-  import.meta.env.VITE_APP_BASE_URL_BACKEND ?? import.meta.env.VITE_APP_BASE_URL_BACKEND_LOCAL,
+  import.meta.env.VITE_APP_BASE_URL_BACKEND ?? import.meta.env.VITE_APP_BASE_URL_BACKEND_DEV,
   () => backendToken,
 );

@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const handleDefaultLogin = async (credentials: ILoginPayloadRequest) => {
     AuthService.login(credentials).then((response) => {
-      setMsalAccessToken(response.token);
+      navigate("/select-zone");
     });
   };
 

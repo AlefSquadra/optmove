@@ -5,7 +5,15 @@ import { Button, Modal, Spin } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { SelectZoneService } from "../../../../services/selectZones/SelectZoneService";
 import { GroupBoxFieldset } from "../../../../shared/components/GroupBoxFieldset/GroupBoxFieldset";
-import { FTLayout } from "../../../../shared/layouts/FTLayout";
+import {
+  FTLayoutContent,
+  FTLayoutFooter,
+  FTLayoutHeader,
+  FTLayoutProvider,
+  FTLayoutRoot,
+  FTLayoutTabPanelDown,
+  FTLayoutTabPanelLeft,
+} from "../../../../shared/layouts/FTLayout";
 import { GHTChart } from "../../components/charts";
 import { dataOfficialization, GHTChartMock } from "../../components/charts/GHTChartMock";
 import { GHTChartProvider, useGHTChartContext } from "../../components/charts/provider/GHTChartProvider";
@@ -15,6 +23,7 @@ import {
   SearchFieldsetGroupBox,
 } from "../../components/ftFieldsetGroupBox";
 import { SelectOfficialization } from "../../components/modals/officialization/select-officialization";
+import { FTVTabLeft } from "../../components/tabLeft/FTVTabLeft";
 
 interface IFTVProps {}
 
@@ -84,38 +93,15 @@ const FTVLayout = (props: IFTVProps) => {
 
   return (
     <>
-      <FTLayout.Root>
-        <FTLayout.TabPanelLeft>
-          <div className="relative">
-            <div className="flex flex-col gap-0">
-              {["Monitoramento de planos", "Atividades alteradas"].map((label, index) => (
-                <div
-                  key={index}
-                  className="group relative flex cursor-pointer items-center justify-center rounded-e-2xl border-2 border-gray-200 bg-white p-3"
-                >
-                  <div className="text-black text-sm [text-orientation:sideways] [writing-mode:sideways-lr]">
-                    {label}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="absolute left-full top-0 h-full w-full bg-red-100 p-2">teste</div>
-          </div>
-        </FTLayout.TabPanelLeft>
-        <FTLayout.Header className="z-20 grid grid-cols-[auto_auto_auto_auto_1fr_auto_auto] grid-rows-1 items-center gap-4 px-2 pb-2">
+      <FTLayoutRoot>
+        <FTLayoutTabPanelLeft>
+          <FTVTabLeft />
+        </FTLayoutTabPanelLeft>
+        <FTLayoutHeader className="z-20 grid grid-cols-[auto_auto_auto_auto_1fr_auto_auto] grid-rows-1 items-center gap-4 px-2 pb-2">
           <FilterFieldsetGroupBox />
           <SearchFieldsetGroupBox />
           <ControlFieldsetGroupBox />
-          {/** Plano */}
-          {/* <GroupBoxFieldset.Root className="flex min-h-20 items-center justify-start gap-4 p-2">
-            <GroupBoxFieldset.Legend>Planos</GroupBoxFieldset.Legend>
-            <Select label="Pátio destino">
-              <option selected value={null}>
-                30/04/2025 10:00
-              </option>
-            </Select>
-          </GroupBoxFieldset.Root> */}
-          {/** Fim Plano */}
+
           {/** Oficialização */}
           <GroupBoxFieldset.Root className="col-start-6 min-h-20 items-center justify-start p-2">
             <GroupBoxFieldset.Legend>Oficialização</GroupBoxFieldset.Legend>
@@ -137,8 +123,8 @@ const FTVLayout = (props: IFTVProps) => {
             <p>SB: Fora do painel</p>
           </GroupBoxFieldset.Root>
           {/** Fim gráfico */}
-        </FTLayout.Header>
-        <FTLayout.Content ref={FTContentRef} className="flex flex-col">
+        </FTLayoutHeader>
+        <FTLayoutContent ref={FTContentRef} className="flex flex-col">
           <div className="grid w-full grid-cols-12 grid-rows-[32px] bg-yellow-50">
             <Text.Label
               variant="1"
@@ -150,16 +136,16 @@ const FTVLayout = (props: IFTVProps) => {
           <div className="h-full w-full overflow-hidden">
             {planParams?.length && FTContentRef.current?.offsetHeight ? renderContent() : <></>}
           </div>
-        </FTLayout.Content>
+        </FTLayoutContent>
 
-        <FTLayout.Footer className="row-auto flex items-center justify-center">
+        <FTLayoutFooter className="row-auto flex items-center justify-center">
           {lineTrainSelected.name && (
             <Text.Body variant="2" className="text-center text-red-700">
               {`${lineTrainSelected.name} (${lineTrainSelected.data.type}) | Chegada: ${lineTrainSelected.data?.xi} | Saída: ${lineTrainSelected?.data?.xf} Destino: ${lineTrainSelected.data?.info.find((x) => x?.label === "Destino")?.value}`}
             </Text.Body>
           )}
-        </FTLayout.Footer>
-        <FTLayout.TabPanelDown>
+        </FTLayoutFooter>
+        <FTLayoutTabPanelDown>
           <div className="relative">
             <div className="flex flex-row gap-0">
               {["Monitoramento de planos", "Atividades alteradas"].map((label, index) => (
@@ -173,8 +159,8 @@ const FTVLayout = (props: IFTVProps) => {
             </div>
             <div className="absolute left-0 top-full w-full bg-red-100 p-2">teste</div>
           </div>
-        </FTLayout.TabPanelDown>
-      </FTLayout.Root>
+        </FTLayoutTabPanelDown>
+      </FTLayoutRoot>
       <SelectOfficialization setPlanParams={setPlanParams} planParams={planParams} />
     </>
   );
@@ -182,11 +168,11 @@ const FTVLayout = (props: IFTVProps) => {
 
 const FTV = () => {
   return (
-    <FTLayout.Provider>
+    <FTLayoutProvider>
       <GHTChartProvider>
         <FTVLayout />
       </GHTChartProvider>
-    </FTLayout.Provider>
+    </FTLayoutProvider>
   );
 };
 

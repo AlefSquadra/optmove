@@ -11,7 +11,7 @@ interface IControlFieldsetGroupBoxProps {}
 
 const ControlFieldsetGroupBox = (props: IControlFieldsetGroupBoxProps) => {
   const {} = props;
-  const { setIsOpenPanelTabBarLeft, setIsPanelOpenDown } = useFTLayout();
+  const { selectedPanelTabBarLeft, setSelectedPanelTabBarLeft, setIsPanelOpenDown } = useFTLayout();
   const { selectZoneParams } = useApplicationContext();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -27,10 +27,10 @@ const ControlFieldsetGroupBox = (props: IControlFieldsetGroupBoxProps) => {
             </Dropdown.Trigger>
 
             <Dropdown.Content>
-              <Dropdown.Item onClick={() => setIsOpenPanelTabBarLeft((prev) => !prev)}>
+              <Dropdown.Item onClick={() => setSelectedPanelTabBarLeft((prev) => ({ ...prev, isOpen: true }))}>
                 Programar circulação (Ctrl + P)
               </Dropdown.Item>
-              <Dropdown.Item onClick={() => setIsOpenPanelTabBarLeft((prev) => !prev)}>
+              <Dropdown.Item onClick={() => setSelectedPanelTabBarLeft((prev) => ({ ...prev, isOpen: true }))}>
                 Priorizar circulação
               </Dropdown.Item>
             </Dropdown.Content>
@@ -46,8 +46,12 @@ const ControlFieldsetGroupBox = (props: IControlFieldsetGroupBoxProps) => {
               <OptMoveIcon name="FTPEoCircleMinus" height={24} width={24} />
             </Dropdown.Trigger>
             <Dropdown.Content>
-              <Dropdown.Item onClick={() => setIsOpenPanelTabBarLeft((prev) => !prev)}>Criar interdição</Dropdown.Item>
-              <Dropdown.Item onClick={() => setIsOpenPanelTabBarLeft((prev) => !prev)}>Criar retenção</Dropdown.Item>
+              <Dropdown.Item onClick={() => setSelectedPanelTabBarLeft((prev) => ({ ...prev, isOpen: true }))}>
+                Criar interdição
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => setSelectedPanelTabBarLeft((prev) => ({ ...prev, isOpen: true }))}>
+                Criar retenção
+              </Dropdown.Item>
             </Dropdown.Content>
           </Dropdown.Root>
           <OptButton variant="outlined" className="h-6 border-none p-0">
@@ -88,10 +92,11 @@ const ControlFieldsetGroupBox = (props: IControlFieldsetGroupBoxProps) => {
             </Dropdown.Trigger>
 
             <Dropdown.Content>
-              <Dropdown.Item onClick={() => setIsOpenPanelTabBarLeft((prev) => !prev)}>
+              {" "}
+              <Dropdown.Item onClick={() => setSelectedPanelTabBarLeft((prev) => ({ ...prev, isOpen: true }))}>
                 Monitoramento de planos
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => setIsOpenPanelTabBarLeft((prev) => !prev)}>
+              </Dropdown.Item>{" "}
+              <Dropdown.Item onClick={() => setSelectedPanelTabBarLeft((prev) => ({ ...prev, isOpen: true }))}>
                 Atividades alteradas
               </Dropdown.Item>
             </Dropdown.Content>
@@ -109,7 +114,16 @@ const ControlFieldsetGroupBox = (props: IControlFieldsetGroupBoxProps) => {
             variant="1"
             className="flex !w-auto cursor-pointer items-center justify-start gap-1 whitespace-nowrap xl:text-xs"
           >
-            <input type="checkbox" name="viewTrainInfo" className="w-[20px]" />
+            <input
+              type="checkbox"
+              name="viewTrainInfo"
+              className="w-[20px]"
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                const isChecked = event.target.checked;
+                setSelectedPanelTabBarLeft((prev) => ({ isOpen: isChecked, openTabName: null }));
+              }}
+            />
+            {JSON.stringify(selectedPanelTabBarLeft.isOpen)}
             Visualizar info's do trem
           </Text.Label>
 
