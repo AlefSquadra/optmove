@@ -1,0 +1,16 @@
+C:\Users\SQUADRA\Desktop\Workspace\MRS\Optmove\Projects\Frontend\mrs3\optmove-frontend
+├── public
+└── src
+   ├── app
+   |  ├── providers
+   |  └── router
+   ├── assets
+   ├── config
+   ├── features
+   ├── shared
+   |  └── hooks
+   └── styles
+
+directory: 14
+
+ignored: directory (1)

@@ -1,19 +1,19 @@
-// vite.config.ts
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { defineConfig } from "vite";
 
+// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 3000,
-  },
-  ssr: {
-    noExternal: ["@optmove/design-system"],
-  },
+  plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@optmoves": path.resolve(__dirname, "./src/lib"),
+      "@app": path.resolve(__dirname, "src/app"),
+      "@assets": path.resolve(__dirname, "src/assets"),
+      "@config": path.resolve(__dirname, "src/config"),
+      "@features": path.resolve(__dirname, "src/features"),
+      "@shared": path.resolve(__dirname, "src/shared"),
+      "@styles": path.resolve(__dirname, "src/styles"),
     },
   },
   build: {
