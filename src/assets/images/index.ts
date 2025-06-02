@@ -1,0 +1,55 @@
+// Assets da raiz
+export { default as binoculars } from './binoculars.svg';
+export { default as formPageTerminal } from './form-page-terminal.svg';
+export { default as ledYellow } from './led-yellow.svg';
+export { default as logo } from './logo.png';
+export { default as searchEye } from './search-eye.svg';
+export { default as velocity } from './velocity.svg';
+export { default as vite } from './vite.svg';
+export { default as wabtecLogin2 } from './wabtec-login2.png';
+
+// Assets da pasta optmove-icons-svg
+export { default as aRed } from './optmove-icons-svg/a-red.svg';
+export { default as binocularsOptmove } from './optmove-icons-svg/binoculars.svg';
+export { default as cardList } from './optmove-icons-svg/card-list.svg';
+export { default as circleGray } from './optmove-icons-svg/circle-gray.svg';
+export { default as circleGreen } from './optmove-icons-svg/circle-green.svg';
+export { default as circleMinusRed } from './optmove-icons-svg/circle-minus-red.svg';
+export { default as circleRed } from './optmove-icons-svg/circle-red.svg';
+export { default as circleYellow } from './optmove-icons-svg/circle-yellow.svg';
+export { default as compass } from './optmove-icons-svg/compass.svg';
+export { default as cursorWhite } from './optmove-icons-svg/cursor-white.svg';
+export { default as cursor } from './optmove-icons-svg/cursor.svg';
+export { default as doubleWindow } from './optmove-icons-svg/double-window.svg';
+export { default as employeeGray } from './optmove-icons-svg/employee-gray.svg';
+export { default as employer } from './optmove-icons-svg/employer.svg';
+export { default as excel } from './optmove-icons-svg/excel.svg';
+export { default as graphBlockSearch } from './optmove-icons-svg/graph-block-search.svg';
+export { default as growingGraph } from './optmove-icons-svg/growing-graph.svg';
+export { default as lightGray } from './optmove-icons-svg/light-gray.svg';
+export { default as lightYellow } from './optmove-icons-svg/light-yellow.svg';
+export { default as likeYellow } from './optmove-icons-svg/like-yellow.svg';
+export { default as listTreeView } from './optmove-icons-svg/list-tree-view.svg';
+export { default as lockedRed } from './optmove-icons-svg/locked-red.svg';
+export { default as logBlack } from './optmove-icons-svg/log-black.svg';
+export { default as log } from './optmove-icons-svg/log.svg';
+export { default as pGreen } from './optmove-icons-svg/p-green.svg';
+export { default as people } from './optmove-icons-svg/people.svg';
+export { default as plus } from './optmove-icons-svg/plus.svg';
+export { default as refresh } from './optmove-icons-svg/refresh.svg';
+export { default as saveDiskBlue } from './optmove-icons-svg/save-disk-blue.svg';
+export { default as saveDiskGray } from './optmove-icons-svg/save-disk-gray.svg';
+export { default as searchView } from './optmove-icons-svg/search-view.svg';
+export { default as search } from './optmove-icons-svg/search.svg';
+export { default as speedometer } from './optmove-icons-svg/speedometer.svg';
+export { default as timingRed } from './optmove-icons-svg/timing-red.svg';
+export { default as timing } from './optmove-icons-svg/timing.svg';
+export { default as twoEmployee } from './optmove-icons-svg/two-employee.svg';
+export { default as unlocked } from './optmove-icons-svg/unlocked.svg';
+export { default as warningConstruction } from './optmove-icons-svg/warning-construction.svg';
+export { default as windowFolder } from './optmove-icons-svg/window-folder.svg';
+export { default as windowListRed } from './optmove-icons-svg/window-list-red.svg';
+export { default as windowList } from './optmove-icons-svg/window-list.svg';
+export { default as windowPage } from './optmove-icons-svg/window-page.svg';
+export { default as windowPlot } from './optmove-icons-svg/window-plot.svg';
+
