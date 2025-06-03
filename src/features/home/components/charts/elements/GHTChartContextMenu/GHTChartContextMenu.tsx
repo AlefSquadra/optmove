@@ -1,47 +1,15 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// @ts-nocheck
-
-import React, { useEffect, useRef } from "react";
+import type {
+  IContextMenuProps,
+  IModifiersKeys,
+} from "@features/home/components/charts/elements/GHTChartContextMenu/contextMenu.types";
+import React, { useEffect, useMemo, useRef } from "react";
 import { contextMenuDefinitions } from "./contextMenuDefinitions";
 import { MenuItem } from "./GHTChartContextMenuITem";
 import { normalizeShortcut } from "./normalizeShortcut";
 
-export type ContextType = "train" | "restriction" | "background";
-
-export interface IDataContextMenu {
-  id: string | number;
-  [key: string]: any;
-}
-
-export interface IContextMenuProps {
-  x: number;
-  y: number;
-  name: string;
-  type: ContextType;
-  data?: IDataContextMenu;
-  onClose: () => void;
-  onAction: (action: string, menuItem: IDataContextMenu) => void;
-}
-
-export interface IMenuItemContextMenu {
-  id: string;
-  label: string;
-  icon?: string;
-  shortcut?: string;
-  action?: string;
-  disabled?: boolean;
-  content?: (props: IContextMenuProps, disabled?: boolean) => React.ReactNode;
-}
-
-export interface IMenuGroupContextMenu {
-  id: string;
-  items: IMenuItemContextMenu[];
-}
-
 export const ContextMenu = ({ x, y, type, name, onClose, onAction, data }: IContextMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
-  const menuGroups = contextMenuDefinitions[type] || [];
+  const menuGroups = useMemo(() => contextMenuDefinitions[type], [type]);
 
   // Fechar o menu quando clicar fora dele
   useEffect(() => {
@@ -69,7 +37,7 @@ export const ContextMenu = ({ x, y, type, name, onClose, onAction, data }: ICont
 
     const handleKeyDown = (event: KeyboardEvent) => {
       // Construir o atalho pressionado
-      const modifiers = [];
+      const modifiers: IModifiersKeys[] = [];
       if (event.ctrlKey) modifiers.push("ctrl");
       if (event.altKey) modifiers.push("alt");
       if (event.shiftKey) modifiers.push("shift");
@@ -82,7 +50,7 @@ export const ContextMenu = ({ x, y, type, name, onClose, onAction, data }: ICont
       const menuItem = shortcutMap.get(pressedShortcut);
       if (menuItem) {
         event.preventDefault();
-        onAction(menuItem.action || menuItem.id, data);
+        onAction(menuItem.action || menuItem.id, data!);
         onClose();
       }
     };

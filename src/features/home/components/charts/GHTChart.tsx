@@ -23,10 +23,19 @@ interface IGHTChartProps {
   database: Date;
   restrictions: IRestrictionsGHT[];
   defaultHeight: number;
+  onContextMenuAction: (action: ContextMenuItemAction, menuItem: IDataContextMenu) => void;
 }
 
 export const GHTChart = (props: IGHTChartProps) => {
-  const { data, database, defaultHeight, restrictions: restricoes, yLabels, dataOfficialization } = props;
+  const {
+    data,
+    database,
+    defaultHeight,
+    restrictions: restricoes,
+    yLabels,
+    dataOfficialization,
+    onContextMenuAction,
+  } = props;
   const canvasLeftRef = useRef(null);
   const canvasRightRef = useRef(null);
   const canvasChartRef = useRef<HTMLCanvasElement>(null);
@@ -506,7 +515,7 @@ export const GHTChart = (props: IGHTChartProps) => {
           type={openContextMenu.type}
           data={openContextMenu.data}
           onClose={() => setOpenContextMenu(null)}
-          onAction={(action, data) => console.log(action, data)}
+          onAction={onContextMenuAction}
         />
       )}
     </>

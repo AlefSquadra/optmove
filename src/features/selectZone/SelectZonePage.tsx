@@ -3,12 +3,13 @@ import { SelectZoneService } from "@features/selectZone/services/SelectZoneServi
 import { SelectZoneFormSchemaZod, type SelectZoneFormValuesZod } from "@features/selectZone/types/SelectZoneFormZod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
 import { CustomDropdown, type DropdownOption } from "./CustomDropdown";
 
 import { Button, Field } from "@fluentui/react-components";
+import { useEffect } from "react";
 
 const SelectZonePage = () => {
   const { setSelectZoneParams } = useApplicationContext();
@@ -17,12 +18,14 @@ const SelectZonePage = () => {
   const {
     control,
     handleSubmit,
+
+    setValue,
     formState: { errors },
   } = useForm<SelectZoneFormValuesZod>({
     resolver: zodResolver(SelectZoneFormSchemaZod),
   });
 
-  const { data: zonasData } = useQuery({
+  const { data: zonasData, isFetched: isFetchedZonas } = useQuery({
     queryKey: ["select-zone-profile-planner"],
     queryFn: SelectZoneService.getZonePlanner,
   });
@@ -46,6 +49,29 @@ const SelectZonePage = () => {
     navigate("/home");
   };
 
+  const perfilSelecionado = useWatch({
+    control,
+    name: "perfilMesa",
+  });
+
+  const mesaSelecionada = useWatch({
+    control,
+    name: "mesa",
+  });
+
+  useEffect(() => {
+    if (perfilSelecionado) {
+      setValue("mesa", []);
+      setValue("zona", {} as DropdownOption);
+    }
+  }, [perfilSelecionado, setValue]);
+
+  useEffect(() => {
+    if (mesaSelecionada?.find((t) => t?.name?.toLocaleLowerCase() === "baixada santista") && zonasData) {
+      setValue("zona", zonasData);
+    }
+  }, [mesaSelecionada, setValue, zonasData]);
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -57,51 +83,50 @@ const SelectZonePage = () => {
         </h1>
 
         {/* Select PERFIL */}
-        {isFetchedPerfil && (
-          <Controller
-            name="perfilMesa"
-            control={control}
-            rules={{ required: "Perfil é obrigatório" }}
-            render={({ field }) => (
-              <Field label="Perfil" validationMessage={errors.perfilMesa?.message}>
-                <CustomDropdown
-                  value={field.value}
-                  onOptionSelect={(selected) => {
-                    field.onChange(selected as DropdownOption);
-                  }}
-                  options={perfilData?.map((perfil) => ({ id: perfil?.id, name: perfil?.name })) || []}
-                  placeholder="Selecione um perfil"
-                  error={!!errors.perfilMesa}
-                  className="perfil-dropdown"
-                />
-              </Field>
-            )}
-          />
-        )}
+
+        <Controller
+          name="perfilMesa"
+          control={control}
+          rules={{ required: "Perfil é obrigatório" }}
+          render={({ field }) => (
+            <Field label="Perfil" validationMessage={errors.perfilMesa?.message}>
+              <CustomDropdown
+                value={field.value}
+                onOptionSelect={(selected) => {
+                  field.onChange(selected as DropdownOption);
+                }}
+                disabled={!isFetchedPerfil}
+                options={perfilData?.map((perfil) => ({ id: perfil?.id, name: perfil?.name })) || []}
+                placeholder="Selecione um perfil"
+                error={!!errors.perfilMesa}
+                className="perfil-dropdown"
+              />
+            </Field>
+          )}
+        />
 
         {/* Select MESA - Multi-seleção com chips */}
-        {isFetchedMesa && (
-          <Controller
-            name="mesa"
-            control={control}
-            rules={{ required: "Mesa é obrigatória" }}
-            render={({ field }) => (
-              <Field label="Mesa" validationMessage={errors.mesa?.message}>
-                <CustomDropdown
-                  value={field.value || []}
-                  onOptionSelect={(selected) => {
-                    field.onChange(selected as DropdownOption[]);
-                  }}
-                  options={[mesaData!]!.map((mesa) => ({ id: mesa?.id, name: mesa?.name })) || []}
-                  placeholder="Selecione uma ou mais mesas"
-                  multiple={true}
-                  error={!!errors.mesa}
-                  className="mesa-dropdown"
-                />
-              </Field>
-            )}
-          />
-        )}
+        <Controller
+          name="mesa"
+          control={control}
+          rules={{ required: "Mesa é obrigatória" }}
+          render={({ field }) => (
+            <Field label="Mesa" validationMessage={errors.mesa?.message}>
+              <CustomDropdown
+                value={field.value || []}
+                onOptionSelect={(selected) => {
+                  field.onChange(selected as DropdownOption[]);
+                }}
+                disabled={!isFetchedMesa}
+                options={[mesaData!]!.map((mesa) => ({ id: mesa?.id, name: mesa?.name })) || []}
+                placeholder="Selecione uma ou mais mesas"
+                multiple={true}
+                error={!!errors.mesa}
+                className="mesa-dropdown"
+              />
+            </Field>
+          )}
+        />
 
         {/* Select ZONA */}
         <Controller
@@ -115,6 +140,7 @@ const SelectZonePage = () => {
                 onOptionSelect={(selected) => {
                   field.onChange(selected as DropdownOption);
                 }}
+                disabled={!isFetchedZonas}
                 options={[zonasData!]?.map((zona) => ({ id: zona?.id, name: zona?.name })) || []}
                 placeholder="Selecione uma zona"
                 error={!!errors.zona}

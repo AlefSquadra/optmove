@@ -1,6 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 
+import type {
+  ContextMenuItemAction,
+  IDataContextMenu,
+} from "@features/home/components/charts/elements/GHTChartContextMenu/contextMenu.types";
 import { ModalSelectOfficialization } from "@features/home/components/modals/selectOfficialization/ModalSelectOfficialization";
 import { ModalTrainMovements } from "@features/home/components/modals/trainMovements/ModalTrainMovements";
 import { FTVOfficeMenu } from "@features/home/components/officeMenu/officeMenu";
@@ -16,6 +20,7 @@ import {
 import { HomeFTLayoutProvider } from "@features/home/providers/HomeFTLayoutProvider/HomeFTLayoutProvider";
 import { Spinner, Text, type SelectionItemId } from "@fluentui/react-components";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
+import type { IModalData } from "@shared/types/IModalData.type";
 import { GHTChart } from "../../components/charts";
 import { dataOfficialization, GHTChartMock } from "../../components/charts/GHTChartMock";
 import { GHTChartProvider, useGHTChartContext } from "../../components/charts/provider/GHTChartProvider";
@@ -26,7 +31,9 @@ const FTVLayout = () => {
   const [planParams, setPlanParams] = useState<Set<SelectionItemId>>(new Set<SelectionItemId>());
   const [loadingStage, setLoadingStage] = useState("");
   const [openSelectOfficialization, setOpenSelectOfficialization] = useState<boolean>(false);
-  const [openTrainMovements, setOpenTrainMovements] = useState<boolean>(false);
+  const [openTrainMovements, setOpenTrainMovements] = useState<IModalData<IDataContextMenu>>({
+    isOpen: false,
+  });
 
   const fetchDataGHT = useQuery({
     queryKey: ["ghtData", planParams?.size],
@@ -51,33 +58,17 @@ const FTVLayout = () => {
     enabled: planParams?.size > 0,
   });
 
+  const handleContextMenu = (action: ContextMenuItemAction, menuItem: IDataContextMenu) => {
+    switch (action) {
+      case "train_movements":
+        console.log(menuItem);
+        setOpenTrainMovements({ isOpen: true, data: menuItem });
+    }
+  };
+
   useEffect(() => {
     setCursorPointer("auto");
   }, [setCursorPointer]);
-
-  // const renderContent = () => {
-  //   if (fetchDataGHT.isLoading) {
-  //     return (
-  //       <WindowModal open={true} initialWidth={"30%"} initialHeight={"50%"} title="Carregando..." onClose={() => {}}>
-  //         <div className="flex flex-col items-center p-1">
-  //           <Spinner size="small" />
-  //           <div className="mt-1 text-lg text-gray-600">{loadingStage || "Carregando..."}</div>
-  //         </div>
-  //       </WindowModal>
-  //     );
-  //   }
-
-  //   return (
-  //     <GHTChart
-  //       data={GHTChartMock.data}
-  //       database={GHTChartMock.database}
-  //       restrictions={GHTChartMock.restricts}
-  //       yLabels={GHTChartMock.yLabels}
-  //       dataOfficialization={dataOfficialization}
-  //       defaultHeight={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
-  //     />
-  //   );
-  // };
 
   return (
     <>
@@ -122,6 +113,7 @@ const FTVLayout = () => {
                   yLabels={GHTChartMock.yLabels}
                   dataOfficialization={dataOfficialization}
                   defaultHeight={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
+                  onContextMenuAction={handleContextMenu}
                 />
               )}
           </div>
