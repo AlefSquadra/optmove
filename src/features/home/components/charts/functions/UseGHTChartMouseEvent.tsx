@@ -4,12 +4,11 @@
 
 /**
  * Hook React que gerencia eventos de mouse para interação com o gráfico GHT.
-*
-* Implementa detecção de hover sobre elementos (trens/restrições), exibição de tooltips,
-* detecção de cliques com hierarquia de prioridade, e abertura de menus de contexto.
-* Utiliza cálculos geométricos para determinar proximidade e interseções.
-*/
-
+ *
+ * Implementa detecção de hover sobre elementos (trens/restrições), exibição de tooltips,
+ * detecção de cliques com hierarquia de prioridade, e abertura de menus de contexto.
+ * Utiliza cálculos geométricos para determinar proximidade e interseções.
+ */
 
 import { useCallback } from "react";
 import type { IContextMenuProps } from "../elements/GHTChartContextMenu/GHTChartContextMenu";
@@ -63,32 +62,35 @@ export const useGHTChartMouseEvents = ({
   const { setOpenContextMenu, setSelectedElementClickable } = useGHTChartContext();
 
   // Detecta se o mouse está perto o suficiente de uma linha para interagir
-  const getDistanceFromLine = useCallback((mouseX: number, mouseY: number, x1: number, y1: number, x2: number, y2: number) => {
-    const A = mouseX - x1;
-    const B = mouseY - y1;
-    const C = x2 - x1;
-    const D = y2 - y1;
-    const dot = A * C + B * D;
-    const len_sq = C * C + D * D;
-    const param = len_sq !== 0 ? dot / len_sq : -1;
+  const getDistanceFromLine = useCallback(
+    (mouseX: number, mouseY: number, x1: number, y1: number, x2: number, y2: number) => {
+      const A = mouseX - x1;
+      const B = mouseY - y1;
+      const C = x2 - x1;
+      const D = y2 - y1;
+      const dot = A * C + B * D;
+      const len_sq = C * C + D * D;
+      const param = len_sq !== 0 ? dot / len_sq : -1;
 
-    let xx, yy;
+      let xx, yy;
 
-    if (param < 0) {
-      xx = x1;
-      yy = y1;
-    } else if (param > 1) {
-      xx = x2;
-      yy = y2;
-    } else {
-      xx = x1 + param * C;
-      yy = y1 + param * D;
-    }
+      if (param < 0) {
+        xx = x1;
+        yy = y1;
+      } else if (param > 1) {
+        xx = x2;
+        yy = y2;
+      } else {
+        xx = x1 + param * C;
+        yy = y1 + param * D;
+      }
 
-    const dx = mouseX - xx;
-    const dy = mouseY - yy;
-    return Math.sqrt(dx * dx + dy * dy);
-  }, []);
+      const dx = mouseX - xx;
+      const dy = mouseY - yy;
+      return Math.sqrt(dx * dx + dy * dy);
+    },
+    [],
+  );
 
   const handleMouseMove = useCallback(
     (event: React.MouseEvent) => {

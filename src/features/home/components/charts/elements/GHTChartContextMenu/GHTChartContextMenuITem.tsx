@@ -1,14 +1,5 @@
 import clsx from "clsx";
 
-export interface IMenuItem {
-  id: string;
-  label: string;
-  icon?: string;
-  shortcut?: string;
-  action?: string;
-  disabled?: boolean;
-}
-
 const MenuItem = ({ item, data, onAction, onClose }) => {
   const { id, label, icon, shortcut, action, disabled } = item;
 

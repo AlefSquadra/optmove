@@ -13,7 +13,7 @@ type IDrawOfficializationLineProps = {
   canvasChart: HTMLCanvasElement;
   paddingLeft: number;
   hourSpacing: number;
-  database: any;
+  database: Date;
   height: number;
   padding: number;
   dataOfficialization: Date | string;

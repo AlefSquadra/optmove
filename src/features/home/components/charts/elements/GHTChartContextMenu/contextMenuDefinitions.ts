@@ -1,8 +1,4 @@
-import type { IMenuGroupContextMenu } from "./GHTChartContextMenu";
-
-export type GHTChartContextMenuType = "train" | "restriction" | "background";
-
-export const contextMenuDefinitions: Record<GHTChartContextMenuType, IMenuGroupContextMenu[]> = {
+export const contextMenuDefinitions = {
   train: [
     {
       id: "train",
@@ -132,4 +128,4 @@ export const contextMenuDefinitions: Record<GHTChartContextMenuType, IMenuGroupC
       ],
     },
   ],
-};
+} as const;
