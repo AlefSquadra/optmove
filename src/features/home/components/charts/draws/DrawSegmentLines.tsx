@@ -26,6 +26,8 @@ export interface DrawChartProps {
   setSegmentClickData: React.Dispatch<React.SetStateAction<IClickableElement[]>>;
   database: Date;
   dataOfficialization: Date;
+  showAccomplished: boolean;
+  showTimelineView: boolean;
 }
 
 const drawActivityIcon = async (
@@ -81,6 +83,8 @@ const drawSegmentLinesChart = ({
   setSegmentClickData,
   database,
   dataOfficialization,
+  showAccomplished,
+  showTimelineView,
 }: DrawChartProps) => {
   ctxChart.globalAlpha = 1;
   const segmentTrainLineClicked: IClickableElement[] = [];
@@ -164,9 +168,11 @@ const drawSegmentLinesChart = ({
       });
 
       // Caso 1: Segmento completamente antes da oficialização
-      if (isFullyBeforeOfficialization) {
-        ctxChart.lineWidth = 4; // Linha mais grossa
+      console.log("showAccomplished-showTimelineView: ", showAccomplished, showTimelineView);
+      if (isFullyBeforeOfficialization && showAccomplished) {
+        ctxChart.lineWidth = 3; // Linha mais grossa
         ctxChart.strokeStyle = lineColor;
+        ctxChart.setLineDash([]);
         ctxChart.beginPath();
         ctxChart.moveTo(xPosStart, yPosStart);
         ctxChart.lineTo(xPosEnd, yPosEnd);
@@ -189,8 +195,9 @@ const drawSegmentLinesChart = ({
         const yPosOfficialization = yPosStart + ratio * (yPosEnd - yPosStart);
 
         // Desenhar a parte antes da oficialização com linha grossa
-        ctxChart.lineWidth = 4;
+        ctxChart.lineWidth = 3;
         ctxChart.strokeStyle = lineColor;
+        ctxChart.setLineDash([]);
         ctxChart.beginPath();
         ctxChart.moveTo(xPosStart, yPosStart);
         ctxChart.lineTo(xPosOfficialization, yPosOfficialization);

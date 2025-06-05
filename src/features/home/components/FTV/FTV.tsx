@@ -5,6 +5,7 @@ import type {
   ContextMenuItemAction,
   IDataContextMenu,
 } from "@features/home/components/charts/elements/GHTChartContextMenu/contextMenu.types";
+import type { ISelectOfficializationDataGrid } from "@features/home/components/modals/selectOfficialization/DataGridSelectOfficialization";
 import { ModalSelectOfficialization } from "@features/home/components/modals/selectOfficialization/ModalSelectOfficialization";
 import { ModalTrainMovements } from "@features/home/components/modals/trainMovements/ModalTrainMovements";
 import { FTVOfficeMenu } from "@features/home/components/officeMenu/officeMenu";
@@ -18,7 +19,8 @@ import {
   FTLayoutTabPanelLeft,
 } from "@features/home/layouts/HomeLayout";
 import { HomeFTLayoutProvider } from "@features/home/providers/HomeFTLayoutProvider/HomeFTLayoutProvider";
-import { Spinner, Text, type SelectionItemId } from "@fluentui/react-components";
+import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
+import { Spinner, Text } from "@fluentui/react-components";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import type { IModalData } from "@shared/types/IModalData.type";
 import { GHTChart } from "../../components/charts";
@@ -28,15 +30,18 @@ import { GHTChartProvider, useGHTChartContext } from "../../components/charts/pr
 const FTVLayout = () => {
   const { setCursorPointer, selectedElementClickable: lineTrainSelected } = useGHTChartContext();
   const FTContentRef = useRef<HTMLDivElement>(null);
-  const [planParams, setPlanParams] = useState<Set<SelectionItemId>>(new Set<SelectionItemId>());
+  const [planParams, setPlanParams] = useState<ISelectOfficializationDataGrid[]>(
+    [] as ISelectOfficializationDataGrid[],
+  );
   const [loadingStage, setLoadingStage] = useState("");
   const [openSelectOfficialization, setOpenSelectOfficialization] = useState<boolean>(false);
   const [openTrainMovements, setOpenTrainMovements] = useState<IModalData<IDataContextMenu>>({
     isOpen: false,
   });
+  const { showAccomplished, showTimelineView } = useFTLayout();
 
   const fetchDataGHT = useQuery({
-    queryKey: ["ghtData", planParams?.size],
+    queryKey: ["ghtData", planParams],
     queryFn: async () => {
       setLoadingStage("Carregando trens da malha...");
       await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -55,7 +60,7 @@ const FTVLayout = () => {
         yLabels: GHTChartMock.yLabels,
       };
     },
-    enabled: planParams?.size > 0,
+    enabled: planParams?.length > 0,
   });
 
   const handleContextMenu = (action: ContextMenuItemAction, menuItem: IDataContextMenu) => {
@@ -69,6 +74,26 @@ const FTVLayout = () => {
   useEffect(() => {
     setCursorPointer("auto");
   }, [setCursorPointer]);
+
+  // useEffect(() => {
+  //   const handleWindowClick = (event: MouseEvent) => {
+  //     // Verifica se é clique esquerdo
+  //     if (event.button !== 0) return;
+
+  //     if (lineTrainSelected?.id && lineTrainSelected?.elementType === "train") {
+  //       setSelectedPanelTabBarLeft({
+  //         isOpen: true,
+  //         openTabName: "editando o trem",
+  //       });
+  //     }
+  //   };
+
+  //   window.addEventListener("click", handleWindowClick);
+
+  //   return () => {
+  //     window.removeEventListener("click", handleWindowClick);
+  //   };
+  // }, [lineTrainSelected?.id, lineTrainSelected?.elementType]);
 
   return (
     <>
@@ -114,6 +139,8 @@ const FTVLayout = () => {
                   dataOfficialization={dataOfficialization}
                   defaultHeight={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
                   onContextMenuAction={handleContextMenu}
+                  showAccomplished={showAccomplished}
+                  showTimelineView={showTimelineView}
                 />
               )}
           </div>
@@ -147,8 +174,8 @@ const FTVLayout = () => {
       </FTLayoutRoot>
       <ModalSelectOfficialization
         onSelectedPlans={(plans) => {
-          console.log("Carregando oficialização...", plans.selectedItems.size);
-          setPlanParams(plans.selectedItems);
+          console.log("Carregando oficialização...", plans);
+          setPlanParams(plans);
         }}
         openSelectOfficialization={openSelectOfficialization}
         setOpenSelectOfficialization={setOpenSelectOfficialization}

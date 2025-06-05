@@ -4,6 +4,9 @@ export interface IDataGHT {
   name: string;
   color: string;
   type: string;
+  wide: boolean;
+  otherName: string | null;
+  patColor: string | null;
   segments: ISegmentGHT[];
 }
 
@@ -24,8 +27,10 @@ export interface ISegmentGHT {
   yi: number;
   yf: number;
   dash: boolean;
-  info: IDataInfoGHT[];
+  info: IDataInfoGHT[] | any;
   color: string;
+  patColor: string | null;
+  patType: string | null;
   activities?: IActivityGHT[]; // Adicionar esta propriedade
 }
 

@@ -12,7 +12,7 @@ export const HomeFTLayoutProvider = ({ children }: IHomeFTLayoutProvider) => {
   });
 
   const [isOpenPanelTabBarDown, setIsPanelOpenDown] = useState<boolean>(false);
-  const [showAccomplished, setShowAccomplished] = useState<boolean>(false);
+  const [showAccomplished, setShowAccomplished] = useState<boolean>(true);
   const [showTimelineView, setShowTimelineView] = useState<boolean>(false);
 
   return (

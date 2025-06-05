@@ -1,9 +1,10 @@
 import { apiClient } from "@shared/services/apiClient";
-import type { IOfficializationDataResponse } from "@shared/types/Officialization.type";
+import type { IOfficializationDataFilter, IOfficializationDataResponse } from "@shared/types/Officialization.type";
 
 export const SelectOfficializationService = {
-  getPlans() {
-    return apiClient.get<IOfficializationDataResponse[]>("/officialization", {
+  getPlans(data: IOfficializationDataFilter) {
+    return apiClient.get<IOfficializationDataResponse[]>("/v1/Ght/selecionarOficializacoes", {
+      params: data,
       notRequiresAuth: false,
     });
   },

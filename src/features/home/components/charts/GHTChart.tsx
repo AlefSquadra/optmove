@@ -24,6 +24,8 @@ interface IGHTChartProps {
   restrictions: IRestrictionsGHT[];
   defaultHeight: number;
   onContextMenuAction: (action: ContextMenuItemAction, menuItem: IDataContextMenu) => void;
+  showAccomplished?: boolean;
+  showTimelineView?: boolean;
 }
 
 export const GHTChart = (props: IGHTChartProps) => {
@@ -35,6 +37,8 @@ export const GHTChart = (props: IGHTChartProps) => {
     yLabels,
     dataOfficialization,
     onContextMenuAction,
+    showAccomplished,
+    showTimelineView,
   } = props;
   const canvasLeftRef = useRef(null);
   const canvasRightRef = useRef(null);
@@ -355,6 +359,8 @@ export const GHTChart = (props: IGHTChartProps) => {
         setSegmentClickData: setElementClickData,
         database,
         dataOfficialization,
+        showAccomplished,
+        showTimelineView,
       });
 
       // Desenhar linha de oficialização
@@ -408,6 +414,7 @@ export const GHTChart = (props: IGHTChartProps) => {
     } catch (error) {
       console.error("Erro ao renderizar o gráfico:", error);
     }
+    console.log("Renderizou gráfico", showAccomplished);
   }, [
     initialRenderComplete,
     data,
@@ -418,6 +425,8 @@ export const GHTChart = (props: IGHTChartProps) => {
     selectionStart,
     selectionEnd,
     selectedElementClickable,
+    showAccomplished,
+    showTimelineView,
   ]);
 
   // Cálculos de valores para posicionamento

@@ -133,7 +133,7 @@ const GridChangedActivities = () => {
   };
 
   return (
-    <div className="box-border flex h-full w-[500px] flex-col">
+    <div className="box-border flex h-full w-[500px] flex-col bg-white">
       <TabWindowHeader
         title={"Atividades alteradas"}
         onClose={() => {

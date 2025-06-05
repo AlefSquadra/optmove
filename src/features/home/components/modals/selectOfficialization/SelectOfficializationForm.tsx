@@ -2,6 +2,7 @@ import { Button, Dropdown, Field, Input, Option } from "@fluentui/react-componen
 import { Search20Regular } from "@fluentui/react-icons";
 import { TimePicker } from "@fluentui/react-timepicker-compat";
 import { DatePickerField } from "@shared/components/forms/DatePickerField";
+import type { IOfficializationDataFilter } from "@shared/types/Officialization.type";
 import React, { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -9,13 +10,11 @@ interface IOfficializationFormProps {
   onSearch: (data: FormData) => void;
 }
 
-interface FormData {
-  startDatePicker: Date | null;
-  endDatePicker: Date | null;
-  prefix: string;
-  line: string;
+interface FormData extends IOfficializationDataFilter {
   timelineDate: Date | null;
   timeLineHours: Date | null;
+  prefix: "";
+  tupo: string;
 }
 
 const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSearch }) => {
@@ -26,10 +25,9 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      startDatePicker: new Date(2025, 0, 1),
-      endDatePicker: new Date(2025, 0, 10),
-      prefix: "",
-      line: "1",
+      dataInicial: new Date(),
+      dataFinal: new Date(),
+      tipo: "TODOS",
       timelineDate: new Date(2025, 0, 5),
       timeLineHours: new Date(2025, 0, 5, 8, 0),
     },
@@ -37,10 +35,9 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
 
   useEffect(() => {
     reset({
-      startDatePicker: new Date(2025, 0, 1),
-      endDatePicker: new Date(2025, 0, 10),
-      prefix: "",
-      line: "1",
+      dataInicial: new Date(),
+      dataFinal: new Date(),
+      tipo: "TODOS",
       timelineDate: new Date(2025, 0, 5),
       timeLineHours: new Date(2025, 0, 5, 8, 0),
     });
@@ -51,29 +48,29 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
   };
 
   const typeOptions = [
-    { key: "1", text: "OFICIALIZADO" },
-    { key: "2", text: "PUBLICADO" },
-    { key: "3", text: "TODOS" },
+    { key: "OFICIALIZADO", text: "OFICIALIZADO" },
+    { key: "PUBLICADO", text: "PUBLICADO" },
+    { key: "TODOS", text: "TODOS" },
   ];
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 p-4">
       <div className="flex flex-wrap items-end gap-4">
         <DatePickerField
-          name="startDatePicker"
+          name="dataInicial"
           control={control}
           placeholder="__/__/__"
           label="Data Início"
-          errorMessage={errors.startDatePicker?.message}
+          errorMessage={errors.dataInicial?.message}
           className="min-w-38"
         />
 
         <DatePickerField
-          name="endDatePicker"
+          name="dataFinal"
           control={control}
           placeholder="__/__/__"
           label="Até"
-          errorMessage={errors.endDatePicker?.message}
+          errorMessage={errors.dataFinal?.message}
           className="min-w-38"
         />
 
@@ -90,10 +87,10 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
 
       <div className="flex flex-wrap items-end gap-4">
         <Controller
-          name="line"
+          name="tipo"
           control={control}
           render={({ field }) => (
-            <Field label="Tipo" validationMessage={errors.line?.message} className="min-w-38">
+            <Field label="Tipo" validationMessage={errors.tipo?.message} className="min-w-38">
               <Dropdown
                 placeholder="Selecione"
                 value={typeOptions.find((option) => option.key === field.value)?.text || ""}

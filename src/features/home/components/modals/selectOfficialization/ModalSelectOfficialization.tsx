@@ -1,13 +1,17 @@
-import { DataGridSelectOfficialization } from "@features/home/components/modals/selectOfficialization/DataGridSelectOfficialization";
+import {
+  DataGridSelectOfficialization,
+  type ISelectOfficializationDataGrid,
+} from "@features/home/components/modals/selectOfficialization/DataGridSelectOfficialization";
 import { SelectOfficializationForm } from "@features/home/components/modals/selectOfficialization/SelectOfficializationForm";
 import { SelectOfficializationService } from "@features/home/services/SelectOfficializationService";
-import { Button, type OnSelectionChangeData } from "@fluentui/react-components";
+import { Button } from "@fluentui/react-components";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
+import type { IOfficializationDataFilter } from "@shared/types/Officialization.type";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 interface IModalSelectOfficializationProps {
-  onSelectedPlans: (data: OnSelectionChangeData) => void;
+  onSelectedPlans: (data: ISelectOfficializationDataGrid[]) => void;
   openSelectOfficialization: boolean;
   setOpenSelectOfficialization: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -15,18 +19,17 @@ interface IModalSelectOfficializationProps {
 const ModalSelectOfficialization = (props: IModalSelectOfficializationProps) => {
   const { onSelectedPlans } = props;
   const [openSelectOfficialization, setOpenSelectOfficialization] = useState<boolean>(true);
-  const [selection, setSelection] = useState<OnSelectionChangeData>({} as OnSelectionChangeData);
+  const [selection, setSelection] = useState<ISelectOfficializationDataGrid[]>([] as ISelectOfficializationDataGrid[]);
+  const [filters, setFilters] = useState<IOfficializationDataFilter | undefined>(undefined);
 
   const officializationQuery = useQuery({
-    queryKey: ["officialization"],
-    queryFn: () => {
-      return SelectOfficializationService.getPlans();
-    },
-    enabled: false,
+    queryKey: ["officialization", filters], // <- chave dinâmica baseada nos filtros
+    queryFn: () => SelectOfficializationService.getPlans(filters!),
+    enabled: !!filters, // só busca se houver filtros definidos
   });
 
   const handleCloseModal = () => {
-    if (!selection?.selectedItems?.size || selection?.selectedItems?.size === 0) {
+    if (selection?.length === 0) {
       alert("Selecione uma oficialização");
       return;
     }
@@ -47,8 +50,7 @@ const ModalSelectOfficialization = (props: IModalSelectOfficializationProps) => 
         <WindowModal.Header>
           <SelectOfficializationForm
             onSearch={(data) => {
-              console.log(data);
-              officializationQuery.refetch();
+              setFilters(data);
             }}
           />
         </WindowModal.Header>
@@ -56,9 +58,10 @@ const ModalSelectOfficialization = (props: IModalSelectOfficializationProps) => 
         <WindowModal.Body>
           <DataGridSelectOfficialization
             data={officializationQuery?.data ? officializationQuery?.data : []}
-            handleSelectionChange={(_, data) => {
+            handleSelectionChange={(data) => {
               setSelection(data);
             }}
+            isLoading={officializationQuery.isLoading}
           />
         </WindowModal.Body>
 
