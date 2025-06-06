@@ -58,5 +58,11 @@
       "scheduler": "0.23.0"
     }
   },
+  "overrides": {
+    "@mantine/core": "8.0.2",
+    "@mantine/dates": "8.0.2",
+    "@mantine/hooks": "8.0.2",
+    "scheduler": "0.23.0"
+  },
   "packageManager": "pnpm@10.11.0"
 }
