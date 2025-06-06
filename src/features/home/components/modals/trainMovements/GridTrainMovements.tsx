@@ -1,352 +1,212 @@
-import {
-  Button,
-  createTableColumn,
-  DataGrid,
-  DataGridBody,
-  DataGridCell,
-  DataGridHeader,
-  DataGridHeaderCell,
-  DataGridRow,
-  Menu,
-  MenuItem,
-  MenuList,
-  MenuPopover,
-  MenuTrigger,
-  TableCellLayout,
-  type DataGridProps,
-  type TableColumnDefinition,
-  type TableRowId,
-} from "@fluentui/react-components";
-import { ChevronDownRegular, ChevronRightRegular } from "@fluentui/react-icons";
-import React from "react";
+import { ChartDyeing } from "@features/home/chartDyeing/ChartDyeing";
+import { Box } from "@mantine/core";
+import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
+import { MantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
+import { MRT_Localization_PT_BR } from "mantine-react-table/locales/pt-BR/index.cjs";
+import "mantine-react-table/styles.css";
+import { useMemo } from "react";
 
-interface IDataGridTrainMovements {
-  id: string;
-  trainsOfficialization: string;
-  user: string;
-  dateOfficialization: string;
-  mesa: string;
-  timeline: string;
-  officializationType: string;
-  versionModel: string;
-  details?: {
-    description?: string;
-    status?: string;
-    observations?: string;
-    attachments?: string[];
-    history?: Array<{
-      date: string;
-      action: string;
-      user: string;
-    }>;
-  };
-}
+const data = [
+  {
+    sb: "T123",
+    type: "Carga",
+    startOccupation: "2025-06-04 08:00",
+    endOccupation: "2025-06-04 09:30",
+    stop: "Estação Central",
+    durationPat: "01:30",
+    endPat: "2025-06-04 09:45",
+    headDepartureDate: "2025-06-04 10:00",
+    sbCbtc: "CBTC-01",
+    controlZone: "Zona A",
+    branch: "Ramal Norte",
+    subRows: [
+      {
+        sb: "T123-A",
+        type: "Manobra",
+        startOccupation: "2025-06-04 08:15",
+        endOccupation: "2025-06-04 08:45",
+        stop: "Pátio 1",
+        durationPat: "00:30",
+        endPat: "2025-06-04 08:50",
+        headDepartureDate: "2025-06-04 09:00",
+        sbCbtc: "CBTC-01-A",
+        controlZone: "Zona A1",
+        branch: "Ramal Norte",
+        subRows: [],
+      },
+    ],
+  },
+  {
+    sb: "T456",
+    type: "Passageiros",
+    startOccupation: "2025-06-04 09:00",
+    endOccupation: "2025-06-04 10:15",
+    stop: "Estação Sul",
+    durationPat: "01:15",
+    endPat: "2025-06-04 10:20",
+    headDepartureDate: "2025-06-04 10:30",
+    sbCbtc: "CBTC-02",
+    controlZone: "Zona B",
+    branch: "Ramal Sul",
+    subRows: [
+      {
+        sb: "T456-A",
+        type: "Manobra",
+        startOccupation: "2025-06-04 09:30",
+        endOccupation: "2025-06-04 09:50",
+        stop: "Pátio 2",
+        durationPat: "00:20",
+        endPat: "2025-06-04 09:55",
+        headDepartureDate: "2025-06-04 10:00",
+        sbCbtc: "CBTC-02-A",
+        controlZone: "Zona B1",
+        branch: "Ramal Sul",
+        subRows: [],
+      },
+      {
+        sb: "T456-B",
+        type: "Manutenção",
+        startOccupation: "2025-06-04 09:55",
+        endOccupation: "2025-06-04 10:10",
+        stop: "Oficina 3",
+        durationPat: "00:15",
+        endPat: "2025-06-04 10:12",
+        headDepartureDate: "2025-06-04 10:15",
+        sbCbtc: "CBTC-02-B",
+        controlZone: "Zona B2",
+        branch: "Ramal Sul",
+        subRows: [],
+      },
+    ],
+  },
+];
 
-interface IDataGridTrainMovementsGridProps {
-  data: IDataGridTrainMovements[];
-  handleSelectionChange?: DataGridProps["onSelectionChange"];
-}
-
-const DataGridTrainMovements: React.FC<IDataGridTrainMovementsGridProps> = (
-  props: IDataGridTrainMovementsGridProps,
-) => {
-  const { data, handleSelectionChange } = props;
-  const refMap = React.useRef<Record<string, HTMLElement | null>>({});
-  const [selectedRows, setSelectedRows] = React.useState(new Set<TableRowId>([]));
-  const [expandedRows, setExpandedRows] = React.useState(new Set<string>());
-
-  const toggleExpanded = (rowId: string) => {
-    const newExpanded = new Set(expandedRows);
-    if (newExpanded.has(rowId)) {
-      newExpanded.delete(rowId);
-    } else {
-      newExpanded.add(rowId);
-    }
-    setExpandedRows(newExpanded);
-  };
-
-  const onSelectionChange: DataGridProps["onSelectionChange"] = (_, data) => {
-    setSelectedRows(data.selectedItems);
-    if (handleSelectionChange) handleSelectionChange(_, data);
-  };
-
-  // Criar array de dados expandido incluindo as linhas de detalhes
-  const expandedData = React.useMemo(() => {
-    const result: (IDataGridTrainMovements & { isDetailRow?: boolean; parentId?: string })[] = [];
-
-    data.forEach((item) => {
-      result.push(item);
-
-      // Se a linha está expandida e tem detalhes, adiciona uma linha de detalhes
-      if (expandedRows.has(item.id) && item.details) {
-        result.push({
-          id: `${item.id}-details`,
-          isDetailRow: true,
-          parentId: item.id,
-          trainsOfficialization: "",
-          user: "",
-          dateOfficialization: "",
-          mesa: "",
-          timeline: "",
-          officializationType: "",
-          versionModel: "",
-          details: item.details,
-        });
-      }
-    });
-
-    return result;
-  }, [data, expandedRows]);
-
-  const columns: TableColumnDefinition<IDataGridTrainMovements & { isDetailRow?: boolean }>[] = [
-    createTableColumn<IDataGridTrainMovements & { isDetailRow?: boolean }>({
-      columnId: "expand",
-      renderHeaderCell: () => {
-        return "";
+const Example = () => {
+  const columns = useMemo<MRT_ColumnDef<typeof data>[]>(
+    () => [
+      {
+        accessorKey: "sb",
+        header: "SB",
       },
-      renderCell: (item) => {
-        if (item.isDetailRow) return <TableCellLayout></TableCellLayout>;
-
-        const isExpanded = expandedRows.has(item.id);
-        const hasDetails = item.details !== undefined;
-
-        return (
-          <TableCellLayout>
-            {hasDetails ?
-              <Button
-                appearance="subtle"
-                size="small"
-                icon={isExpanded ? <ChevronDownRegular /> : <ChevronRightRegular />}
-                onClick={() => toggleExpanded(item.id)}
-                aria-label={isExpanded ? "Colapsar linha" : "Expandir linha"}
-                style={{ minWidth: "32px", padding: "4px" }}
-              />
-            : null}
-          </TableCellLayout>
-        );
+      {
+        accessorKey: "type",
+        header: "Tipo",
       },
-    }),
-    createTableColumn<IDataGridTrainMovements & { isDetailRow?: boolean }>({
-      columnId: "trainsOfficialization",
-      compare: (a, b) => {
-        if (a.isDetailRow || b.isDetailRow) return 0;
-        return a.trainsOfficialization.localeCompare(b.trainsOfficialization);
+      {
+        accessorKey: "startOccupation",
+        header: "Data Ocupação",
       },
-      renderHeaderCell: () => {
-        return "Trens Oficializados";
+      {
+        accessorKey: "endOccupation",
+        header: "Fim Ocupação",
       },
-      renderCell: (item) => {
-        if (item.isDetailRow) {
-          return (
-            <TableCellLayout style={{ gridColumn: "1 / -1", padding: "0" }}>
-              <div
-                style={{
-                  padding: "16px",
-                  backgroundColor: "#f8f9fa",
-                  border: "1px solid #e1e5e9",
-                  borderRadius: "4px",
-                  margin: "8px 0",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                  width: "100%",
-                }}
-              >
-                <div style={{ display: "grid", gap: "12px" }}>
-                  {item.details?.description && (
-                    <div>
-                      <strong>Descrição:</strong> {item.details.description}
-                    </div>
-                  )}
-                  {item.details?.status && (
-                    <div>
-                      <strong>Status:</strong> {item.details.status}
-                    </div>
-                  )}
-                  {item.details?.observations && (
-                    <div>
-                      <strong>Observações:</strong> {item.details.observations}
-                    </div>
-                  )}
-                  {item.details?.attachments && item.details.attachments.length > 0 && (
-                    <div>
-                      <strong>Anexos:</strong>
-                      <ul style={{ margin: "4px 0 0 16px" }}>
-                        {item.details.attachments.map((attachment, index) => (
-                          <li key={index}>{attachment}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {item.details?.history && item.details.history.length > 0 && (
-                    <div>
-                      <strong>Histórico:</strong>
-                      <div style={{ marginLeft: "16px", marginTop: "8px" }}>
-                        {item.details.history.map((historyItem, index) => (
-                          <div key={index} style={{ marginBottom: "4px" }}>
-                            <strong>{historyItem.date}</strong> - {historyItem.action}
-                            <em> ({historyItem.user})</em>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </TableCellLayout>
-          );
-        }
-        return <TableCellLayout truncate>{item.trainsOfficialization}</TableCellLayout>;
+      {
+        accessorKey: "stop",
+        header: "Parada",
       },
-    }),
-    createTableColumn<IDataGridTrainMovements & { isDetailRow?: boolean }>({
-      columnId: "user",
-      compare: (a, b) => {
-        if (a.isDetailRow || b.isDetailRow) return 0;
-        return a.user.localeCompare(b.user);
+      {
+        accessorKey: "durationPat",
+        header: "Duração PAT",
       },
-      renderHeaderCell: () => {
-        return "Usuário";
+      {
+        accessorKey: "endPat",
+        header: "Fim PAT",
       },
-      renderCell: (item) => {
-        if (item.isDetailRow) return <TableCellLayout></TableCellLayout>;
-        return <TableCellLayout truncate>{item.user}</TableCellLayout>;
+      {
+        accessorKey: "headDepartureDate",
+        header: "Data Saída Cabeça",
       },
-    }),
-    createTableColumn<IDataGridTrainMovements & { isDetailRow?: boolean }>({
-      columnId: "dateOfficialization",
-      renderHeaderCell: () => {
-        return "Data Oficialização";
+      {
+        accessorKey: "sbCbtc",
+        header: "SB CBTC",
       },
-      renderCell: (item) => {
-        if (item.isDetailRow) return <TableCellLayout></TableCellLayout>;
-        return <TableCellLayout truncate>{item.dateOfficialization}</TableCellLayout>;
+      {
+        accessorKey: "controlZone",
+        header: "Zona Controle",
       },
-    }),
-    createTableColumn<IDataGridTrainMovements & { isDetailRow?: boolean }>({
-      columnId: "mesa",
-      compare: (a, b) => {
-        if (a.isDetailRow || b.isDetailRow) return 0;
-        return a.mesa.localeCompare(b.mesa);
+      {
+        accessorKey: "branch",
+        header: "Ramal",
       },
-      renderHeaderCell: () => {
-        return "Mesa";
-      },
-      renderCell: (item) => {
-        if (item.isDetailRow) return <TableCellLayout></TableCellLayout>;
-        return <TableCellLayout truncate>{item.mesa}</TableCellLayout>;
-      },
-    }),
-    createTableColumn<IDataGridTrainMovements & { isDetailRow?: boolean }>({
-      columnId: "timeline",
-      compare: (a, b) => {
-        if (a.isDetailRow || b.isDetailRow) return 0;
-        return a.timeline.localeCompare(b.timeline);
-      },
-      renderHeaderCell: () => {
-        return "Linha do tempo";
-      },
-      renderCell: (item) => {
-        if (item.isDetailRow) return <TableCellLayout></TableCellLayout>;
-        return <TableCellLayout truncate>{item.timeline}</TableCellLayout>;
-      },
-    }),
-    createTableColumn<IDataGridTrainMovements & { isDetailRow?: boolean }>({
-      columnId: "officializationType",
-      compare: (a, b) => {
-        if (a.isDetailRow || b.isDetailRow) return 0;
-        return a.officializationType.localeCompare(b.officializationType);
-      },
-      renderHeaderCell: () => {
-        return "Tipo de Oficialização";
-      },
-      renderCell: (item) => {
-        if (item.isDetailRow) return <TableCellLayout></TableCellLayout>;
-        return <TableCellLayout truncate>{item.officializationType}</TableCellLayout>;
-      },
-    }),
-    createTableColumn<IDataGridTrainMovements & { isDetailRow?: boolean }>({
-      columnId: "versionModel",
-      compare: (a, b) => {
-        if (a.isDetailRow || b.isDetailRow) return 0;
-        return a.versionModel.localeCompare(b.versionModel);
-      },
-      renderHeaderCell: () => {
-        return "Modelo de Versão";
-      },
-      renderCell: (item) => {
-        if (item.isDetailRow) return <TableCellLayout></TableCellLayout>;
-        return <TableCellLayout truncate>{item.versionModel}</TableCellLayout>;
-      },
-    }),
-  ];
+    ],
+    [],
+  );
 
   return (
-    <div style={{ width: "100%" }}>
-      <DataGrid
-        items={expandedData}
+    <Box
+      style={{
+        width: "100%",
+        overflow: "auto",
+      }}
+    >
+      <MantineReactTable
         columns={columns}
-        getRowId={(item) => item.id}
-        resizableColumns
-        selectedItems={selectedRows}
-        onSelectionChange={onSelectionChange}
-        resizableColumnsOptions={{
-          autoFitColumns: false,
+        data={data as any}
+        enableExpanding
+        enableExpandAll={false}
+        enableColumnResizing
+        columnResizeMode="onEnd"
+        selectAllMode="all"
+        enableSelectAll
+        enableRowSelection={false}
+        initialState={{
+          density: "xs",
+          columnSizing: {
+            sb: 50,
+            type: 100,
+            startOccupation: 50,
+            endOccupation: 50,
+            stop: 50,
+            durationPat: 100,
+            endPat: 100,
+            headDepartureDate: 100,
+            sbCbtc: 100,
+            controlZone: 100,
+            branch: 100,
+          },
         }}
-        columnSizingOptions={{
-          expand: { idealWidth: 50, minWidth: 50 },
-          trainsOfficialization: { idealWidth: 200, minWidth: 150 },
-          user: { idealWidth: 150, minWidth: 120 },
-          dateOfficialization: { idealWidth: 160, minWidth: 140 },
-          mesa: { idealWidth: 120, minWidth: 100 },
-          timeline: { idealWidth: 150, minWidth: 120 },
-          officializationType: { idealWidth: 180, minWidth: 150 },
-          versionModel: { idealWidth: 150, minWidth: 120 },
+        enableBottomToolbar={false}
+        enableTopToolbar={false}
+        enablePagination={false}
+        enableFilters={false}
+        layoutMode="grid"
+        localization={MRT_Localization_PT_BR}
+        mantineTableProps={{
+          style: {
+            tableLayout: "fixed",
+            width: "100%",
+          },
         }}
-      >
-        <DataGridHeader>
-          <DataGridRow
-            selectionCell={
-              {
-                //checkboxIndicator: { "aria-label": "Select all rows" },
-              }
-            }
+        mantineTableHeadCellProps={{
+          style: {
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          },
+        }}
+        mantineTableBodyCellProps={{
+          style: {
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          },
+        }}
+        renderDetailPanel={() => (
+          <Box
+            style={{
+              display: "grid",
+              margin: "auto",
+              gridTemplateColumns: "1fr",
+              width: "100%",
+            }}
           >
-            {({ renderHeaderCell, columnId }) => (
-              <Menu openOnContext>
-                <MenuTrigger>
-                  <DataGridHeaderCell ref={(el) => (refMap.current[columnId] = el)}>
-                    {renderHeaderCell()}
-                  </DataGridHeaderCell>
-                </MenuTrigger>
-                <MenuPopover>
-                  <MenuList>
-                    <MenuItem>Keyboard Column Resizing</MenuItem>
-                  </MenuList>
-                </MenuPopover>
-              </Menu>
-            )}
-          </DataGridRow>
-        </DataGridHeader>
-
-        <DataGridBody<IDataGridTrainMovements & { isDetailRow?: boolean }>>
-          {({ item: rowItem, rowId }) => (
-            <DataGridRow<IDataGridTrainMovements & { isDetailRow?: boolean }>
-              key={rowId}
-              selectionCell={
-                rowItem.isDetailRow ? undefined : (
-                  {
-                    checkboxIndicator: { "aria-label": "Select row" },
-                  }
-                )
-              }
-              style={rowItem.isDetailRow ? { backgroundColor: "transparent" } : undefined}
-            >
-              {({ renderCell }) => <DataGridCell>{renderCell(rowItem)}</DataGridCell>}
-            </DataGridRow>
-          )}
-        </DataGridBody>
-      </DataGrid>
-    </div>
+            <ChartDyeing />
+          </Box>
+        )}
+      />
+    </Box>
   );
 };
 
-export { DataGridTrainMovements };
+export default Example;

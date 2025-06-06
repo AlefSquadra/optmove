@@ -22,7 +22,7 @@ export const TabWindowHeader = ({
 }: WindowHeaderProps) => {
   return (
     <div
-      className="flex cursor-move items-center justify-between rounded-t-sm bg-gray-600 p-2 text-white select-none"
+      className="flex cursor-move items-center justify-between bg-gray-600 p-2 text-white select-none"
       onMouseDown={onMouseDown}
     >
       <span className="truncate font-medium">{title}</span>

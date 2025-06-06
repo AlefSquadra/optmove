@@ -1,5 +1,7 @@
 import { GridChangedActivities } from "@features/home/components/tabPanelLeft/changedActivities/GridChangedActivities";
+import { TrainEditForm } from "@features/home/components/tabPanelLeft/TrainEditForm/TrainEditForm";
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
+import clsx from "clsx";
 import { GridSelectRailwayTrain } from "./GridSelectRailwayTrain/GridSelectRailwayTrain";
 
 type TabItem = {
@@ -22,12 +24,17 @@ export const SideLabelContainer: React.FC<SideLabelContainerProps> = ({ tabs, ac
           return (
             <div
               key={tab.label}
-              className={`group relative flex cursor-pointer items-center justify-center rounded-s-lg border border-r-0 border-gray-200 p-3 transition-colors ${
-                isActive ? "bg-gray-100" : "bg-white"
+              className={`group relative flex cursor-pointer items-center justify-center rounded-s-lg border border-r-0 border-gray-200 p-3 text-sm transition-colors ${
+                isActive ? "bg-[#ded9d9]" : "bg-[#f3f2f1]"
               } ${isActive ? "border-r-transparent" : ""}`}
               onClick={() => onClick(tab.label)}
             >
-              <div className="text-sm text-black [text-orientation:sideways] [writing-mode:sideways-lr]">
+              <div
+                className={clsx(
+                  "text-xs font-medium antialiased [text-orientation:sideways] [writing-mode:sideways-lr]",
+                  isActive ? "text-gray-900" : "text-gray-900",
+                )}
+              >
                 {tab.label}
               </div>
             </div>
@@ -49,6 +56,10 @@ const FTVTabLeft = () => {
     {
       label: "Atividades alteradas",
       content: <GridChangedActivities />,
+    },
+    {
+      label: "Editando o trem",
+      content: <TrainEditForm />,
     },
   ];
 
@@ -79,7 +90,7 @@ const FTVTabLeft = () => {
       {activeTab && (
         <div className="absolute top-0 left-full h-full">
           <div
-            className={`h-full rounded-e-lg border border-s-0 border-gray-200 bg-white p-1 shadow-lg transition-all`}
+            className={`h-full overflow-hidden rounded-tr-lg border border-[var(--color-gray-600)] bg-white shadow-lg transition-all`}
           >
             {activeTab.content}
           </div>

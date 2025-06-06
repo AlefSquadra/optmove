@@ -3,6 +3,7 @@ import { msalInstance } from "@app/providers/AuthProvider/msalConfig";
 import { AppRoutes } from "@app/router/Routes";
 import { MsalProvider } from "@azure/msal-react";
 import { FluentProvider, webLightTheme } from "@fluentui/react-components";
+import { MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./App.css";
 
@@ -16,7 +17,9 @@ function App() {
           <QueryClientProvider client={queryClient}>
             {/* <StyleProvider> */}
             <FluentProvider theme={webLightTheme}>
-              <AppRoutes />
+              <MantineProvider>
+                <AppRoutes />
+              </MantineProvider>
             </FluentProvider>
 
             {/* </StyleProvider> */}

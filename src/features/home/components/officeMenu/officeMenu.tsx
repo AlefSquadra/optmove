@@ -42,8 +42,9 @@ const FTVOfficeMenu = () => {
     showTimelineView,
     setShowTimelineView,
     setIsPanelOpenDown,
+    setOpenSelectOfficialization,
   } = useFTLayout();
-  const { selectZoneParams } = useApplicationContext();
+  const { selectZoneParams, selectedOfficialization } = useApplicationContext();
   const [, setIsOpen] = useState(false);
 
   //   const onTabSelect = (_: SelectTabEvent, data: SelectTabData) => {
@@ -62,8 +63,18 @@ const FTVOfficeMenu = () => {
 
       <div className="relative flex flex-col-reverse items-start justify-between gap-1">
         <div className="relative flex items-start gap-1">
-          <Input type="datetime-local" style={{ width: "180px", height: "28px" }} />
-          <ToolbarButton icon={<img src={refresh} width={24} alt="Icon" />}></ToolbarButton>
+          <Input
+            type="datetime-local"
+            value={selectedOfficialization?.officializationForm.timelineDatetime}
+            disabled
+            style={{ width: "180px", height: "28px" }}
+          />
+          <ToolbarButton
+            icon={<img src={refresh} width={24} alt="Icon" />}
+            onClick={() => {
+              setOpenSelectOfficialization(true);
+            }}
+          ></ToolbarButton>
           <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("PlanejadorCCO").result}>
             <Select style={{ width: "150px" }}>
               <Option value="1">Mesa de programação</Option>
