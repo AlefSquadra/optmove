@@ -103,6 +103,12 @@ const GridSelectRailwayTrain = () => {
           type: "123",
           dateOfficialization: "123",
         },
+        {
+          id: "2",
+          prefix: "123",
+          type: "123",
+          dateOfficialization: "123",
+        },
       ];
     },
   });

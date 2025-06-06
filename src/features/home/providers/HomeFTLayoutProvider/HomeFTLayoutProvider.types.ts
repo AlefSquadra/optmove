@@ -15,4 +15,6 @@ export interface FTLayoutContext {
   setShowAccomplished: React.Dispatch<React.SetStateAction<boolean>>;
   showTimelineView: boolean;
   setShowTimelineView: React.Dispatch<React.SetStateAction<boolean>>;
+  openSelectOfficialization: boolean;
+  setOpenSelectOfficialization: React.Dispatch<React.SetStateAction<boolean>>;
 }

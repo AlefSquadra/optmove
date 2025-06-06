@@ -34,11 +34,10 @@ const FTVLayout = () => {
     [] as ISelectOfficializationDataGrid[],
   );
   const [loadingStage, setLoadingStage] = useState("");
-  const [openSelectOfficialization, setOpenSelectOfficialization] = useState<boolean>(false);
   const [openTrainMovements, setOpenTrainMovements] = useState<IModalData<IDataContextMenu>>({
     isOpen: false,
   });
-  const { showAccomplished, showTimelineView } = useFTLayout();
+  const { showAccomplished, showTimelineView, setOpenSelectOfficialization, openSelectOfficialization } = useFTLayout();
 
   const fetchDataGHT = useQuery({
     queryKey: ["ghtData", planParams],
@@ -174,7 +173,6 @@ const FTVLayout = () => {
       </FTLayoutRoot>
       <ModalSelectOfficialization
         onSelectedPlans={(plans) => {
-          console.log("Carregando oficialização...", plans);
           setPlanParams(plans);
         }}
         openSelectOfficialization={openSelectOfficialization}

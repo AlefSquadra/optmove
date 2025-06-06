@@ -14,4 +14,18 @@ export interface IOfficializationDataFilter {
   dataFinal: string | Date;
   tipo: string;
   prefixo: string;
+  timelineDatetime: string;
+}
+
+export interface IOfficializationFormData extends IOfficializationDataFilter {
+  dataInicial: Date | string;
+  dataFinal: Date | string;
+  prefix: "";
+  tipo: string;
+  timelineDatetime: string;
+}
+
+export interface IOfficializationApplicationData {
+  listOfficialization: IOfficializationDataResponse[];
+  officializationForm: IOfficializationDataFilter;
 }

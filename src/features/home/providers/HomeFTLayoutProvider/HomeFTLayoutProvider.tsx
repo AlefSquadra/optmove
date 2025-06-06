@@ -13,7 +13,8 @@ export const HomeFTLayoutProvider = ({ children }: IHomeFTLayoutProvider) => {
 
   const [isOpenPanelTabBarDown, setIsPanelOpenDown] = useState<boolean>(false);
   const [showAccomplished, setShowAccomplished] = useState<boolean>(true);
-  const [showTimelineView, setShowTimelineView] = useState<boolean>(false);
+  const [showTimelineView, setShowTimelineView] = useState<boolean>(true);
+  const [openSelectOfficialization, setOpenSelectOfficialization] = useState<boolean>(true);
 
   return (
     <FtlContext.Provider
@@ -26,6 +27,8 @@ export const HomeFTLayoutProvider = ({ children }: IHomeFTLayoutProvider) => {
         setShowAccomplished,
         showTimelineView,
         setShowTimelineView,
+        openSelectOfficialization,
+        setOpenSelectOfficialization,
       }}
     >
       {children}
