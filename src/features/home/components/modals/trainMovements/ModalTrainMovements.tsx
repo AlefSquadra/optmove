@@ -42,7 +42,6 @@ const ModalTrainMovements = (props: IModalTrainMovementsProps) => {
       <WindowModal
         title={`Movimentos do trem: ${openTrainMovements?.data?.name}`}
         initialWidth={"55%"}
-        initialHeight={"70%"}
         open={openTrainMovements.isOpen}
         onClose={() => setOpenTrainMovements({ isOpen: false })}
       >
