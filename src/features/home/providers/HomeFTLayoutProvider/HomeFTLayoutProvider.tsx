@@ -3,6 +3,7 @@ import type {
   IHomeFTLayoutProvider,
   IOpenPanelTabBarLeft,
 } from "@features/home/providers/HomeFTLayoutProvider/HomeFTLayoutProvider.types";
+import type { IModalData } from "@shared/types/IModalData.type";
 import { useState } from "react";
 
 export const HomeFTLayoutProvider = ({ children }: IHomeFTLayoutProvider) => {
@@ -15,6 +16,7 @@ export const HomeFTLayoutProvider = ({ children }: IHomeFTLayoutProvider) => {
   const [showAccomplished, setShowAccomplished] = useState<boolean>(true);
   const [showTimelineView, setShowTimelineView] = useState<boolean>(true);
   const [openSelectOfficialization, setOpenSelectOfficialization] = useState<boolean>(true);
+  const [openSystemParams, setOpenSystemParams] = useState<IModalData<any>>({ isOpen: false });
 
   return (
     <FtlContext.Provider
@@ -29,6 +31,8 @@ export const HomeFTLayoutProvider = ({ children }: IHomeFTLayoutProvider) => {
         setShowTimelineView,
         openSelectOfficialization,
         setOpenSelectOfficialization,
+        openSystemParams,
+        setOpenSystemParams,
       }}
     >
       {children}

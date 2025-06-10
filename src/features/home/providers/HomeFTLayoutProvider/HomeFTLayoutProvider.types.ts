@@ -1,3 +1,5 @@
+import type { IModalData } from "@shared/types/IModalData.type";
+
 export interface IHomeFTLayoutProvider {
   children: React.ReactNode;
 }
@@ -17,4 +19,6 @@ export interface FTLayoutContext {
   setShowTimelineView: React.Dispatch<React.SetStateAction<boolean>>;
   openSelectOfficialization: boolean;
   setOpenSelectOfficialization: React.Dispatch<React.SetStateAction<boolean>>;
+  openSystemParams: IModalData<any>;
+  setOpenSystemParams: React.Dispatch<React.SetStateAction<IModalData<any>>>;
 }
