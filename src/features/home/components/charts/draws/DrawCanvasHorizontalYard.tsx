@@ -9,7 +9,7 @@ export interface IDrawCanvasHorizontalYard {
   padding: number;
   height: number;
   width: number;
-  accumulatedYPositions: IAccumulatedYPositions[];
+  accumulatedYPositions: IAccumulatedYPositions;
 }
 
 /**
