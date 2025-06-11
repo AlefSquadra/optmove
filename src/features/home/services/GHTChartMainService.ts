@@ -2,7 +2,7 @@ import type { IDataGHT, IRestrictionsGHT, IYLabelsGHT } from "@features/home/com
 import { apiClient } from "@shared/services/apiClient";
 
 export const GHTChartMainService = {
-  getYards(ramal: string = "FPU-FOS Barra do Piraí") {
+  getYards(ramal: string = "ICZ-ISN Baixada Conceição-Santos") {
     return apiClient.get<IYLabelsGHT[]>(`/v1/Ght/patios/${ramal}`, {
       notRequiresAuth: false,
     });
