@@ -21,7 +21,7 @@ type IDrawOfficializationLineProps = {
 
 export const drawOfficializationLine = (props: IDrawOfficializationLineProps) => {
   const { ctxChart, dataOfficialization, canvasChart, paddingLeft, padding, database, height, hourSpacing } = props;
-  ctxChart.strokeStyle = "#48a151a6";
+  ctxChart.strokeStyle = "#00c000";
   ctxChart.lineWidth = 3;
   ctxChart.setLineDash([]);
 

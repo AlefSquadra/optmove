@@ -57,13 +57,12 @@ export interface IRestrictionsGHT {
   info: IDataInfoGHT[];
 }
 
-export interface IAccumulatedYPositions {
+export type IAccumulatedYPositions = {
   label: string;
   yPos: number;
   allocatedSpace: number;
   backgroundColor: string;
-}
-[];
+}[];
 
 /** FIM - interfaces GHTChart */
 

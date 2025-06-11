@@ -34,6 +34,7 @@ import { useState } from "react";
 
 const FTVOfficeMenu = () => {
   const [selectedTab] = useState("ftv");
+
   const {
     selectedPanelTabBarLeft,
     setSelectedPanelTabBarLeft,
@@ -43,6 +44,7 @@ const FTVOfficeMenu = () => {
     setShowTimelineView,
     setIsPanelOpenDown,
     setOpenSelectOfficialization,
+    setOpenSystemParams,
   } = useFTLayout();
   const { selectZoneParams, selectedOfficialization } = useApplicationContext();
   const [, setIsOpen] = useState(false);
@@ -195,7 +197,10 @@ const FTVOfficeMenu = () => {
             <ToolbarButton icon={<img src={growingGraph} width={20} />} />
             <ToolbarButton icon={<img src={graphBlockSearch} width={20} />} />
             <ToolbarButton icon={<img src={windowPlot} width={20} />} />
-            <ToolbarButton icon={<img src={windowFolder} width={20} />} />
+            <ToolbarButton
+              icon={<img src={windowFolder} width={20} />}
+              onClick={() => setOpenSystemParams({ isOpen: true })}
+            />
 
             {/* Checkboxes */}
             <Checkbox
