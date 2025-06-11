@@ -9,8 +9,6 @@
 
 import type { IAccumulatedYPositions } from "@features/home/components/charts/GHTChart.types";
 
-
-
 interface DrawAxesParams {
   ctxChart: CanvasRenderingContext2D;
   hoursToShow: number;
@@ -21,7 +19,7 @@ interface DrawAxesParams {
   paddingRight: number;
   hourSpacing: number;
   width: number;
-  accumulatedYPositions: IAccumulatedYPositions[];
+  accumulatedYPositions: IAccumulatedYPositions;
 }
 
 export const drawAxesAndGuides = (props: DrawAxesParams) => {
