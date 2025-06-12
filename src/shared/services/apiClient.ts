@@ -1,6 +1,6 @@
 import { HttpClient } from "@config/HttpClient";
 
-let backendToken: string | null = localStorage.getItem("apiAccessToken");
+export let backendToken: string | null = localStorage.getItem("apiAccessToken");
 
 export const setBackendToken = (token: string) => {
   backendToken = token;

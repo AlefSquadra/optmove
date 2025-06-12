@@ -5,6 +5,7 @@ import type {
   ContextMenuItemAction,
   IDataContextMenu,
 } from "@features/home/components/charts/elements/GHTChartContextMenu/contextMenu.types";
+import { PriorizarDestinoModal } from "@features/home/components/modals/PriorizarDestinoModal";
 import type { ISelectOfficializationDataGrid } from "@features/home/components/modals/selectOfficialization/DataGridSelectOfficialization";
 import { ModalSelectOfficialization } from "@features/home/components/modals/selectOfficialization/ModalSelectOfficialization";
 import { ModalSystemParams } from "@features/home/components/modals/systemParams/ModalSystemParams";
@@ -188,6 +189,7 @@ const FTVLayout = () => {
       />
       <ModalTrainMovements openTrainMovements={openTrainMovements} setOpenTrainMovements={setOpenTrainMovements} />
       <ModalSystemParams openSystemParams={openSystemParams} setOpenSystemParams={setOpenSystemParams} />
+      <PriorizarDestinoModal onClose={() => {}} open={false} />
     </>
   );
 };

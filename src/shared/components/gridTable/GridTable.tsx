@@ -18,7 +18,7 @@ export interface ISelectOfficializationDataGrid {
 
 export interface IGridTableProps<T extends Record<string, any>> extends MRT_TableOptions<T> {
   defaultId: keyof T;
-  onSelectionChange: (prop: T[]) => void;
+  onSelectionChange?: (prop: T[]) => void;
   preSelectedItems?: T[];
 }
 
