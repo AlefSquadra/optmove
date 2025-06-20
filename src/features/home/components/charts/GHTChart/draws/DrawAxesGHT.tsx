@@ -7,7 +7,7 @@
  * - Renderizar as linhas horizontais do eixo Y baseadas nas posições acumuladas (proporções dos labels)
  */
 
-import type { IAccumulatedYPositions } from "@features/home/components/charts/GHTChart.types";
+import type { IAccumulatedYPositions } from "@features/home/components/charts/GHTChart/GHTChart.types";
 
 interface DrawAxesParams {
   ctxChart: CanvasRenderingContext2D;

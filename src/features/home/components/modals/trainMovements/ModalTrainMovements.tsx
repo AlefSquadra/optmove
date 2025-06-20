@@ -1,4 +1,4 @@
-import type { IDataContextMenu } from "@features/home/components/charts/elements/GHTChartContextMenu/contextMenu.types";
+import type { IDataContextMenu } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
 import Example from "@features/home/components/modals/trainMovements/GridTrainMovements";
 import { Button, type OnSelectionChangeData } from "@fluentui/react-components";
 import { MantineProvider } from "@mantine/core";

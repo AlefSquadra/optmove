@@ -1,7 +1,7 @@
 import type {
   IContextMenuProps,
   IModifiersKeys,
-} from "@features/home/components/charts/elements/GHTChartContextMenu/contextMenu.types";
+} from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
 import React, { useEffect, useMemo, useRef } from "react";
 import { contextMenuDefinitions } from "./contextMenuDefinitions";
 import { MenuItem } from "./GHTChartContextMenuITem";

@@ -3,7 +3,7 @@ import { MantineProvider } from "@mantine/core";
 import { IconsGridTableIMantineToFluent } from "@styles/iconsGridTableIMantineToFluent/iconsGridTableIMantineToFluent";
 import { MantineReactTable, type MRT_RowSelectionState, type MRT_TableOptions } from "mantine-react-table";
 import { MRT_Localization_PT_BR } from "mantine-react-table/locales/pt-BR/index.cjs";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export interface ISelectOfficializationDataGrid {
   id: string;
@@ -44,22 +44,19 @@ export const OptGridTable = <T extends Record<string, any>>(props: IGridTablePro
     return map;
   }, [optGridProps.data, defaultId]);
 
-  const handleRowSelectionChange = useCallback(
-    (updater: any) => {
-      setRowSelection((prev) => {
-        const newSelection = typeof updater === "function" ? updater(prev) : updater;
+  const handleRowSelectionChange = useCallback((updater: any) => {
+    setRowSelection(updater); // só atualiza state
+  }, []);
 
-        if (onSelectionChange) {
-          const selectedRowIds = Object.keys(newSelection);
-          const selectedRows = selectedRowIds.map((id) => dataLookup.get(id)!).filter(Boolean);
-          onSelectionChange(selectedRows);
-        }
+  useEffect(() => {
+    if (!onSelectionChange) return;
 
-        return newSelection;
-      });
-    },
-    [onSelectionChange, dataLookup],
-  );
+    const selectedRows = Object.keys(rowSelection)
+      .map((id) => dataLookup.get(id)!)
+      .filter(Boolean);
+
+    onSelectionChange(selectedRows);
+  }, [rowSelection, dataLookup, onSelectionChange]);
 
   return (
     <MantineProvider>

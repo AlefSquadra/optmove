@@ -1,12 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 
+import { useApplicationContext } from "@app/providers/ApplicationProvider/useApplication";
 import type {
   ContextMenuItemAction,
   IDataContextMenu,
-} from "@features/home/components/charts/elements/GHTChartContextMenu/contextMenu.types";
-import { PriorizarDestinoModal } from "@features/home/components/modals/PriorizarDestinoModal";
-import type { ISelectOfficializationDataGrid } from "@features/home/components/modals/selectOfficialization/DataGridSelectOfficialization";
+} from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
 import { ModalSelectOfficialization } from "@features/home/components/modals/selectOfficialization/ModalSelectOfficialization";
 import { ModalSystemParams } from "@features/home/components/modals/systemParams/ModalSystemParams";
 import { ModalTrainMovements } from "@features/home/components/modals/trainMovements/ModalTrainMovements";
@@ -25,16 +24,19 @@ import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFt
 import { Spinner, Text } from "@fluentui/react-components";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import type { IModalData } from "@shared/types/IModalData.type";
-import { GHTChart } from "../../components/charts";
-import { dataOfficialization, GHTChartMock } from "../../components/charts/GHTChartMock";
-import { GHTChartProvider, useGHTChartContext } from "../../components/charts/provider/GHTChartProvider";
+
+import { GHTChart } from "@features/home/components/charts/GHTChart/GHTChart";
+import { dataOfficialization, GHTChartMock } from "@features/home/components/charts/GHTChart/GHTChartMock";
+import {
+  GHTChartProvider,
+  useGHTChartContext,
+} from "@features/home/components/charts/GHTChart/provider/GHTChartProvider";
+import { GHTChartMainService } from "@features/home/services/GHTChartMainService";
+import { DateFormat } from "@shared/utils/DateFormat";
 
 const FTVLayout = () => {
   const { setCursorPointer, selectedElementClickable: lineTrainSelected } = useGHTChartContext();
   const FTContentRef = useRef<HTMLDivElement>(null);
-  const [planParams, setPlanParams] = useState<ISelectOfficializationDataGrid[]>(
-    [] as ISelectOfficializationDataGrid[],
-  );
   const [loadingStage, setLoadingStage] = useState("");
   const [openTrainMovements, setOpenTrainMovements] = useState<IModalData<IDataContextMenu>>({
     isOpen: false,
@@ -48,11 +50,18 @@ const FTVLayout = () => {
     openSystemParams,
   } = useFTLayout();
 
+  const { selectedOfficialization } = useApplicationContext();
+
   const fetchDataGHT = useQuery({
-    queryKey: ["ghtData", planParams],
+    queryKey: ["ghtData", selectedOfficialization],
     queryFn: async () => {
       setLoadingStage("Carregando trens da malha...");
       await new Promise((resolve) => setTimeout(resolve, 2000));
+      const data = await GHTChartMainService.getTrains(
+        selectedOfficialization?.listOfficialization.map((o) =>
+          DateFormat.isoToSpace(o.dateOfficialization).toString(),
+        ) ?? [],
+      );
 
       setLoadingStage("Processando dados...");
       await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -62,13 +71,13 @@ const FTVLayout = () => {
 
       setLoadingStage("");
       return {
-        data: GHTChartMock.data,
+        data: data.trains,
         database: GHTChartMock.database,
         restricts: GHTChartMock.restricts,
-        yLabels: GHTChartMock.yLabels,
+        yLabels: data.yards,
       };
     },
-    enabled: planParams?.length > 0,
+    enabled: Object.keys(selectedOfficialization || {}).length > 0,
   });
 
   const handleContextMenu = (action: ContextMenuItemAction, menuItem: IDataContextMenu) => {
@@ -181,15 +190,15 @@ const FTVLayout = () => {
         </FTLayoutTabPanelDown>
       </FTLayoutRoot>
       <ModalSelectOfficialization
-        onSelectedPlans={(plans) => {
-          setPlanParams(plans);
+        onSelectedPlans={() => {
+          // setPlanParams(plans);
         }}
         openSelectOfficialization={openSelectOfficialization}
         setOpenSelectOfficialization={setOpenSelectOfficialization}
       />
       <ModalTrainMovements openTrainMovements={openTrainMovements} setOpenTrainMovements={setOpenTrainMovements} />
       <ModalSystemParams openSystemParams={openSystemParams} setOpenSystemParams={setOpenSystemParams} />
-      <PriorizarDestinoModal onClose={() => {}} open={false} />
+      {/* <PriorizarDestinoModal onClose={() => {}} open={false} /> */}
     </>
   );
 };

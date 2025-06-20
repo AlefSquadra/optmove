@@ -1,4 +1,4 @@
-import type { contextMenuDefinitions } from "@features/home/components/charts/elements/GHTChartContextMenu/contextMenuDefinitions";
+import type { contextMenuDefinitions } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenuDefinitions";
 
 export type IModifiersKeys = "ctrl" | "shift" | "alt" | string;
 
@@ -16,7 +16,7 @@ export type ContextMenuItemAction = ContextMenuItem["action"];
 
 export interface IDataContextMenu {
   id: string | number;
-  [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
 }
 
 export interface IContextMenuProps {

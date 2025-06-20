@@ -1,4 +1,4 @@
-import { ChartDyeing } from "@features/home/chartDyeing/ChartDyeing";
+import { ChartDyeing } from "@features/home/components/charts/chartDyeing/ChartDyeing";
 import { Box } from "@mantine/core";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";

@@ -65,4 +65,9 @@ function stringToDayjs(input: string): Dayjs | null {
   return parsed.isValid() ? parsed : null;
 }
 
-export const DateFormat = { formatToISO, dateToString, stringToDate, stringToDayjs };
+function isoToSpace(input: string): string {
+  const parsed = dayjs(input); // dayjs entende ISO automaticamente
+  return parsed.isValid() ? parsed.format("YYYY-MM-DD HH:mm:ss") : "";
+}
+
+export const DateFormat = { formatToISO, dateToString, stringToDate, stringToDayjs, isoToSpace };

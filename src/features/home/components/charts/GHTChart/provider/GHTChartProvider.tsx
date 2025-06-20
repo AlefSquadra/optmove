@@ -1,4 +1,4 @@
-import type { IContextMenuProps } from "@features/home/components/charts/elements/GHTChartContextMenu/contextMenu.types";
+import type { IContextMenuProps } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
 import { createContext, useContext, useState } from "react";
 import type { IClickableElement } from "../GHTChart.types";
 
