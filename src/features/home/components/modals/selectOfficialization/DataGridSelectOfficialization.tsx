@@ -26,7 +26,7 @@ interface ISelectOfficializationDataGridProps {
 }
 
 const DataGridSelectOfficialization = (props: ISelectOfficializationDataGridProps) => {
-  const { data, isLoading } = props;
+  const { data = [], isLoading } = props;
   const contentRef = useRef<HTMLDivElement>(null);
   const { setValue, getValues } = useFormContext<IOfficializationFormData>();
 

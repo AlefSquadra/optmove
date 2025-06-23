@@ -7,19 +7,26 @@ export const GHTChartMainService = {
       notRequiresAuth: false,
     });
   },
-  getTrains(officializationDates: string[] = [""]) {
-    console.log("officializationDates", officializationDates);
-    return apiClient.post<
-      { yards: any[]; trains: IDataGHT[] },
-      {
-        DateGHTTimeline: string;
-        DateOfficializationList: string[];
-      }
-    >(`/v1/ght/trens/v2`, {
-      DateGHTTimeline: "2025-06-03T03:09:22",
-      DateOfficializationList: ["2025-06-03T09:09:22"],
+
+  getTrains(data: { dateGhtTimeline: string; officializations: string[] }) {
+    return apiClient.get<{ trains: IDataGHT[]; yards: IYLabelsGHT[] }>("/v1/Ght/trens", {
+      params: {
+        DateGHTTimeline: data.dateGhtTimeline,
+        DateOfficializationList: data.officializations,
+      },
+
+      paramsSerializer: (p) => {
+        const sp = new URLSearchParams();
+        Object.entries(p).forEach(([k, v]) =>
+          Array.isArray(v) ? v.forEach((item) => sp.append(k, item)) : sp.append(k, String(v)),
+        );
+        return sp.toString();
+      },
+
+      notRequiresAuth: false,
     });
   },
+
   getRestrictions(dataOfficialization: string) {
     return apiClient.get<IRestrictionsGHT[]>(`/v1/Ght/restricoes/${dataOfficialization}`, {
       notRequiresAuth: false,

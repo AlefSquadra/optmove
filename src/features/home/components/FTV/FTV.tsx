@@ -26,14 +26,14 @@ import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import type { IModalData } from "@shared/types/IModalData.type";
 
 import { GHTChart } from "@features/home/components/charts/GHTChart/GHTChart";
-import { dataOfficialization, GHTChartMock } from "@features/home/components/charts/GHTChart/GHTChartMock";
+import { GHTChartMock } from "@features/home/components/charts/GHTChart/GHTChartMock";
 import {
   GHTChartProvider,
   useGHTChartContext,
 } from "@features/home/components/charts/GHTChart/provider/GHTChartProvider";
 import { GHTChartMainService } from "@features/home/services/GHTChartMainService";
 import { DateFormat } from "@shared/utils/DateFormat";
-
+import dayjs from "dayjs";
 const FTVLayout = () => {
   const { setCursorPointer, selectedElementClickable: lineTrainSelected } = useGHTChartContext();
   const FTContentRef = useRef<HTMLDivElement>(null);
@@ -57,11 +57,13 @@ const FTVLayout = () => {
     queryFn: async () => {
       setLoadingStage("Carregando trens da malha...");
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      const data = await GHTChartMainService.getTrains(
-        selectedOfficialization?.listOfficialization.map((o) =>
-          DateFormat.isoToSpace(o.dateOfficialization).toString(),
-        ) ?? [],
-      );
+      const data = await GHTChartMainService.getTrains({
+        dateGhtTimeline: selectedOfficialization?.officializationForm.timelineDatetime as string,
+        officializations:
+          selectedOfficialization?.listOfficialization.map((o) =>
+            DateFormat.isoToSpace(o.dateOfficialization).toString(),
+          ) ?? [],
+      });
 
       setLoadingStage("Processando dados...");
       await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -72,7 +74,7 @@ const FTVLayout = () => {
       setLoadingStage("");
       return {
         data: data.trains,
-        database: GHTChartMock.database,
+        database: "2025-06-03T09:09:22",
         restricts: GHTChartMock.restricts,
         yLabels: data.yards,
       };
@@ -92,25 +94,15 @@ const FTVLayout = () => {
     setCursorPointer("auto");
   }, [setCursorPointer]);
 
-  // useEffect(() => {
-  //   const handleWindowClick = (event: MouseEvent) => {
-  //     // Verifica se é clique esquerdo
-  //     if (event.button !== 0) return;
+  const database = dayjs(selectedOfficialization?.officializationForm.timelineDatetime, "YYYY-MM-DD HH:mm:ss")?.add(
+    -6,
+    "hour",
+  );
 
-  //     if (lineTrainSelected?.id && lineTrainSelected?.elementType === "train") {
-  //       setSelectedPanelTabBarLeft({
-  //         isOpen: true,
-  //         openTabName: "editando o trem",
-  //       });
-  //     }
-  //   };
-
-  //   window.addEventListener("click", handleWindowClick);
-
-  //   return () => {
-  //     window.removeEventListener("click", handleWindowClick);
-  //   };
-  // }, [lineTrainSelected?.id, lineTrainSelected?.elementType]);
+  const databaseOfficialization = dayjs(
+    selectedOfficialization?.officializationForm.timelineDatetime,
+    "YYYY-MM-DD HH:mm:ss",
+  );
 
   return (
     <>
@@ -147,13 +139,14 @@ const FTVLayout = () => {
             {!fetchDataGHT.isLoading &&
               fetchDataGHT?.data?.data?.length &&
               fetchDataGHT?.data?.data?.length > 0 &&
-              FTContentRef.current?.offsetHeight && (
+              FTContentRef.current?.offsetHeight &&
+              selectedOfficialization!.officializationForm.timelineDatetime && (
                 <GHTChart
-                  data={GHTChartMock.data}
-                  database={GHTChartMock.database}
+                  data={fetchDataGHT?.data.data}
+                  dataOfficialization={databaseOfficialization.toDate()}
+                  database={database.toDate()}
                   restrictions={GHTChartMock.restricts}
-                  yLabels={GHTChartMock.yLabels}
-                  dataOfficialization={dataOfficialization}
+                  yLabels={fetchDataGHT?.data.yLabels}
                   defaultHeight={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
                   onContextMenuAction={handleContextMenu}
                   showAccomplished={showAccomplished}
