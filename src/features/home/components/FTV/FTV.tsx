@@ -104,6 +104,13 @@ const FTVLayout = () => {
     "YYYY-MM-DD HH:mm:ss",
   );
 
+  const canRenderGHTChart =
+    !fetchDataGHT.isLoading &&
+    fetchDataGHT.isSuccess &&
+    fetchDataGHT.data?.data &&
+    fetchDataGHT.data?.restricts &&
+    fetchDataGHT.data?.yLabels;
+
   return (
     <>
       <FTLayoutRoot>
@@ -136,23 +143,19 @@ const FTVLayout = () => {
               </WindowModal>
             )}
 
-            {!fetchDataGHT.isLoading &&
-              fetchDataGHT?.data?.data?.length &&
-              fetchDataGHT?.data?.data?.length > 0 &&
-              FTContentRef.current?.offsetHeight &&
-              selectedOfficialization!.officializationForm.timelineDatetime && (
-                <GHTChart
-                  data={fetchDataGHT?.data.data}
-                  dataOfficialization={databaseOfficialization.toDate()}
-                  database={database.toDate()}
-                  restrictions={GHTChartMock.restricts}
-                  yLabels={fetchDataGHT?.data.yLabels}
-                  defaultHeight={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
-                  onContextMenuAction={handleContextMenu}
-                  showAccomplished={showAccomplished}
-                  showTimelineView={showTimelineView}
-                />
-              )}
+            {canRenderGHTChart && (
+              <GHTChart
+                data={fetchDataGHT?.data?.data}
+                dataOfficialization={databaseOfficialization.toDate()}
+                database={database.toDate()}
+                restrictions={fetchDataGHT?.data?.restricts}
+                yLabels={fetchDataGHT?.data?.yLabels}
+                defaultHeight={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
+                onContextMenuAction={handleContextMenu}
+                showAccomplished={showAccomplished}
+                showTimelineView={showTimelineView}
+              />
+            )}
           </div>
         </FTLayoutContent>
 
