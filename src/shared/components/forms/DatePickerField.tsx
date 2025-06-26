@@ -53,12 +53,13 @@ export function DatePickerField<T extends FieldValues>({
       name={name}
       control={control}
       render={({ field }) => (
-        <Field label={label} validationMessage={errorMessage} className={className}>
+        <Field label={label} size={rest.size} validationMessage={errorMessage} className={className}>
           <DatePicker
             placeholder={placeholder}
             value={field.value}
             onSelectDate={(date) => field.onChange(date)}
             strings={datePickerStrings}
+            className={className}
             formatDate={(date) => (date ? date.toLocaleDateString("pt-BR") : "")}
             parseDateFromString={(value) => {
               const [day, month, year] = value.split("/");

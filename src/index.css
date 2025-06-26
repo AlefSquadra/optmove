@@ -1,5 +1,31 @@
 @import "tailwindcss";
 
+@theme {
+  /* 1024px  → 1024/16 = 64rem */
+  --breakpoint-xs: 64rem;
+  /* 1280px → 1280/16 = 80rem */
+  --breakpoint-md: 80rem;
+  /* 1366px → 1366/16 ≈ 85.375rem */
+  --breakpoint-lg: 85.375rem;
+  /* 1920px → 1920/16 = 120rem */
+  --breakpoint-xl: 120rem;
+
+  --font-family-base: var(--fontFamilyBase);
+}
+
+@layer utilities {
+  .mrt-table-head-cell-resize-handle {
+    @apply !h-[100%] !w-[2.1px] rounded !bg-slate-200 transition-colors;
+  }
+  .mrt-table-head-cell-resize-handle:hover,
+  .mrt-table-head-cell-resize-handle[data-active="true"] {
+    @apply cursor-col-resize bg-black;
+  }
+  .mrt-table-head-cell-content-wrapper {
+    @apply !font-family-base text-sm font-normal;
+  }
+}
+
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;

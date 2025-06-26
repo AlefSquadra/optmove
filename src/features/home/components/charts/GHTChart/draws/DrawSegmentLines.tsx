@@ -213,7 +213,7 @@ const drawSegmentLinesChart = ({
       }
       // Caso 3: Segmento completamente depois da oficialização
       else {
-        ctxChart.lineWidth = 2; // Espessura normal
+        ctxChart.lineWidth = 1; // Espessura normal
         ctxChart.setLineDash([5, 2]);
         ctxChart.strokeStyle = lineColor;
         ctxChart.beginPath();

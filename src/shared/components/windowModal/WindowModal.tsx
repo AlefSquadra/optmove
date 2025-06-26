@@ -1,4 +1,4 @@
-import { Dismiss20Regular, Maximize20Regular, Subtract20Regular } from "@fluentui/react-icons";
+import { TabWindowHeader } from "@shared/components/tabWindowHeader/tabWindowHeader";
 import clsx from "clsx";
 import React, { Children, isValidElement, useEffect, useRef, useState, type ReactNode } from "react";
 
@@ -144,27 +144,14 @@ export const WindowModal: React.FC<WindowModalProps> & {
         height: size.height,
       }}
     >
-      {/* Barra Superior */}
-      <div
-        className="flex cursor-move items-center justify-between bg-gray-600 p-2 text-white select-none"
+      <TabWindowHeader
         onMouseDown={handleMouseDown}
-      >
-        <span className="truncate font-medium">{title}</span>
-        {showButtonsHeader && (
-          <div className="flex gap-2">
-            <button onClick={handleMinimize} className="rounded p-1 hover:bg-gray-500" title="Minimizar">
-              <Subtract20Regular />
-            </button>
-            <button onClick={handleMaximize} className="rounded p-1 hover:bg-gray-500" title="Maximizar">
-              <Maximize20Regular />
-            </button>
-            <button onClick={handleClose} className="rounded p-1 hover:bg-red-600" title="Fechar">
-              <Dismiss20Regular />
-            </button>
-          </div>
-        )}
-      </div>
-
+        showButtons={showButtonsHeader}
+        title={title}
+        onClose={handleClose}
+        onMaximize={handleMaximize}
+        onMinimize={handleMinimize}
+      />
       {/* Conteúdo */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {Children.map(children, (child) => {
@@ -187,7 +174,6 @@ export const WindowModal: React.FC<WindowModalProps> & {
           return child;
         })}
       </div>
-
       {/* Resize Handle */}
       {!isMaximized && (
         <div

@@ -54,10 +54,7 @@ export const drawRestrictions = (props: IDrawRestrictions) => {
       hourSpacing,
       database,
     });
-    let yPosStart = getCanvasYFromYardValue({
-      ...canvasYFromYardValue!,
-      yValue: yi,
-    });
+
     let xPosEnd = getCanvasXFromTime({
       time: new Date(xf),
       canvasWidth,
@@ -65,6 +62,12 @@ export const drawRestrictions = (props: IDrawRestrictions) => {
       hourSpacing,
       database,
     });
+
+    let yPosStart = getCanvasYFromYardValue({
+      ...canvasYFromYardValue!,
+      yValue: yi,
+    });
+
     let yPosEnd = getCanvasYFromYardValue({
       ...canvasYFromYardValue!,
       yValue: yf,
@@ -80,8 +83,13 @@ export const drawRestrictions = (props: IDrawRestrictions) => {
     ctxChart.fillStyle = color || "rgba(0, 0, 255, 0.3)";
     ctxChart.globalAlpha = 0.3;
     ctxChart.beginPath();
-    ctxChart.fillRect(xPosStart, yPosStart, xPosEnd - xPosStart, yPosEnd - yPosStart);
-    ctxChart.globalAlpha = 1;
+    ctxChart.fillRect(
+      xPosStart,
+      yPosStart - padding,
+      xPosEnd - xPosStart,
+      yPosEnd - yPosStart == 0 ? yPosEnd + yPosStart : yPosEnd - yPosStart,
+    );
+    // ctxChart.globalAlpha = 1;
 
     // Aplica borda azul se a restrição estiver selecionada
     const isSelected =

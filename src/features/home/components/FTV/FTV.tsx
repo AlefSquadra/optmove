@@ -26,7 +26,6 @@ import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import type { IModalData } from "@shared/types/IModalData.type";
 
 import { GHTChart } from "@features/home/components/charts/GHTChart/GHTChart";
-import { GHTChartMock } from "@features/home/components/charts/GHTChart/GHTChartMock";
 import {
   GHTChartProvider,
   useGHTChartContext,
@@ -75,7 +74,7 @@ const FTVLayout = () => {
       return {
         data: data.trains,
         database: "2025-06-03T09:09:22",
-        restricts: GHTChartMock.restricts,
+        restrictions: data.restrictions,
         yLabels: data.yards,
       };
     },
@@ -108,7 +107,7 @@ const FTVLayout = () => {
     !fetchDataGHT.isLoading &&
     fetchDataGHT.isSuccess &&
     fetchDataGHT.data?.data &&
-    fetchDataGHT.data?.restricts &&
+    fetchDataGHT.data?.restrictions &&
     fetchDataGHT.data?.yLabels;
 
   return (
@@ -148,7 +147,7 @@ const FTVLayout = () => {
                 data={fetchDataGHT?.data?.data}
                 dataOfficialization={databaseOfficialization.toDate()}
                 database={database.toDate()}
-                restrictions={fetchDataGHT?.data?.restricts}
+                restrictions={fetchDataGHT?.data?.restrictions}
                 yLabels={fetchDataGHT?.data?.yLabels}
                 defaultHeight={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
                 onContextMenuAction={handleContextMenu}

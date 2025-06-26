@@ -43,15 +43,18 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
   ];
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 p-4">
-      <div className="flex flex-wrap items-end gap-4">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex gap-4 p-4 md:flex-row md:gap-2 md:p-2 lg:flex-col lg:gap-4 lg:p-4"
+    >
+      <div className="flex flex-wrap items-end gap-4 md:flex-row md:flex-nowrap md:gap-2 lg:flex-wrap lg:gap-4">
         <DatePickerField
           name="dataInicial"
           control={control}
           placeholder="__/__/__"
           label="Data Início"
           errorMessage={errors.dataInicial?.message}
-          className="min-w-38"
+          className="w-[9.5rem] md:w-[7.5rem] lg:w-[9.5rem]"
         />
 
         <DatePickerField
@@ -60,7 +63,8 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
           placeholder="__/__/__"
           label="Até"
           errorMessage={errors.dataFinal?.message}
-          className="min-w-38"
+          size="medium"
+          className="w-[9.5rem] md:w-[7.5rem] lg:w-[9.5rem]"
         />
 
         <Controller
@@ -68,26 +72,25 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
           control={control}
           render={({ field }) => (
             <Field label="Prefixo" validationMessage={errors.prefix?.message}>
-              <Input {...field} placeholder="Digite o prefixo" />
+              <Input {...field} placeholder="Digite o prefixo" className="w-[9.5rem] md:w-[7.5rem] lg:w-[9.5rem]" />
             </Field>
           )}
         />
       </div>
 
-      <div className="flex flex-wrap items-end gap-4">
+      <div className="flex flex-wrap items-end gap-4 md:flex-row md:flex-nowrap md:gap-2 lg:flex-wrap lg:gap-4">
         <Controller
           name="tipo"
           control={control}
           render={({ field }) => (
-            <Field label="Tipo" validationMessage={errors.tipo?.message} className="min-w-38">
+            <Field label="Tipo" validationMessage={errors.tipo?.message}>
               <Dropdown
                 placeholder="Selecione"
-                value={typeOptions.find((option) => option.key === field.value)?.text || ""}
+                value={typeOptions.find((o) => o.key === field.value)?.text || ""}
                 onOptionSelect={(_, data) => {
-                  if (data.optionValue) {
-                    field.onChange(data.optionValue);
-                  }
+                  if (data.optionValue) field.onChange(data.optionValue);
                 }}
+                className="w-[9.5rem] !min-w-[9.5rem] md:w-[7.5rem] lg:w-[9.5rem] lg:!min-w-[9.5rem]"
               >
                 {typeOptions.map((option) => (
                   <Option key={option.key} value={option.key}>
@@ -99,14 +102,19 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
           )}
         />
 
-        <Button type="submit" appearance="primary" icon={<Search20Regular />} className="w-9 min-w-9 p-0" />
+        <Button
+          type="submit"
+          appearance="primary"
+          icon={<Search20Regular />}
+          className="w-9 min-w-9 p-0 lg:w-9 lg:min-w-9 lg:p-0"
+        />
 
         <Controller
           name="timelineDatetime"
           control={control}
           render={({ field }) => (
-            <Field label="Linha do tempo" validationMessage={errors.prefix?.message}>
-              <Input {...field} placeholder="timeline" type="datetime-local" />
+            <Field label="Linha do tempo" validationMessage={errors.timelineDatetime?.message}>
+              <Input {...field} type="datetime-local" className="w-[9.5rem] md:w-[11rem] lg:w-[9.5rem]" />
             </Field>
           )}
         />
