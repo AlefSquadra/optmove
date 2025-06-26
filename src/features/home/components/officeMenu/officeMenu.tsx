@@ -49,10 +49,6 @@ const FTVOfficeMenu = () => {
   const { selectZoneParams, selectedOfficialization } = useApplicationContext();
   const [, setIsOpen] = useState(false);
 
-  //   const onTabSelect = (_: SelectTabEvent, data: SelectTabData) => {
-  //     setSelectedTab(data.value as string);
-  //   };
-
   const TabsMenu = () => (
     <span className="ml-2 rounded-t-lg border-x border-t border-[#e1e5e9] bg-[#f8f9fa] p-1 px-3 text-xs text-gray-600">
       ICZ-ISN Baixada conceição - santos
@@ -60,16 +56,16 @@ const FTVOfficeMenu = () => {
   );
 
   const FTVRibbon = () => (
-    <div className="border-bottom flex flex-wrap gap-4 bg-[#f8f9fa] px-4 py-2">
+    <div className="border-bottom flex flex-wrap gap-4 bg-[#f8f9fa] px-4 py-2 md:gap-0">
       {/* Grupo Filtros */}
 
-      <div className="relative flex flex-col-reverse items-start justify-between gap-1">
+      <div className="relative flex flex-col-reverse items-start justify-between gap-1 md:gap-0">
         <div className="relative flex items-start gap-1">
           <Input
             type="datetime-local"
             value={selectedOfficialization?.officializationForm.timelineDatetime}
             disabled
-            style={{ width: "180px", height: "28px" }}
+            className="h-[1.750rem] w-[11rem] md:w-[8rem]"
           />
           <ToolbarButton
             icon={<img src={refresh} width={24} alt="Icon" />}
@@ -83,15 +79,15 @@ const FTVOfficeMenu = () => {
             </Select>
           </SecurityComponent>
         </div>
-        <span className="text-xs text-gray-500">Ações</span>
+        <span className="text-sm text-gray-500 md:text-xs">Ações</span>
       </div>
 
       <ToolbarDivider />
 
       {/* Grupo Busca */}
-      <div className="relative flex flex-col-reverse items-start justify-between gap-1">
+      <div className="relative flex flex-col-reverse items-start justify-between gap-1 md:gap-0">
         <div className="relative flex items-start gap-1">
-          <Input placeholder="Prefixo / Tabela" />
+          <Input placeholder="Prefixo / Tabela" className="h-[1.750rem] w-[11rem] md:w-[8rem]" />
           <Tooltip withArrow content="Pesquisar por prefixo ou tabela" relationship="label">
             <ToolbarButton icon={<img src={searchEye} width={24} alt="Icon" />}></ToolbarButton>
           </Tooltip>
@@ -123,13 +119,13 @@ const FTVOfficeMenu = () => {
           </Menu>
           <ToolbarButton icon={<img src={binoculars} width={24} alt="Icon" />}></ToolbarButton>
         </div>
-        <span className="text-xs text-gray-500">Busca</span>
+        <span className="text-sm text-gray-500 md:text-xs">Busca</span>
       </div>
 
       <ToolbarDivider />
 
       {/* Grupo Controle */}
-      <div className="relative flex flex-col-reverse items-start justify-between gap-1">
+      <div className="relative flex flex-col-reverse items-start justify-between gap-1 md:gap-0">
         <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("1").result}>
           <div
             style={{
@@ -211,22 +207,24 @@ const FTVOfficeMenu = () => {
                   openTabName: null,
                 }));
               }}
-              label={"Info's do trem"}
+              label={<Text className="text-sm md:!text-[.7rem]">Info's do trem</Text>}
             />
 
             <Checkbox
-              label="Exibir realizados"
+              label={<Text className="text-sm md:!text-[.7rem]">Exibir realizados</Text>}
+              size="medium"
+              className="text-xs"
               checked={showAccomplished}
               onClick={() => setShowAccomplished((prev) => !prev)}
             />
             <Checkbox
-              label="Até linha do tempo"
+              label={<Text className="text-sm md:!text-[.7rem]">Até linha do tempo</Text>}
               checked={showTimelineView}
               onClick={() => setShowTimelineView((prev) => !prev)}
             />
           </div>
         </SecurityComponent>
-        <span className="text-xs text-gray-500">Controles</span>
+        <span className="text-sm text-gray-500 md:text-xs">Controles</span>
       </div>
 
       <div className="hidden flex-1 xl:flex">
@@ -235,20 +233,20 @@ const FTVOfficeMenu = () => {
       <ToolbarDivider />
 
       {/* Grupo Oficialização */}
-      <div className="relative flex flex-col-reverse items-start justify-between gap-1">
+      <div className="relative flex flex-col-reverse items-start justify-between gap-1 md:gap-0">
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <Text style={{ fontSize: "12px" }}>16/04/2025 17:39:23</Text>
+            <Text className="text-sm md:!text-[.7rem]">16/04/2025 17:39:23</Text>
             <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-              <div>
-                <Text style={{ fontSize: "11px" }}>Mesa 4</Text>
-                <Text style={{ fontSize: "11px" }}>100%</Text>
+              <div className="flex items-center justify-between gap-1 md:gap-0">
+                <Text className="text-sm md:!text-[.7rem]">Mesa4</Text>
+                <Text className="text-sm md:!text-[.7rem]">100%</Text>
               </div>
               <ToolbarButton icon={<img src={windowList} width={20} alt="Icon" />}></ToolbarButton>
             </div>
           </div>
         </div>
-        <span className="text-xs text-gray-500">Oficialização</span>
+        <span className="text-sm text-gray-500 md:text-xs">Oficialização</span>
       </div>
 
       <ToolbarDivider />
@@ -258,7 +256,7 @@ const FTVOfficeMenu = () => {
         <div style={{ padding: "8px" }}>
           <Text style={{ fontSize: "12px" }}>SB: Fora do painel</Text>
         </div>
-        <span className="text-xs text-gray-500">Coordenadas Gráfico</span>
+        <span className="text-sm text-gray-500 md:text-xs">Coordenadas Gráfico</span>
       </div>
 
       <ToolbarDivider />

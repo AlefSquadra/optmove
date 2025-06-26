@@ -9,22 +9,25 @@ export const GHTChartMainService = {
   },
 
   getTrains(data: { dateGhtTimeline: string; officializations: string[] }) {
-    return apiClient.get<{ trains: IDataGHT[]; yards: IYLabelsGHT[] }>("/v1/Ght/trens", {
-      params: {
-        DateGHTTimeline: data.dateGhtTimeline,
-        DateOfficializationList: data.officializations,
-      },
+    return apiClient.get<{ trains: IDataGHT[]; yards: IYLabelsGHT[]; restrictions: IRestrictionsGHT[] }>(
+      "/v1/Ght/trens",
+      {
+        params: {
+          DateGHTTimeline: data.dateGhtTimeline,
+          DateOfficializationList: data.officializations,
+        },
 
-      paramsSerializer: (p) => {
-        const sp = new URLSearchParams();
-        Object.entries(p).forEach(([k, v]) =>
-          Array.isArray(v) ? v.forEach((item) => sp.append(k, item)) : sp.append(k, String(v)),
-        );
-        return sp.toString();
-      },
+        paramsSerializer: (p) => {
+          const sp = new URLSearchParams();
+          Object.entries(p).forEach(([k, v]) =>
+            Array.isArray(v) ? v.forEach((item) => sp.append(k, item)) : sp.append(k, String(v)),
+          );
+          return sp.toString();
+        },
 
-      notRequiresAuth: false,
-    });
+        notRequiresAuth: false,
+      },
+    );
   },
 
   getRestrictions(dataOfficialization: string) {

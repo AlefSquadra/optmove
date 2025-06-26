@@ -7,6 +7,7 @@ import { SelectOfficializationForm } from "@features/home/components/modals/sele
 import { SelectOfficializationService } from "@features/home/services/SelectOfficializationService";
 import { Button } from "@fluentui/react-components";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
+import { useWindowSize } from "@shared/hooks/useWindowSize";
 import type { IOfficializationDataFilter, IOfficializationFormData } from "@shared/types/Officialization.type";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -24,7 +25,7 @@ const ModalSelectOfficialization = (props: IModalSelectOfficializationProps) => 
   const [filters, setFilters] = useState<IOfficializationDataFilter | undefined>(undefined);
   const [timeLine, setTimeLine] = useState<string | undefined>(undefined);
   const { setSelectedOfficialization } = useApplicationContext();
-
+  const { breakpoint } = useWindowSize();
   const methods = useForm<IOfficializationFormData>({
     defaultValues: {
       dataInicial: new Date(),
@@ -64,8 +65,8 @@ const ModalSelectOfficialization = (props: IModalSelectOfficializationProps) => 
       <FormProvider {...methods}>
         <WindowModal
           title="Selecionar oficialização"
-          initialWidth={"55%"}
-          initialHeight={"70%"}
+          initialWidth={"65%"}
+          initialHeight={breakpoint == "md" ? "80%" : "70%"}
           open={openSelectOfficialization}
           onClose={() => setOpenSelectOfficialization(false)}
         >
