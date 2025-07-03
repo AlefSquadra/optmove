@@ -209,6 +209,21 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
   useEffect(() => {
     [svgLeftRef, svgPlotRef, svgRightRef].forEach((r) => d3.select(r.current!).selectAll("*").remove());
 
+    // Tooltip container
+    const container = d3.select(scrollContainerRef.current!).style("position", "relative");
+    container.selectAll(".tooltip").remove();
+    const tooltip = container
+      .append("div")
+      .attr("class", "tooltip")
+      .style("position", "absolute")
+      .style("pointer-events", "none")
+      .style("background", "rgba(0,0,0,0.7)")
+      .style("color", "#fff")
+      .style("padding", "4px 8px")
+      .style("border-radius", "4px")
+      .style("font-size", "12px")
+      .style("opacity", "0");
+
     const { processedData, segmentData, totalHeight } = processData(yLabels);
 
     // <-- ALTERAÇÃO UTC: Usar d3.utcHour para cálculos de tempo
@@ -443,11 +458,29 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
           .attr("stroke", trainColor)
           .attr("stroke-width", 2)
           .style("cursor", "pointer")
-          .on("mouseover", function () {
-            d3.select(this).attr("stroke", "#1976d2").attr("stroke-width", 3);
+          .on("mouseover", function (event) {
+            d3.select(this).raise().attr("stroke", "steelblue").attr("stroke-width", 3);
+
+            tooltip
+              .html(
+                `<strong>Prefixo:</strong> ${train.prefixo}<br/>
+<strong>Segmento:</strong> ${mov.segmento}<br/>
+<strong>Chegada:</strong> ${mov.chegada}<br/>
+<strong>Partida:</strong> ${mov.partida}`,
+              )
+              .style("left", event.offsetX + 10 + "px")
+              .style("top", event.offsetY + 10 + "px")
+              .transition()
+              .duration(100)
+              .style("opacity", 1);
+          })
+          .on("mousemove", function (event) {
+            tooltip.style("left", event.offsetX + 10 + "px").style("top", event.offsetY + 10 + "px");
           })
           .on("mouseout", function () {
             d3.select(this).attr("stroke", trainColor).attr("stroke-width", 2);
+
+            tooltip.transition().duration(100).style("opacity", 0);
           });
 
         if (fimCursoDate < partidaDate) {
@@ -460,11 +493,28 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
             .attr("stroke", trainColor)
             .attr("stroke-width", 2)
             .style("cursor", "pointer")
-            .on("mouseover", function () {
-              d3.select(this).attr("stroke", "#1976d2").attr("stroke-width", 3);
+            .on("mouseover", function (event) {
+              d3.select(this).raise().attr("stroke", "steelblue").attr("stroke-width", 3);
+
+              tooltip
+                .html(
+                  `<strong>Prefixo:</strong> ${train.prefixo}<br/>
+<strong>Segmento:</strong> ${mov.segmento}<br/>
+<strong>Chegada:</strong> ${mov.chegada}<br/>
+<strong>Partida:</strong> ${mov.partida}`,
+                )
+                .style("left", event.offsetX + 10 + "px")
+                .style("top", event.offsetY + 10 + "px")
+                .transition()
+                .duration(100)
+                .style("opacity", 1);
+            })
+            .on("mousemove", function (event) {
+              tooltip.style("left", event.offsetX + 10 + "px").style("top", event.offsetY + 10 + "px");
             })
             .on("mouseout", function () {
               d3.select(this).attr("stroke", trainColor).attr("stroke-width", 2);
+              tooltip.transition().duration(100).style("opacity", 0);
             });
         }
 
