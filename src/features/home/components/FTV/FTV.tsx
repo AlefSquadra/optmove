@@ -72,7 +72,7 @@ const FTVLayout = () => {
             )} */}
 
             <GHTChartD3
-              trains={ChartTrainsMock}
+              trains={ChartTrainsMock as any}
               yLabels={ChartYLabelMock}
               height={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
               hourWidth={80}

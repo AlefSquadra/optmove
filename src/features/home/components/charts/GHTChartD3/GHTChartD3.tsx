@@ -12,6 +12,7 @@ export interface TrainMovement {
   partida: string | Date;
   fimOcupacao: string | Date;
   idFicha: string;
+  destino: string;
 }
 
 export interface TrainData {
@@ -34,6 +35,7 @@ export interface TrainData {
   dataBaseCarregamento: string | Date;
   zonaOficial: string;
   movimentos: TrainMovement[];
+  nomeSbl: string;
 }
 // --- FIM: NOVAS TIPAGENS ---
 
@@ -225,6 +227,8 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       .style("opacity", "0");
 
     const { processedData, segmentData, totalHeight } = processData(yLabels);
+
+    console.log("Processed Data:", processedData);
 
     // <-- ALTERAÇÃO UTC: Usar d3.utcHour para cálculos de tempo
     const hoursShown = d3.utcHour.count(initialDate, finalDate);
@@ -418,7 +422,6 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       const singleTrainGroup = trainGroup.append("g").attr("class", `train-path train-${train.prefixo}`);
       const trainColor = `rgb(${train.cor.slice(0, -1)})`;
 
-      let lastY2: number | null = null;
       let firstVisibleMovement = true;
 
       train.movimentos.forEach((mov) => {
@@ -436,25 +439,19 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
           return;
         }
 
-        const currentSB = processedData.find((sb) => sb.nomeSbl === mov.linha);
-        if (!currentSB || currentSB.indexGraficoI === undefined || currentSB.indexGraficoS === undefined) {
-          lastY2 = null;
-          return;
-        }
+        const y1 = processedData.find((sb) => sb.nomeSbl === mov.linha)?.indexGraficoI;
+        const y2 = processedData.find((sb) => sb.nomeSbl === mov.destino)?.indexGraficoI;
 
-        const y1 = lastY2 !== null ? lastY2 : currentSB.indexGraficoI;
-        const y2 = currentSB.indexGraficoS;
-
-        if (Math.max(y1, y2) < yDomain[0] || Math.min(y1, y2) > yDomain[1]) {
+        if (Math.max(y1!, y2!) < yDomain[0] || Math.min(y1!, y2!) > yDomain[1]) {
           return;
         }
 
         singleTrainGroup
           .append("line")
           .attr("x1", xScale(chegadaDate))
-          .attr("y1", yScale(y1))
+          .attr("y1", yScale(y1!))
           .attr("x2", xScale(fimCursoDate))
-          .attr("y2", yScale(y2))
+          .attr("y2", yScale(y2!))
           .attr("stroke", trainColor)
           .attr("stroke-width", 2)
           .style("cursor", "pointer")
@@ -487,9 +484,9 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
           singleTrainGroup
             .append("line")
             .attr("x1", xScale(fimCursoDate))
-            .attr("y1", yScale(y2))
+            .attr("y1", yScale(y2!))
             .attr("x2", xScale(partidaDate))
-            .attr("y2", yScale(y2))
+            .attr("y2", yScale(y2!))
             .attr("stroke", trainColor)
             .attr("stroke-width", 2)
             .style("cursor", "pointer")
@@ -499,7 +496,7 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
               tooltip
                 .html(
                   `<strong>Prefixo:</strong> ${train.prefixo}<br/>
-<strong>Segmento:</strong> ${mov.segmento}<br/>
+<strong>Segmento:</strong> ${mov.linha}<br/>
 <strong>Chegada:</strong> ${mov.chegada}<br/>
 <strong>Partida:</strong> ${mov.partida}`,
                 )
@@ -522,7 +519,7 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
           singleTrainGroup
             .append("text")
             .attr("x", xScale(chegadaDate) - 5)
-            .attr("y", yScale(y1) + 4)
+            .attr("y", yScale(y1!) + 4)
             .attr("text-anchor", "end")
             .attr("font-size", "10px")
             .attr("font-weight", "bold")
@@ -531,8 +528,6 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
 
           firstVisibleMovement = false;
         }
-
-        lastY2 = y2;
       });
     });
     // --- FIM: LÓGICA DE PLOTAGEM DOS TRENS ---
