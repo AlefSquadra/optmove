@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>D3.js Gráfico Ferroviário (Versão Corrigida)</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f4f4f9;
+        overflow: hidden;
+      }
+      h1 {
+        color: #333;
+        font-weight: 300;
+      }
+      #chart-wrapper {
+        width: 90%;
+        height: 85%;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        overflow-x: auto; /* Scroll horizontal para o tempo */
+        overflow-y: hidden; /* Scroll vertical é controlado pelo zoom */
+      }
+      .axis-label {
+        font-size: 11px;
+        fill: #555;
+        user-select: none;
+      }
+      .segment-label {
+        font-weight: bold;
+        font-size: 12px;
+        fill: #111;
+      }
+      .axis-left .tick text {
+        text-anchor: end;
+      }
+      .axis-right .tick text {
+        text-anchor: start;
+      }
+      .time-axis .tick line {
+        stroke: #ddd;
+      }
+      .time-axis path {
+        stroke: #aaa;
+      }
+      .brush .selection {
+        fill: steelblue;
+        fill-opacity: 0.3;
+      }
+      .main-chart-area {
+        cursor: grab;
+      }
+      .main-chart-area:active {
+        cursor: grabbing;
+      }
+      .brush-mode .main-chart-area {
+        cursor: crosshair;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Gráfico de Gantt Ferroviário <small>(Segure Shift para dar zoom com o mouse)</small></h1>
+    <div id="chart-wrapper"></div>
+
+    <script type="module">
+      import { jsonData } from "./json.js";
+
+      function processData(data) {
+        data.sort((a, b) => {
+          const seqA = parseInt(a.SEQSEGMENT);
+          const seqB = parseInt(b.SEQSEGMENT);
+          if (seqA !== seqB) return seqB - seqA;
+          return parseInt(a.SEQSB) - parseInt(b.SEQSB);
+        });
+        let comprimentoAcumulado = 0.0;
+        let segmentoAtual = "";
+        const segmentMap = new Map();
+        data.forEach((item) => {
+          if (segmentoAtual !== item.CDSGMT) {
+            segmentoAtual = item.CDSGMT;
+            const maxCpkmDoSegmento = data
+              .filter((d) => d.CDSGMT === segmentoAtual)
+              .reduce((max, d) => Math.max(max, parseFloat(d.CPKM.replace(",", "."))), 0);
+            if (!segmentMap.has(segmentoAtual)) {
+              segmentMap.set(segmentoAtual, { startY: comprimentoAcumulado, length: maxCpkmDoSegmento });
+              comprimentoAcumulado += maxCpkmDoSegmento;
+            }
+          }
+        });
+        data.forEach((item) => {
+          const cpkm = parseFloat(item.CPKM.replace(",", "."));
+          const segmentInfo = segmentMap.get(item.CDSGMT);
+          if (!segmentInfo) return;
+          const countLinhaSeg = parseInt(item.SEQSB);
+          item.indexGraficoI = segmentInfo.startY + (countLinhaSeg - 1) * 0.1;
+          item.indexGraficoS = item.indexGraficoI + cpkm - 0.5;
+        });
+        const segmentData = Array.from(segmentMap.entries()).map(([name, info]) => ({
+          name,
+          startY: info.startY,
+          endY: info.startY + info.length,
+          midY: info.startY + info.length / 2,
+        }));
+        const totalHeight = d3.max(data, (d) => d.indexGraficoS) || 0;
+        return { processedData: data, segmentData, totalHeight };
+      }
+
+      const { processedData, segmentData, totalHeight } = processData(jsonData);
+
+      const margin = { top: 20, right: 100, bottom: 65, left: 100 };
+      const wrapper = d3.select("#chart-wrapper");
+      const height = wrapper.node().clientHeight;
+      const width = wrapper.node().clientWidth;
+      const plotWidth = 48 * 60; // Largura total para 48 horas
+
+      const svg = wrapper.append("svg").attr("width", plotWidth).attr("height", height);
+
+      const x = d3
+        .scaleTime()
+        .domain([new Date(), d3.timeHour.offset(new Date(), 48)])
+        .range([margin.left, plotWidth - margin.right]);
+      const y = d3
+        .scaleLinear()
+        .domain([0, totalHeight])
+        .range([height - margin.bottom, margin.top]);
+
+      const xAxis = d3.axisBottom(x).ticks(d3.timeHour.every(1)).tickFormat(d3.timeFormat("%Hh"));
+      const yAxisLeft = d3.axisLeft(y).tickSize(0).tickPadding(10);
+      const yAxisRight = d3.axisRight(y).tickSize(0).tickPadding(10);
+
+      const gX = svg
+        .append("g")
+        .attr("class", "time-axis")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(xAxis);
+      const gYLeft = svg
+        .append("g")
+        .attr("class", "axis-left")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(yAxisLeft);
+      const gYRight = svg
+        .append("g")
+        .attr("class", "axis-right")
+        .attr("transform", `translate(${plotWidth - margin.right},0)`)
+        .call(yAxisRight);
+
+      const clipPath = svg
+        .append("defs")
+        .append("clipPath")
+        .attr("id", "clip-plot")
+        .append("rect")
+        .attr("x", margin.left)
+        .attr("y", margin.top)
+        .attr("width", plotWidth - margin.left - margin.right)
+        .attr("height", height - margin.top - margin.bottom);
+
+      const plotArea = svg.append("g").attr("clip-path", "url(#clip-plot)");
+
+      const tracks = plotArea
+        .append("g")
+        .selectAll(".sb-track")
+        .data(processedData)
+        .join("rect")
+        .attr("class", "sb-track")
+        .attr("x", margin.left)
+        .attr("width", plotWidth - margin.left - margin.right)
+        .attr("y", (d) => y(d.indexGraficoS))
+        .attr("height", (d) => y(d.indexGraficoI) - y(d.indexGraficoS))
+        .attr("fill", (d, i) => (i % 2 === 0 ? "#f8f9fa" : "#f1f3f5"));
+
+      const zoom = d3
+        .zoom()
+        .scaleExtent([0.5, 10])
+        .translateExtent([
+          [-plotWidth, -Infinity],
+          [plotWidth * 2, Infinity],
+        ])
+        .on("zoom", zoomed);
+
+      const brush = d3
+        .brushX()
+        .extent([
+          [margin.left, margin.top],
+          [plotWidth - margin.right, height - margin.bottom],
+        ])
+        .on("end", brushed);
+
+      const brushG = svg.append("g").attr("class", "brush").call(brush);
+      brushG.style("display", "none"); // Começa desativado
+
+      svg.call(zoom).on("dblclick.zoom", () => svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity));
+
+      function zoomed(event) {
+        const transform = event.transform;
+        const newX = transform.rescaleX(x);
+        const newY = transform.rescaleY(y);
+
+        gX.call(xAxis.scale(newX));
+        gYLeft.call(yAxisLeft.scale(newY));
+        gYRight.call(yAxisRight.scale(newY));
+
+        tracks
+          .attr("y", (d) => newY(d.indexGraficoS))
+          .attr("height", (d) => newY(d.indexGraficoI) - newY(d.indexGraficoS));
+
+        updateLabels(newY, transform.k);
+      }
+
+      function brushed(event) {
+        if (!event.selection) return;
+        const [x0, x1] = event.selection.map(x.invert);
+
+        const scaleX = (plotWidth - margin.left - margin.right) / (x(x1) - x(x0));
+        const translateX = -x(x0) * scaleX + margin.left;
+
+        svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(translateX, 0).scale(scaleX));
+        brushG.call(brush.move, null);
+      }
+
+      function updateLabels(currentYScale, zoomK) {
+        const showDetail = zoomK > 1.5;
+
+        gYLeft.selectAll(".axis-label").remove();
+        gYRight.selectAll(".axis-label").remove();
+
+        if (showDetail) {
+          gYLeft
+            .selectAll(".sb-label")
+            .data(processedData)
+            .enter()
+            .append("text")
+            .attr("class", "axis-label")
+            .attr("y", (d) => currentYScale(d.indexGraficoI))
+            .attr("x", -5)
+            .attr("dy", "0.35em")
+            .text((d) => d.NMSBL);
+          gYRight
+            .selectAll(".sb-label")
+            .data(processedData)
+            .enter()
+            .append("text")
+            .attr("class", "axis-label")
+            .attr("y", (d) => currentYScale(d.indexGraficoS))
+            .attr("x", 5)
+            .attr("dy", "0.35em")
+            .text((d) => d.NMSBL);
+        } else {
+          gYLeft
+            .selectAll(".segment-label")
+            .data(segmentData)
+            .enter()
+            .append("text")
+            .attr("class", "axis-label segment-label")
+            .attr("y", (d) => currentYScale(d.midY))
+            .attr("x", -5)
+            .attr("dy", "0.35em")
+            .text((d) => d.name);
+          gYRight
+            .selectAll(".segment-label")
+            .data(segmentData)
+            .enter()
+            .append("text")
+            .attr("class", "axis-label segment-label")
+            .attr("y", (d) => currentYScale(d.midY))
+            .attr("x", 5)
+            .attr("dy", "0.35em")
+            .text((d) => d.name);
+        }
+      }
+
+      d3.select("body")
+        .on("keydown.shift", (event) => {
+          if (event.key === "Shift") {
+            wrapper.classed("brush-mode", true);
+            brushG.style("display", "block");
+            svg.on(".zoom", null);
+          }
+        })
+        .on("keyup.shift", (event) => {
+          if (event.key === "Shift") {
+            wrapper.classed("brush-mode", false);
+            brushG.style("display", "none");
+            svg.call(zoom);
+          }
+        });
+
+      // Renderização inicial
+      updateLabels(y, 1);
+    </script>
+  </body>
+</html>

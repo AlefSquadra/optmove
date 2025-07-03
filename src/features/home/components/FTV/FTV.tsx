@@ -1,11 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 
-import { useApplicationContext } from "@app/providers/ApplicationProvider/useApplication";
-import type {
-  ContextMenuItemAction,
-  IDataContextMenu,
-} from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
+import type { IDataContextMenu } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
 import { ModalSelectOfficialization } from "@features/home/components/modals/selectOfficialization/ModalSelectOfficialization";
 import { ModalSystemParams } from "@features/home/components/modals/systemParams/ModalSystemParams";
 import { ModalTrainMovements } from "@features/home/components/modals/trainMovements/ModalTrainMovements";
@@ -21,94 +16,28 @@ import {
 } from "@features/home/layouts/HomeLayout";
 import { HomeFTLayoutProvider } from "@features/home/providers/HomeFTLayoutProvider/HomeFTLayoutProvider";
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
-import { Spinner, Text } from "@fluentui/react-components";
-import { WindowModal } from "@shared/components/windowModal/WindowModal";
+import { Text } from "@fluentui/react-components";
 import type { IModalData } from "@shared/types/IModalData.type";
 
-import { GHTChart } from "@features/home/components/charts/GHTChart/GHTChart";
 import {
   GHTChartProvider,
   useGHTChartContext,
 } from "@features/home/components/charts/GHTChart/provider/GHTChartProvider";
-import { GHTChartMainService } from "@features/home/services/GHTChartMainService";
-import { DateFormat } from "@shared/utils/DateFormat";
-import dayjs from "dayjs";
+import { GHTChartD3 } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
+import { ChartTrainsMock, ChartYLabelMock } from "@features/home/components/FTV/json";
+
 const FTVLayout = () => {
   const { setCursorPointer, selectedElementClickable: lineTrainSelected } = useGHTChartContext();
   const FTContentRef = useRef<HTMLDivElement>(null);
-  const [loadingStage, setLoadingStage] = useState("");
   const [openTrainMovements, setOpenTrainMovements] = useState<IModalData<IDataContextMenu>>({
     isOpen: false,
   });
-  const {
-    showAccomplished,
-    showTimelineView,
-    setOpenSelectOfficialization,
-    openSelectOfficialization,
-    setOpenSystemParams,
-    openSystemParams,
-  } = useFTLayout();
-
-  const { selectedOfficialization } = useApplicationContext();
-
-  const fetchDataGHT = useQuery({
-    queryKey: ["ghtData", selectedOfficialization],
-    queryFn: async () => {
-      setLoadingStage("Carregando trens da malha...");
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      const data = await GHTChartMainService.getTrains({
-        dateGhtTimeline: selectedOfficialization?.officializationForm.timelineDatetime as string,
-        officializations:
-          selectedOfficialization?.listOfficialization.map((o) =>
-            DateFormat.isoToSpace(o.dateOfficialization).toString(),
-          ) ?? [],
-      });
-
-      setLoadingStage("Processando dados...");
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      setLoadingStage("Plotando gráfico...");
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      setLoadingStage("");
-      return {
-        data: data.trains,
-        database: "2025-06-03T09:09:22",
-        restrictions: data.restrictions,
-        yLabels: data.yards,
-      };
-    },
-    enabled: Object.keys(selectedOfficialization || {}).length > 0,
-  });
-
-  const handleContextMenu = (action: ContextMenuItemAction, menuItem: IDataContextMenu) => {
-    switch (action) {
-      case "train_movements":
-        console.log(menuItem);
-        setOpenTrainMovements({ isOpen: true, data: menuItem });
-    }
-  };
+  const { setOpenSelectOfficialization, openSelectOfficialization, setOpenSystemParams, openSystemParams } =
+    useFTLayout();
 
   useEffect(() => {
     setCursorPointer("auto");
   }, [setCursorPointer]);
-
-  const database = dayjs(selectedOfficialization?.officializationForm.timelineDatetime, "YYYY-MM-DD HH:mm:ss")?.add(
-    -6,
-    "hour",
-  );
-
-  const databaseOfficialization = dayjs(
-    selectedOfficialization?.officializationForm.timelineDatetime,
-    "YYYY-MM-DD HH:mm:ss",
-  );
-
-  const canRenderGHTChart =
-    !fetchDataGHT.isLoading &&
-    fetchDataGHT.isSuccess &&
-    fetchDataGHT.data?.data &&
-    fetchDataGHT.data?.restrictions &&
-    fetchDataGHT.data?.yLabels;
 
   return (
     <>
@@ -126,7 +55,7 @@ const FTVLayout = () => {
             </Text>
           </div>
           <div className="h-full w-full overflow-hidden">
-            {fetchDataGHT.isLoading && (
+            {/* {fetchDataGHT.isLoading && (
               <WindowModal
                 showButtonsHeader={false}
                 open={true}
@@ -140,21 +69,17 @@ const FTVLayout = () => {
                   <div className="mt-1 text-lg text-gray-600">{loadingStage || "Carregando..."}</div>
                 </div>
               </WindowModal>
-            )}
+            )} */}
 
-            {canRenderGHTChart && (
-              <GHTChart
-                data={fetchDataGHT?.data?.data}
-                dataOfficialization={databaseOfficialization.toDate()}
-                database={database.toDate()}
-                restrictions={fetchDataGHT?.data?.restrictions}
-                yLabels={fetchDataGHT?.data?.yLabels}
-                defaultHeight={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
-                onContextMenuAction={handleContextMenu}
-                showAccomplished={showAccomplished}
-                showTimelineView={showTimelineView}
-              />
-            )}
+            <GHTChartD3
+              trains={ChartTrainsMock}
+              yLabels={ChartYLabelMock}
+              height={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
+              hourWidth={80}
+              yAxisWidth={80}
+              initialDate={new Date("2025-06-30T10:12:32")}
+              finalDate={new Date("2025-07-01T16:12:32")}
+            />
           </div>
         </FTLayoutContent>
 
