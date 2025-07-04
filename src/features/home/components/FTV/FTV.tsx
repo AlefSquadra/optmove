@@ -25,6 +25,7 @@ import {
 } from "@features/home/components/charts/GHTChart/provider/GHTChartProvider";
 import { GHTChartD3 } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import { ChartTrainsMock, ChartYLabelMock } from "@features/home/components/FTV/json";
+import dayjs from "dayjs";
 
 const FTVLayout = () => {
   const { setCursorPointer, selectedElementClickable: lineTrainSelected } = useGHTChartContext();
@@ -32,12 +33,19 @@ const FTVLayout = () => {
   const [openTrainMovements, setOpenTrainMovements] = useState<IModalData<IDataContextMenu>>({
     isOpen: false,
   });
-  const { setOpenSelectOfficialization, openSelectOfficialization, setOpenSystemParams, openSystemParams } =
-    useFTLayout();
+  const {
+    setOpenSelectOfficialization,
+    openSelectOfficialization,
+    setOpenSystemParams,
+    openSystemParams,
+    setGraphTimeAndCoordinates,
+  } = useFTLayout();
 
   useEffect(() => {
     setCursorPointer("auto");
   }, [setCursorPointer]);
+
+  const initialDate = dayjs(new Date("2025-06-30T16:12:32+00:00")).subtract(6, "hour").toDate();
 
   return (
     <>
@@ -77,8 +85,10 @@ const FTVLayout = () => {
               height={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
               hourWidth={80}
               yAxisWidth={80}
-              initialDate={new Date("2025-06-30T10:12:32")}
-              finalDate={new Date("2025-07-01T16:12:32")}
+              initialDate={initialDate}
+              dateTimeLine={new Date("2025-06-30T16:12:32+00:00")}
+              finalDate={new Date("2025-07-01T16:12:32+00:00")}
+              onGraphTimeAndCoordenatesChange={setGraphTimeAndCoordinates}
             />
           </div>
         </FTLayoutContent>

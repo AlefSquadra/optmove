@@ -101,6 +101,10 @@ interface ProcessedSegment {
   backgroundType: BackgroundType;
 }
 
+export interface IOnGraphCoordinatesUpdateProps {
+  sbs: string;
+  date: string;
+}
 interface GHTChartD3Props {
   hourWidth: number;
   height: number;
@@ -109,6 +113,8 @@ interface GHTChartD3Props {
   yLabels: YLabel[];
   yAxisWidth: number;
   trains: TrainData[];
+  dateTimeLine: Date;
+  onGraphTimeAndCoordenatesChange: (props: IOnGraphCoordinatesUpdateProps) => void;
 }
 
 interface ZoomState {
@@ -122,11 +128,13 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
   const {
     hourWidth = 60,
     height,
-    initialDate = new Date("2025-06-29"),
-    finalDate = new Date("2025-07-01"),
+    initialDate,
+    finalDate,
     yLabels,
     yAxisWidth = 80,
     trains = [],
+    dateTimeLine,
+    onGraphTimeAndCoordenatesChange: onGraphCoordenatesChange,
   } = props;
 
   const svgLeftRef = useRef<SVGSVGElement | null>(null);
@@ -207,6 +215,28 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
 
     return { processedData: flatData, segmentData, totalHeight };
   };
+
+  const formatDate = d3.utcFormat("%Y-%m-%d %H:%M:%SZ");
+
+  function getGraphCoords<E extends MouseEvent>(
+    event: E,
+    xScale: d3.ScaleTime<number, number, never>,
+    yScale: d3.ScaleLinear<number, number>,
+    processedData: Array<YLabel | Child>,
+  ) {
+    const [mx, my] = d3.pointer(event);
+    const date = xScale.invert(mx);
+    const yVal = yScale.invert(my);
+
+    const nearest = processedData.reduce((best, cur) =>
+      Math.abs((cur.indexGraficoI || 0) - yVal) < Math.abs((best.indexGraficoI || 0) - yVal) ? cur : best,
+    );
+
+    return {
+      sbs: nearest.nomeSbl || nearest.nomeApelido,
+      date: formatDate(date),
+    };
+  }
 
   useEffect(() => {
     [svgLeftRef, svgPlotRef, svgRightRef].forEach((r) => d3.select(r.current!).selectAll("*").remove());
@@ -350,13 +380,14 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
 
     const plotG = d3.select(svgPlotRef.current).append("g").attr("transform", `translate(0,${margin.top})`);
 
-    plotG
-      .append("g")
-      .attr("class", "segment-backgrounds")
-      .selectAll("rect")
+    const segBgGroup = plotG.append("g").attr("class", "segment-backgrounds");
+
+    segBgGroup
+      .selectAll("rect.background")
       .data(segmentData)
       .enter()
       .append("rect")
+      .attr("class", "background")
       .attr("x", 0)
       .attr("width", plotWidth)
       .attr("y", (d) => yScale(d.endY))
@@ -364,13 +395,40 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       .attr("fill", (d) => {
         switch (d.backgroundType) {
           case "linhaDupla":
-            return "rgba(210, 200, 200, 1)";
+            return "rgba(210,200,200,1)";
           case "patio":
             return "url(#hatch-pattern)";
           default:
             return "none";
         }
       });
+
+    segBgGroup
+      .append("rect")
+      .attr("class", "overlay")
+      .attr("width", plotWidth)
+      .attr("height", innerH)
+      .style("fill", "none")
+      .style("pointer-events", "all")
+      .on("mousemove", function (event) {
+        const [mx, my] = d3.pointer(event, this);
+        const date = xScale.invert(mx);
+        const yVal = yScale.invert(my);
+        const nearest = processedData.reduce((best, cur) =>
+          Math.abs((cur.indexGraficoI || 0) - yVal) < Math.abs((best.indexGraficoI || 0) - yVal) ? cur : best,
+        );
+        tooltip
+          .html(
+            `<strong>Data/Hora:</strong> ${d3.utcFormat("%Y-%m-%d %H:%M:%S")(date)}<br/>
+           <strong>SBL:</strong> ${nearest.nomeSbl || nearest.nomeApelido}`,
+          )
+          .style("left", event.offsetX + 10 + "px")
+          .style("top", event.offsetY + 10 + "px")
+          .transition()
+          .duration(50)
+          .style("opacity", 1);
+      })
+      .on("mouseout", () => tooltip.transition().duration(50).style("opacity", 0));
 
     const gridYValues =
       showDetailedLabels ?
@@ -380,6 +438,8 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
           )
           .map((d) => d.indexGraficoI!)
       : segmentData.filter((seg) => seg.startY >= yDomain[0] && seg.startY <= yDomain[1]).map((seg) => seg.startY);
+
+    const timelineX = xScale(dateTimeLine);
 
     plotG
       .append("g")
@@ -410,6 +470,31 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       .attr("stroke", "#ccc")
       .attr("stroke-width", 1)
       .attr("opacity", 0.8);
+
+    plotG
+      .append("line")
+      .attr("class", "timeline-line")
+      .attr("x1", timelineX)
+      .attr("x2", timelineX)
+      .attr("y1", 0)
+      .attr("y2", innerH)
+      .attr("stroke", "green")
+      .attr("stroke-width", 3);
+
+    const graphCoordenateOverlay = plotG.append("g").attr("class", "overlay-group");
+    graphCoordenateOverlay
+      .append("rect")
+      .attr("width", plotWidth)
+      .attr("height", innerH)
+      .style("fill", "none")
+      .style("pointer-events", "all")
+      .on("mousemove", function (event) {
+        const coords = getGraphCoords(event, xScale, yScale, processedData);
+        onGraphCoordenatesChange(coords);
+      })
+      .on("mouseout", () => {
+        tooltip.transition().duration(50).style("opacity", 0);
+      });
 
     // --- INÍCIO: LÓGICA DE PLOTAGEM DOS TRENS ---
     const trainGroup = plotG.append("g").attr("class", "trains-group");
@@ -572,6 +657,11 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       });
 
     const brushG = plotG.append("g").attr("class", "brush").call(brush);
+
+    brushG.select<SVGRectElement>(".overlay").on("mousemove", function (event) {
+      const coords = getGraphCoords(event, xScale, yScale, processedData);
+      onGraphCoordenatesChange(coords);
+    });
     brushG.selectAll(".overlay").style("cursor", "crosshair");
     brushG
       .selectAll(".selection")
@@ -580,7 +670,7 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       .attr("stroke-width", 1);
 
     trainGroup.raise();
-  }, [hourWidth, height, initialDate, finalDate, yLabels, yAxisWidth, zoomState, trains]);
+  }, [hourWidth, height, initialDate, finalDate, yLabels, yAxisWidth, zoomState, trains, dateTimeLine]);
 
   return (
     <div

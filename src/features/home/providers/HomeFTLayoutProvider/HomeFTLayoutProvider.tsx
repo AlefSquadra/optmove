@@ -1,3 +1,4 @@
+import type { IOnGraphCoordinatesUpdateProps } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import { FtlContext } from "@features/home/providers/HomeFTLayoutProvider/HomeFtLayoutContext";
 import type {
   IHomeFTLayoutProvider,
@@ -17,6 +18,10 @@ export const HomeFTLayoutProvider = ({ children }: IHomeFTLayoutProvider) => {
   const [showTimelineView, setShowTimelineView] = useState<boolean>(true);
   const [openSelectOfficialization, setOpenSelectOfficialization] = useState<boolean>(false);
   const [openSystemParams, setOpenSystemParams] = useState<IModalData<any>>({ isOpen: false });
+  const [graphTimeAndCoordinates, setGraphTimeAndCoordinates] = useState<IOnGraphCoordinatesUpdateProps>({
+    date: "",
+    sbs: "",
+  });
 
   return (
     <FtlContext.Provider
@@ -33,6 +38,8 @@ export const HomeFTLayoutProvider = ({ children }: IHomeFTLayoutProvider) => {
         setOpenSelectOfficialization,
         openSystemParams,
         setOpenSystemParams,
+        graphTimeAndCoordinates,
+        setGraphTimeAndCoordinates,
       }}
     >
       {children}

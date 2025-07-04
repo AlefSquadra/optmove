@@ -45,6 +45,7 @@ const FTVOfficeMenu = () => {
     setIsPanelOpenDown,
     setOpenSelectOfficialization,
     setOpenSystemParams,
+    graphTimeAndCoordinates,
   } = useFTLayout();
   const { selectZoneParams, selectedOfficialization } = useApplicationContext();
   const [, setIsOpen] = useState(false);
@@ -253,8 +254,9 @@ const FTVOfficeMenu = () => {
 
       {/* Grupo Coordenadas */}
       <div className="relative flex flex-col-reverse items-start justify-between gap-1">
-        <div style={{ padding: "8px" }}>
-          <Text style={{ fontSize: "12px" }}>SB: Fora do painel</Text>
+        <div className="flex flex-col items-start gap-1">
+          <Text className="text-sm md:!text-[.7rem]">SB: {graphTimeAndCoordinates.sbs || "Fora do painel"}</Text>
+          <Text className="text-sm md:!text-[.7rem]">SB: {graphTimeAndCoordinates.date}</Text>
         </div>
         <span className="text-sm text-gray-500 md:text-xs">Coordenadas Gráfico</span>
       </div>

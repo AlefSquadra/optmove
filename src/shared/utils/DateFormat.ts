@@ -1,8 +1,10 @@
 import dayjs, { Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import utc from "dayjs/plugin/utc";
 
 // Ativa o plugin para parsing com formato customizado
 dayjs.extend(customParseFormat);
+dayjs.extend(utc);
 
 /**
  * Converte uma string de data no formato "DD/MM/YYYY HH:mm:ss"
@@ -70,4 +72,4 @@ function isoToSpace(input: string): string {
   return parsed.isValid() ? parsed.format("YYYY-MM-DD HH:mm:ss") : "";
 }
 
-export const DateFormat = { formatToISO, dateToString, stringToDate, stringToDayjs, isoToSpace };
+export const DateFormat = { formatToISO, dateToString, stringToDate, stringToDayjs, isoToSpace, dayjs };
