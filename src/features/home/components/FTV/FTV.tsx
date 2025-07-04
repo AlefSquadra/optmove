@@ -24,7 +24,7 @@ import {
   useGHTChartContext,
 } from "@features/home/components/charts/GHTChart/provider/GHTChartProvider";
 import { GHTChartD3 } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
-import { ChartTrainsMock, ChartYLabelMock } from "@features/home/components/FTV/json";
+import { ChartRestrictionsMock, ChartTrainsMock, ChartYLabelMock } from "@features/home/components/FTV/json";
 import dayjs from "dayjs";
 
 const FTVLayout = () => {
@@ -86,6 +86,7 @@ const FTVLayout = () => {
               hourWidth={80}
               yAxisWidth={80}
               initialDate={initialDate}
+              restrictions={[ChartRestrictionsMock]}
               dateTimeLine={new Date("2025-06-30T16:12:32+00:00")}
               finalDate={new Date("2025-07-01T16:12:32+00:00")}
               onGraphTimeAndCoordenatesChange={setGraphTimeAndCoordinates}

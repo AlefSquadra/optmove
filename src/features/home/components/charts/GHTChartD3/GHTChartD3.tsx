@@ -39,6 +39,23 @@ export interface TrainData {
 }
 // --- FIM: NOVAS TIPAGENS ---
 
+// --- INÍCIO: NOVA TIPAGEM PARA AS RESTRIÇÕES ---
+export interface RestrictionInfo {
+  label: string;
+  value: string;
+}
+
+export interface RestrictionData {
+  name: string;
+  color: string;
+  xi: string; // Data/hora início (formato ISO UTC)
+  xf: string; // Data/hora fim (formato ISO UTC)
+  linha: string; // SBL de início no eixo Y
+  destino: string; // SBL de fim no eixo Y
+  info: RestrictionInfo[];
+}
+// --- FIM: NOVA TIPAGEM PARA AS RESTRIÇÕES ---
+
 // Tipagens existentes
 export interface YLabel {
   totalLinhas: number;
@@ -113,6 +130,9 @@ interface GHTChartD3Props {
   yLabels: YLabel[];
   yAxisWidth: number;
   trains: TrainData[];
+  // --- INÍCIO: ADICIONANDO PROP DE RESTRIÇÕES ---
+  restrictions?: RestrictionData[];
+  // --- FIM: ADICIONANDO PROP DE RESTRIÇÕES ---
   dateTimeLine: Date;
   onGraphTimeAndCoordenatesChange: (props: IOnGraphCoordinatesUpdateProps) => void;
 }
@@ -133,6 +153,9 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
     yLabels,
     yAxisWidth = 80,
     trains = [],
+    // --- INÍCIO: DESTRUCTURING DA NOVA PROP ---
+    restrictions = [],
+    // --- FIM: DESTRUCTURING DA NOVA PROP ---
     dateTimeLine,
     onGraphTimeAndCoordenatesChange: onGraphCoordenatesChange,
   } = props;
@@ -185,8 +208,10 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       if (!segmentInfo) return;
 
       const countLinhaSeg = item.seqBd;
-      item.indexGraficoI = segmentInfo.startY + (countLinhaSeg - 1) * 0.1;
-      item.indexGraficoS = item.indexGraficoI + item.cpKm - 0.5;
+      // Ajuste para que o index I e S representem o início e o fim da "faixa" da linha
+      const yPos = segmentInfo.startY + ((countLinhaSeg - 1) / (item.linhas || 1)) * segmentInfo.length;
+      item.indexGraficoI = yPos;
+      item.indexGraficoS = yPos + segmentInfo.length / (item.linhas || 1);
     });
 
     const segmentData: ProcessedSegment[] = Array.from(segmentMap.entries()).map(([name, info]) => {
@@ -211,7 +236,7 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       };
     });
 
-    const totalHeight = d3.max(flatData, (d) => d.indexGraficoS || 0) || 0;
+    const totalHeight = d3.max(segmentData, (d) => d.endY) || 0;
 
     return { processedData: flatData, segmentData, totalHeight };
   };
@@ -241,7 +266,6 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
   useEffect(() => {
     [svgLeftRef, svgPlotRef, svgRightRef].forEach((r) => d3.select(r.current!).selectAll("*").remove());
 
-    // Tooltip container
     const container = d3.select(scrollContainerRef.current!).style("position", "relative");
     container.selectAll(".tooltip").remove();
     const tooltip = container
@@ -258,26 +282,23 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
 
     const { processedData, segmentData, totalHeight } = processData(yLabels);
 
-    console.log("Processed Data:", processedData);
-
-    // <-- ALTERAÇÃO UTC: Usar d3.utcHour para cálculos de tempo
     const hoursShown = d3.utcHour.count(initialDate, finalDate);
     const plotWidth = hoursShown * hourWidth;
     const margin = { top: 40, bottom: 40 };
     const innerH = height - margin.top - margin.bottom;
 
-    const originalYDomain = [0, totalHeight];
-    // <-- ALTERAÇÃO UTC: Usar d3.utcHour para arredondar a data inicial
+    const yPaddingInPixels = 10;
+    const yDomainPadding = (yPaddingInPixels / innerH) * totalHeight;
+    const originalYDomain = [0 - yDomainPadding, totalHeight + yDomainPadding];
     const databaseHourFloor = d3.utcHour.floor(initialDate);
-    // <-- ALTERAÇÃO UTC: Usar d3.utcHour para calcular o domínio final
     const originalXDomain = [databaseHourFloor, d3.utcHour.offset(databaseHourFloor, hoursShown)];
 
     const yDomain = zoomState ? [zoomState.yMin, zoomState.yMax] : originalYDomain;
     const xDomain = zoomState ? [zoomState.xMin, zoomState.xMax] : originalXDomain;
 
-    // <-- ALTERAÇÃO UTC: Usar d3.scaleUtc para a escala do eixo X
     const xScale = d3.scaleUtc().domain(xDomain).range([0, plotWidth]);
     const yScale = d3.scaleLinear().domain(yDomain).range([innerH, 0]);
+    const parseDateUTC = d3.utcParse("%Y-%m-%dT%H:%M:%SZ");
 
     const zoomLevel = (originalYDomain[1] - originalYDomain[0]) / (yDomain[1] - yDomain[0]);
     const showDetailedLabels = zoomLevel > 1.5;
@@ -295,7 +316,6 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
     pattern.append("rect").attr("width", 8).attr("height", 8).attr("fill", "rgba(235, 225, 225, 1)");
     pattern.append("path").attr("d", "M 0,0 l 8,0").attr("stroke", "rgba(210, 200, 200, 1)").attr("stroke-width", 4);
 
-    // Eixo Y Left
     if (showDetailedLabels) {
       const visibleItems = processedData.filter(
         (d) => d.indexGraficoI !== undefined && d.indexGraficoI >= yDomain[0] && d.indexGraficoI <= yDomain[1],
@@ -328,7 +348,6 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
         .call(axisYLeft);
     }
 
-    // Eixo Y Right
     const axisYRightGroup = d3.select(svgRightRef.current).append("g").attr("transform", `translate(1,${margin.top})`);
     if (showDetailedLabels) {
       processedData.forEach((item) => {
@@ -359,7 +378,6 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       });
     }
 
-    // Eixos X
     const hourInterval = 1;
     const hourTicks: Date[] = [];
     let currentHour = new Date(xDomain[0]);
@@ -379,7 +397,6 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       .tickFormat((d: Date | d3.NumberValue) => timeFmt(new Date(d.valueOf())));
 
     const plotG = d3.select(svgPlotRef.current).append("g").attr("transform", `translate(0,${margin.top})`);
-
     const segBgGroup = plotG.append("g").attr("class", "segment-backgrounds");
 
     segBgGroup
@@ -403,33 +420,6 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
         }
       });
 
-    segBgGroup
-      .append("rect")
-      .attr("class", "overlay")
-      .attr("width", plotWidth)
-      .attr("height", innerH)
-      .style("fill", "none")
-      .style("pointer-events", "all")
-      .on("mousemove", function (event) {
-        const [mx, my] = d3.pointer(event, this);
-        const date = xScale.invert(mx);
-        const yVal = yScale.invert(my);
-        const nearest = processedData.reduce((best, cur) =>
-          Math.abs((cur.indexGraficoI || 0) - yVal) < Math.abs((best.indexGraficoI || 0) - yVal) ? cur : best,
-        );
-        tooltip
-          .html(
-            `<strong>Data/Hora:</strong> ${d3.utcFormat("%Y-%m-%d %H:%M:%S")(date)}<br/>
-           <strong>SBL:</strong> ${nearest.nomeSbl || nearest.nomeApelido}`,
-          )
-          .style("left", event.offsetX + 10 + "px")
-          .style("top", event.offsetY + 10 + "px")
-          .transition()
-          .duration(50)
-          .style("opacity", 1);
-      })
-      .on("mouseout", () => tooltip.transition().duration(50).style("opacity", 0));
-
     const gridYValues =
       showDetailedLabels ?
         processedData
@@ -438,9 +428,6 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
           )
           .map((d) => d.indexGraficoI!)
       : segmentData.filter((seg) => seg.startY >= yDomain[0] && seg.startY <= yDomain[1]).map((seg) => seg.startY);
-
-    const timelineX = xScale(dateTimeLine);
-
     plotG
       .append("g")
       .selectAll("line.y-grid")
@@ -455,7 +442,6 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       .attr("stroke", "#ccc")
       .attr("stroke-width", 1)
       .attr("opacity", 0.8);
-
     plotG
       .append("g")
       .selectAll("line.x-grid")
@@ -471,6 +457,71 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       .attr("stroke-width", 1)
       .attr("opacity", 0.8);
 
+    // --- INÍCIO: LÓGICA DE PLOTAGEM DAS RESTRIÇÕES ---
+    const restrictionsGroup = plotG.append("g").attr("class", "restrictions-group");
+
+    restrictions.forEach((res) => {
+      const x1Date = parseDateUTC(res.xi);
+      const x2Date = parseDateUTC(res.xf);
+
+      const yStartSBL = processedData.find((p) => p.nomeSbl === res.linha);
+      const yEndSBL = processedData.find((p) => p.nomeSbl === res.destino);
+
+      if (
+        !x1Date ||
+        !x2Date ||
+        !yStartSBL ||
+        !yEndSBL ||
+        yStartSBL.indexGraficoI === undefined ||
+        yEndSBL.indexGraficoS === undefined
+      ) {
+        console.warn("Dados de restrição inválidos ou SBL não encontrado:", res);
+        return;
+      }
+
+      const yDomainTop = Math.max(yStartSBL.indexGraficoS!, yEndSBL.indexGraficoS!);
+      const yDomainBottom = Math.min(yStartSBL.indexGraficoI!, yEndSBL.indexGraficoI!);
+
+      const x = xScale(x1Date);
+      const width = xScale(x2Date) - x;
+      const y = yScale(yDomainTop);
+      const height = yScale(yDomainBottom) - y;
+
+      if (width <= 0 || height <= 0) return;
+
+      restrictionsGroup
+        .append("rect")
+        .attr("x", x)
+        .attr("y", y)
+        .attr("width", width)
+        .attr("height", height)
+        .attr("fill", res.color)
+        .attr("stroke", "rgba(0,0,0,0.5)")
+        .attr("stroke-width", 1)
+        .style("pointer-events", "all")
+        .style("cursor", "help")
+        .on("mouseover", function (event) {
+          tooltip
+            .html(
+              `<strong>Restrição:</strong> ${res.name}<br/>` +
+                res.info.map((i) => `<strong>${i.label}:</strong> ${i.value}`).join("<br/>"),
+            )
+            .style("left", event.offsetX + 10 + "px")
+            .style("top", event.offsetY + 10 + "px")
+            .transition()
+            .duration(100)
+            .style("opacity", 1);
+        })
+        .on("mousemove", function (event) {
+          tooltip.style("left", event.offsetX + 10 + "px").style("top", event.offsetY + 10 + "px");
+        })
+        .on("mouseout", function () {
+          tooltip.transition().duration(100).style("opacity", 0);
+        });
+    });
+    // --- FIM: LÓGICA DE PLOTAGEM DAS RESTRIÇÕES ---
+
+    const timelineX = xScale(dateTimeLine);
     plotG
       .append("line")
       .attr("class", "timeline-line")
@@ -496,9 +547,7 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
         tooltip.transition().duration(50).style("opacity", 0);
       });
 
-    // --- INÍCIO: LÓGICA DE PLOTAGEM DOS TRENS ---
     const trainGroup = plotG.append("g").attr("class", "trains-group");
-    const parseDateUTC = d3.utcParse("%Y-%m-%dT%H:%M:%SZ");
 
     trains.forEach((train) => {
       const singleTrainGroup = trainGroup.append("g").attr("class", `train-path train-${train.prefixo}`);
@@ -507,7 +556,6 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       let firstVisibleMovement = true;
 
       train.movimentos.forEach((mov) => {
-        // <-- ALTERAÇÃO UTC: Usar o parser UTC
         const chegadaDate = mov.chegada ? parseDateUTC(mov.chegada as string) : null;
         const fimCursoDate = mov.fimCurso ? parseDateUTC(mov.fimCurso as string) : null;
         const partidaDate = mov.partida ? parseDateUTC(mov.partida as string) : null;
@@ -517,16 +565,13 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
           return;
         }
 
-        if (xScale(partidaDate) < 0 || xScale(chegadaDate) > plotWidth) {
-          return;
-        }
+        if (xScale(partidaDate) < 0 || xScale(chegadaDate) > plotWidth) return;
 
         const y1 = processedData.find((sb) => sb.nomeSbl === mov.linha)?.indexGraficoI;
         const y2 = processedData.find((sb) => sb.nomeSbl === mov.destino)?.indexGraficoI;
 
-        if (Math.max(y1!, y2!) < yDomain[0] || Math.min(y1!, y2!) > yDomain[1]) {
+        if (y1 === undefined || y2 === undefined || Math.max(y1!, y2!) < yDomain[0] || Math.min(y1!, y2!) > yDomain[1])
           return;
-        }
 
         singleTrainGroup
           .append("line")
@@ -539,13 +584,9 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
           .style("cursor", "pointer")
           .on("mouseover", function (event) {
             d3.select(this).raise().attr("stroke", "steelblue").attr("stroke-width", 3);
-
             tooltip
               .html(
-                `<strong>Prefixo:</strong> ${train.prefixo}<br/>
-                  <strong>Segmento:</strong> ${mov.segmento}<br/>
-                  <strong>Chegada:</strong> ${mov.chegada}<br/>
-                  <strong>Partida:</strong> ${mov.partida}`,
+                `<strong>Prefixo:</strong> ${train.prefixo}<br/><strong>Segmento:</strong> ${mov.segmento}<br/><strong>Chegada:</strong> ${mov.chegada}<br/><strong>Partida:</strong> ${mov.partida}`,
               )
               .style("left", event.offsetX + 10 + "px")
               .style("top", event.offsetY + 10 + "px")
@@ -558,7 +599,6 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
           })
           .on("mouseout", function () {
             d3.select(this).attr("stroke", trainColor).attr("stroke-width", 2);
-
             tooltip.transition().duration(100).style("opacity", 0);
           });
 
@@ -574,13 +614,9 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
             .style("cursor", "pointer")
             .on("mouseover", function (event) {
               d3.select(this).raise().attr("stroke", "steelblue").attr("stroke-width", 3);
-
               tooltip
                 .html(
-                  `<strong>Prefixo:</strong> ${train.prefixo}<br/>
-<strong>Segmento:</strong> ${mov.linha}<br/>
-<strong>Chegada:</strong> ${mov.chegada}<br/>
-<strong>Partida:</strong> ${mov.partida}`,
+                  `<strong>Prefixo:</strong> ${train.prefixo}<br/><strong>Segmento:</strong> ${mov.linha}<br/><strong>Chegada:</strong> ${mov.chegada}<br/><strong>Partida:</strong> ${mov.partida}`,
                 )
                 .style("left", event.offsetX + 10 + "px")
                 .style("top", event.offsetY + 10 + "px")
@@ -607,12 +643,10 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
             .attr("font-weight", "bold")
             .attr("fill", trainColor)
             .text(train.prefixo);
-
           firstVisibleMovement = false;
         }
       });
     });
-    // --- FIM: LÓGICA DE PLOTAGEM DOS TRENS ---
 
     plotG.append("g").call(axisXTop);
     plotG.append("g").attr("transform", `translate(0,${innerH})`).call(axisXBottom);
@@ -670,7 +704,9 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       .attr("stroke-width", 1);
 
     trainGroup.raise();
-  }, [hourWidth, height, initialDate, finalDate, yLabels, yAxisWidth, zoomState, trains, dateTimeLine]);
+    // --- INÍCIO: ADICIONANDO `restrictions` AO ARRAY DE DEPENDÊNCIAS ---
+  }, [hourWidth, height, initialDate, finalDate, yLabels, yAxisWidth, zoomState, trains, dateTimeLine, restrictions]);
+  // --- FIM: ADICIONANDO `restrictions` AO ARRAY DE DEPENDÊNCIAS ---
 
   return (
     <div
