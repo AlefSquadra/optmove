@@ -335,10 +335,8 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
     let currentHour = new Date(xDomain[0]);
     while (currentHour <= xDomain[1]) {
       hourTicks.push(new Date(currentHour));
-      // <-- ALTERAÇÃO UTC: Usar d3.utcHour para incrementar as horas
       currentHour = d3.utcHour.offset(currentHour, hourInterval);
     }
-    // <-- ALTERAÇÃO UTC: Usar d3.utcFormat para formatar o tempo
     const timeFmt = d3.utcFormat("%H:%M");
     const innerHourTicks = hourTicks.slice(1, -1);
     const axisXTop = d3
@@ -415,7 +413,6 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
 
     // --- INÍCIO: LÓGICA DE PLOTAGEM DOS TRENS ---
     const trainGroup = plotG.append("g").attr("class", "trains-group");
-    // <-- ALTERAÇÃO UTC: Usar d3.utcParse para interpretar as strings de data como UTC
     const parseDateUTC = d3.utcParse("%Y-%m-%dT%H:%M:%SZ");
 
     trains.forEach((train) => {
@@ -461,9 +458,9 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
             tooltip
               .html(
                 `<strong>Prefixo:</strong> ${train.prefixo}<br/>
-<strong>Segmento:</strong> ${mov.segmento}<br/>
-<strong>Chegada:</strong> ${mov.chegada}<br/>
-<strong>Partida:</strong> ${mov.partida}`,
+                  <strong>Segmento:</strong> ${mov.segmento}<br/>
+                  <strong>Chegada:</strong> ${mov.chegada}<br/>
+                  <strong>Partida:</strong> ${mov.partida}`,
               )
               .style("left", event.offsetX + 10 + "px")
               .style("top", event.offsetY + 10 + "px")
