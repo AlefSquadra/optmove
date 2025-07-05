@@ -1,3 +1,4 @@
+import { useKeyPress } from "@shared/hooks/useKeyPress";
 import * as d3 from "d3";
 import { useEffect, useRef, useState } from "react";
 
@@ -166,6 +167,8 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   const [zoomState, setZoomState] = useState<ZoomState | null>(null);
+
+  const keyPressCtrl = useKeyPress().ctrl().current();
 
   const processData = (data: YLabel[]) => {
     const flatData: (YLabel | Child)[] = [];
@@ -496,11 +499,13 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
         .attr("width", width)
         .attr("height", height)
         .attr("fill", res.color)
-        .attr("stroke", "rgba(0,0,0,0.5)")
+        .attr("stroke", "rgba(0,0,0,0.3)")
         .attr("stroke-width", 1)
         .style("pointer-events", "all")
         .style("cursor", "help")
+        .style("opacity", 0.4)
         .on("mouseover", function (event) {
+          console.log(res);
           tooltip
             .html(
               `<strong>Restrição:</strong> ${res.name}<br/>` +
@@ -654,6 +659,7 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
     let brushStart: [number, number] | null = null;
     const brush = d3
       .brush()
+      .filter((event) => event.ctrlKey && !event.button)
       .extent([
         [0, 0],
         [plotWidth, innerH],
@@ -661,6 +667,7 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       .on("start", function (event) {
         if (event.sourceEvent) {
           brushStart = d3.pointer(event.sourceEvent, this);
+          return;
         }
       })
       .on("end", function (event) {
@@ -692,20 +699,34 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
 
     const brushG = plotG.append("g").attr("class", "brush").call(brush);
 
-    brushG.select<SVGRectElement>(".overlay").on("mousemove", function (event) {
-      const coords = getGraphCoords(event, xScale, yScale, processedData);
-      onGraphCoordenatesChange(coords);
-    });
-    brushG.selectAll(".overlay").style("cursor", "crosshair");
+    brushG.selectAll(".overlay").style("cursor", keyPressCtrl !== "Control" ? "default" : "crosshair");
+
     brushG
       .selectAll(".selection")
       .attr("fill", "rgba(107, 109, 111, 0.2)")
       .attr("stroke", "#000000")
       .attr("stroke-width", 1);
 
+    if (keyPressCtrl !== "Control") {
+      graphCoordenateOverlay.raise();
+    }
+
     trainGroup.raise();
+    restrictionsGroup.raise();
     // --- INÍCIO: ADICIONANDO `restrictions` AO ARRAY DE DEPENDÊNCIAS ---
-  }, [hourWidth, height, initialDate, finalDate, yLabels, yAxisWidth, zoomState, trains, dateTimeLine, restrictions]);
+  }, [
+    hourWidth,
+    height,
+    initialDate,
+    finalDate,
+    yLabels,
+    yAxisWidth,
+    zoomState,
+    trains,
+    dateTimeLine,
+    restrictions,
+    keyPressCtrl,
+  ]);
   // --- FIM: ADICIONANDO `restrictions` AO ARRAY DE DEPENDÊNCIAS ---
 
   return (
