@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { IDataContextMenu } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
 import { ModalSelectOfficialization } from "@features/home/components/modals/selectOfficialization/ModalSelectOfficialization";
@@ -28,7 +28,7 @@ import { ChartRestrictionsMock, ChartTrainsMock, ChartYLabelMock } from "@featur
 import dayjs from "dayjs";
 
 const FTVLayout = () => {
-  const { setCursorPointer, selectedElementClickable: lineTrainSelected } = useGHTChartContext();
+  const { setCursorPointer, mouseOverInElementData, setMouseOverInElementData } = useGHTChartContext();
   const FTContentRef = useRef<HTMLDivElement>(null);
   const [openTrainMovements, setOpenTrainMovements] = useState<IModalData<IDataContextMenu>>({
     isOpen: false,
@@ -46,6 +46,17 @@ const FTVLayout = () => {
   }, [setCursorPointer]);
 
   const initialDate = dayjs(new Date("2025-06-30T16:12:32+00:00")).subtract(6, "hour").toDate();
+
+  const handleMouseMoveInRestriction = useCallback(
+    (data) => {
+      setMouseOverInElementData(data);
+    },
+    [setMouseOverInElementData],
+  ); // A dependência é a função de set do estado
+
+  const handleGraphTimeChange = useCallback((props) => {
+    setGraphTimeAndCoordinates(props);
+  }, []);
 
   return (
     <>
@@ -89,20 +100,25 @@ const FTVLayout = () => {
               restrictions={[ChartRestrictionsMock]}
               dateTimeLine={new Date("2025-06-30T16:12:32+00:00")}
               finalDate={new Date("2025-07-01T16:12:32+00:00")}
-              onGraphTimeAndCoordenatesChange={setGraphTimeAndCoordinates}
+              onGraphTimeAndCoordenatesChange={handleGraphTimeChange}
+              onMouseMoveInRestriction={handleMouseMoveInRestriction}
             />
           </div>
         </FTLayoutContent>
 
         <FTLayoutFooter className="row-auto flex items-center justify-center">
-          {lineTrainSelected.name && (
-            <Text className="text-center text-red-700">
-              {`${lineTrainSelected.name} (${lineTrainSelected.data.type}) | Chegada: ${lineTrainSelected.data?.xi} | Saída: ${lineTrainSelected?.data?.xf} Destino: ${
+          <Text className="text-center text-red-700">
+            {mouseOverInElementData?.element === "train" && (
+              <>
+                {/* {`${lineTrainSelected.name} (${lineTrainSelected.data.type}) | Chegada: ${lineTrainSelected.data?.xi} | Saída: ${lineTrainSelected?.data?.xf} Destino: ${
                 lineTrainSelected.data?.info.find((x: { label: string; value: string }) => x?.label === "Destino")
                   ?.value
-              }`}
-            </Text>
-          )}
+              }`} */}
+                {JSON.stringify(mouseOverInElementData?.data)}
+              </>
+            )}
+            {mouseOverInElementData?.element === "restriction" && <> {JSON.stringify(mouseOverInElementData?.data)}</>}
+          </Text>
         </FTLayoutFooter>
         <FTLayoutTabPanelDown>
           <div className="relative">

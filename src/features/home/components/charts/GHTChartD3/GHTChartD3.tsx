@@ -1,6 +1,16 @@
+import type { IElementEventInPlotG } from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
+import { ChartGhtContextMenu, type MenuGroup } from "@features/home/components/charts/GHTChartD3/ContextMenuChart";
 import { useKeyPress } from "@shared/hooks/useKeyPress";
+import type { IModalData } from "@shared/types/IModalData.type";
 import * as d3 from "d3";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+export interface TrainMovementActivity {
+  id: string;
+  name: string;
+  tyoe: string;
+  color: string;
+}
 
 // --- INÍCIO: NOVAS TIPAGENS PARA OS DADOS DOS TRENS ---
 export interface TrainMovement {
@@ -14,6 +24,7 @@ export interface TrainMovement {
   fimOcupacao: string | Date;
   idFicha: string;
   destino: string;
+  activity?: TrainMovementActivity[];
 }
 
 export interface TrainData {
@@ -131,10 +142,9 @@ interface GHTChartD3Props {
   yLabels: YLabel[];
   yAxisWidth: number;
   trains: TrainData[];
-  // --- INÍCIO: ADICIONANDO PROP DE RESTRIÇÕES ---
   restrictions?: RestrictionData[];
-  // --- FIM: ADICIONANDO PROP DE RESTRIÇÕES ---
   dateTimeLine: Date;
+  onMouseMoveInRestriction: (data: IElementEventInPlotG<MouseEvent> | null) => void;
   onGraphTimeAndCoordenatesChange: (props: IOnGraphCoordinatesUpdateProps) => void;
 }
 
@@ -154,10 +164,9 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
     yLabels,
     yAxisWidth = 80,
     trains = [],
-    // --- INÍCIO: DESTRUCTURING DA NOVA PROP ---
     restrictions = [],
-    // --- FIM: DESTRUCTURING DA NOVA PROP ---
     dateTimeLine,
+    onMouseMoveInRestriction,
     onGraphTimeAndCoordenatesChange: onGraphCoordenatesChange,
   } = props;
 
@@ -169,6 +178,11 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
   const [zoomState, setZoomState] = useState<ZoomState | null>(null);
 
   const keyPressCtrl = useKeyPress().ctrl().current();
+  const [contextMenuData, setContextMenuData] = useState<IModalData<{
+    y: number;
+    x: number;
+    menuGroup: MenuGroup[];
+  }> | null>(null);
 
   const processData = (data: YLabel[]) => {
     const flatData: (YLabel | Child)[] = [];
@@ -265,6 +279,16 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       date: formatDate(date),
     };
   }
+
+  const onMouseMoveInRestrictionCallback = useCallback(
+    (element) => {
+      onMouseMoveInRestriction(element);
+    },
+    [onMouseMoveInRestriction],
+  );
+  // useEffect(() => {
+  //   onMouseMoveInRestrictionCallback();
+  // }, [onMouseMoveInRestrictionCallback]);
 
   useEffect(() => {
     [svgLeftRef, svgPlotRef, svgRightRef].forEach((r) => d3.select(r.current!).selectAll("*").remove());
@@ -417,9 +441,30 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
           case "linhaDupla":
             return "rgba(210,200,200,1)";
           case "patio":
-            return "url(#hatch-pattern)";
+            return "rgba(235, 225, 225, 1)";
           default:
-            return "none";
+            return "transparent";
+        }
+      })
+      // ADICIONANDO OS NOVOS EVENTOS
+      .on("mousemove", function (event) {
+        const coords = getGraphCoords(event, xScale, yScale, processedData);
+        onGraphCoordenatesChange(coords);
+      })
+      .on("mouseover", function () {
+        onMouseMoveInRestrictionCallback(null);
+      })
+      .on("contextmenu", function (event: MouseEvent) {
+        event.preventDefault();
+
+        // Sua lógica de context menu aqui...
+        const [, my] = d3.pointer(event);
+        const yVal = yScale.invert(my);
+        const clickedSegment = segmentData.find((d) => yVal >= d.startY && yVal <= d.endY);
+
+        if (clickedSegment) {
+          alert(`Menu de contexto para o segmento: ${clickedSegment.name}`);
+          // setContextMenuData(...)
         }
       });
 
@@ -431,6 +476,7 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
           )
           .map((d) => d.indexGraficoI!)
       : segmentData.filter((seg) => seg.startY >= yDomain[0] && seg.startY <= yDomain[1]).map((seg) => seg.startY);
+
     plotG
       .append("g")
       .selectAll("line.y-grid")
@@ -501,56 +547,48 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
         .attr("fill", res.color)
         .attr("stroke", "rgba(0,0,0,0.3)")
         .attr("stroke-width", 1)
-        .style("pointer-events", "all")
-        .style("cursor", "help")
         .style("opacity", 0.4)
         .on("mouseover", function (event) {
-          console.log(res);
-          tooltip
-            .html(
-              `<strong>Restrição:</strong> ${res.name}<br/>` +
-                res.info.map((i) => `<strong>${i.label}:</strong> ${i.value}`).join("<br/>"),
-            )
-            .style("left", event.offsetX + 10 + "px")
-            .style("top", event.offsetY + 10 + "px")
-            .transition()
-            .duration(100)
-            .style("opacity", 1);
+          event.stopPropagation();
+          onMouseMoveInRestrictionCallback({
+            data: { code: "codigo", description: "descricao" },
+            element: "restriction",
+          });
         })
-        .on("mousemove", function (event) {
-          tooltip.style("left", event.offsetX + 10 + "px").style("top", event.offsetY + 10 + "px");
+        .on("mouseout", function (event) {
+          event.stopPropagation();
+          onMouseMoveInRestrictionCallback(null);
         })
-        .on("mouseout", function () {
-          tooltip.transition().duration(100).style("opacity", 0);
+        .on("contextmenu", function (event: MouseEvent) {
+          event.preventDefault();
+          setContextMenuData({
+            isOpen: true,
+            data: {
+              x: event.clientX,
+              y: event.clientY,
+              menuGroup: [
+                {
+                  section: "Trem", // id: "train"
+                  items: [
+                    {
+                      id: "train_movements",
+                      label: "Movimentos trem",
+                      shortcut: "Ctrl+M",
+                      onClick: () => alert("Ação: train_movements"),
+                    },
+                    {
+                      id: "select_restrictions",
+                      label: "Modo Seleção Restrições",
+                      shortcut: "Alt+I",
+                      onClick: () => alert("Ação: select_restrictions"),
+                    },
+                  ],
+                },
+              ],
+            },
+          });
         });
     });
-    // --- FIM: LÓGICA DE PLOTAGEM DAS RESTRIÇÕES ---
-
-    const timelineX = xScale(dateTimeLine);
-    plotG
-      .append("line")
-      .attr("class", "timeline-line")
-      .attr("x1", timelineX)
-      .attr("x2", timelineX)
-      .attr("y1", 0)
-      .attr("y2", innerH)
-      .attr("stroke", "green")
-      .attr("stroke-width", 3);
-
-    const graphCoordenateOverlay = plotG.append("g").attr("class", "overlay-group");
-    graphCoordenateOverlay
-      .append("rect")
-      .attr("width", plotWidth)
-      .attr("height", innerH)
-      .style("fill", "none")
-      .style("pointer-events", "all")
-      .on("mousemove", function (event) {
-        const coords = getGraphCoords(event, xScale, yScale, processedData);
-        onGraphCoordenatesChange(coords);
-      })
-      .on("mouseout", () => {
-        tooltip.transition().duration(50).style("opacity", 0);
-      });
 
     const trainGroup = plotG.append("g").attr("class", "trains-group");
 
@@ -586,8 +624,10 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
           .attr("y2", yScale(y2!))
           .attr("stroke", trainColor)
           .attr("stroke-width", 2)
+          .attr("stroke-dasharray", "3,2")
           .style("cursor", "pointer")
           .on("mouseover", function (event) {
+            event.stopPropagation();
             d3.select(this).raise().attr("stroke", "steelblue").attr("stroke-width", 3);
             tooltip
               .html(
@@ -600,45 +640,71 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
               .style("opacity", 1);
           })
           .on("mousemove", function (event) {
+            event.stopPropagation();
             tooltip.style("left", event.offsetX + 10 + "px").style("top", event.offsetY + 10 + "px");
+            onMouseMoveInRestrictionCallback({
+              data: { id: mov.segmento, name: mov.segmento },
+              element: "train",
+            });
           })
           .on("mouseout", function () {
             d3.select(this).attr("stroke", trainColor).attr("stroke-width", 2);
             tooltip.transition().duration(100).style("opacity", 0);
+            onMouseMoveInRestrictionCallback(null);
+          })
+          .on("contextmenu", function (event: MouseEvent) {
+            event.preventDefault();
+            setContextMenuData({
+              isOpen: true,
+              data: {
+                x: event.clientX,
+                y: event.clientY,
+                menuGroup: [
+                  {
+                    section: "Trens",
+                    items: [
+                      {
+                        id: "train_movements",
+                        label: "Movimentos trem",
+                        shortcut: "Ctrl+M",
+                        onClick: () => {},
+                      },
+                      {
+                        id: "train_ficha",
+                        label: "Ficha do trem",
+                        onClick: () => {},
+                      },
+                    ],
+                  },
+                  {
+                    section: "Atividade do trem",
+                    items: [
+                      {
+                        id: "train_activities",
+                        label: "Atividades trem",
+                        shortcut: "F2",
+                        onClick: () => {},
+                      },
+                    ],
+                  },
+                  {
+                    section: "Trazer trem pra frente",
+                    items: [
+                      {
+                        id: "train_front",
+                        label: "Trazer trem pra frente",
+                        shortcut: "F9",
+                        onClick: () => {},
+                      },
+                    ],
+                  },
+                ],
+              },
+            });
           });
 
-        if (fimCursoDate < partidaDate) {
-          singleTrainGroup
-            .append("line")
-            .attr("x1", xScale(fimCursoDate))
-            .attr("y1", yScale(y2!))
-            .attr("x2", xScale(partidaDate))
-            .attr("y2", yScale(y2!))
-            .attr("stroke", trainColor)
-            .attr("stroke-width", 2)
-            .style("cursor", "pointer")
-            .on("mouseover", function (event) {
-              d3.select(this).raise().attr("stroke", "steelblue").attr("stroke-width", 3);
-              tooltip
-                .html(
-                  `<strong>Prefixo:</strong> ${train.prefixo}<br/><strong>Segmento:</strong> ${mov.linha}<br/><strong>Chegada:</strong> ${mov.chegada}<br/><strong>Partida:</strong> ${mov.partida}`,
-                )
-                .style("left", event.offsetX + 10 + "px")
-                .style("top", event.offsetY + 10 + "px")
-                .transition()
-                .duration(100)
-                .style("opacity", 1);
-            })
-            .on("mousemove", function (event) {
-              tooltip.style("left", event.offsetX + 10 + "px").style("top", event.offsetY + 10 + "px");
-            })
-            .on("mouseout", function () {
-              d3.select(this).attr("stroke", trainColor).attr("stroke-width", 2);
-              tooltip.transition().duration(100).style("opacity", 0);
-            });
-        }
-
         if (firstVisibleMovement) {
+          // Adiciona label para o nome do trem
           singleTrainGroup
             .append("text")
             .attr("x", xScale(chegadaDate) - 5)
@@ -650,8 +716,53 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
             .text(train.prefixo);
           firstVisibleMovement = false;
         }
+
+        const centerX = (xScale(chegadaDate) + xScale(fimCursoDate)) / 2;
+        const centerY = (yScale(y1!) + yScale(y2!)) / 2 - 10;
+
+        const desiredIconHeight = 16;
+        const scale = desiredIconHeight / 106;
+
+        if (mov.activity && mov.activity.length > 0) {
+          const iconGroup = singleTrainGroup
+            .append("g")
+            .attr(
+              "transform",
+              `translate(${centerX - (79 * scale) / 2}, ${centerY - (106 * scale) / 2}) scale(${scale})`,
+            );
+
+          iconGroup
+            .append("g")
+            .attr("transform", "translate(0,106) scale(0.1,-0.1)")
+            .append("path")
+            .attr(
+              "d",
+              "M230 1020 c0 -39 -1 -40 -35 -40 l-35 0 0 -225 0 -225 35 0 c33 0 35 -2 35 -35 l0 -35 55 0 55 0 0 -230 0 -230 40 0 40 0 0 230 0 230 55 0 55 0 0 35 c0 33 2 35 35 35 l35 0 0 225 0 225 -35 0 c-34 0 -35 1 -35 40 l0 40 -150 0 -150 0 0 -40z",
+            )
+            .attr("fill", "#000")
+            .attr("stroke", "none");
+
+          iconGroup
+            .append("rect")
+            .attr("x", 0.3 * 79)
+            .attr("y", 0.05 * 106)
+            .attr("width", 0.35 * 79)
+            .attr("height", 0.45 * 106)
+            .attr("fill", "#ffb335");
+        }
       });
     });
+
+    const timelinePlot = plotG.append("line");
+
+    timelinePlot
+      .attr("class", "timeline-line")
+      .attr("x1", xScale(dateTimeLine))
+      .attr("x2", xScale(dateTimeLine))
+      .attr("y1", -10)
+      .attr("y2", innerH + 10)
+      .attr("stroke", "green")
+      .attr("stroke-width", 3);
 
     plotG.append("g").call(axisXTop);
     plotG.append("g").attr("transform", `translate(0,${innerH})`).call(axisXBottom);
@@ -708,9 +819,10 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       .attr("stroke-width", 1);
 
     if (keyPressCtrl !== "Control") {
-      graphCoordenateOverlay.raise();
+      segBgGroup.raise();
     }
 
+    timelinePlot.raise();
     trainGroup.raise();
     restrictionsGroup.raise();
     // --- INÍCIO: ADICIONANDO `restrictions` AO ARRAY DE DEPENDÊNCIAS ---
@@ -726,6 +838,7 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
     dateTimeLine,
     restrictions,
     keyPressCtrl,
+    onMouseMoveInRestrictionCallback,
   ]);
   // --- FIM: ADICIONANDO `restrictions` AO ARRAY DE DEPENDÊNCIAS ---
 
@@ -744,6 +857,15 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
         <svg ref={svgPlotRef} />
       </div>
       <svg ref={svgRightRef} width={yAxisWidth} height={height} style={{ gridColumn: "3", overflow: "visible" }} />
+
+      <ChartGhtContextMenu
+        groups={contextMenuData?.data?.menuGroup || []}
+        x={contextMenuData?.data?.x || 0}
+        y={contextMenuData?.data?.y || 0}
+        onClose={() => {
+          setContextMenuData({ isOpen: false });
+        }}
+      />
     </div>
   );
 };

@@ -1930,6 +1930,13 @@ export const ChartTrainsMock = [
         partida: "2025-06-30T16:38:25Z",
         fimOcupacao: "2025-06-30T16:43:37Z",
         idFicha: "BFICA0000000dj2",
+        activity: [
+          {
+            type: "parada",
+            name: "parada",
+            color: "red",
+          },
+        ],
       },
       {
         id: "404",
