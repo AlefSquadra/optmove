@@ -99,12 +99,13 @@ const FTVLayout = () => {
   }, []);
 
   const handleOnClickInElement = useCallback(
-    (data: IElementEventInPlotG | null) => {
-      if (data !== null) {
-        if (data.element === "train") {
+    (elementEvent: IElementEventInPlotG | null) => {
+      if (elementEvent !== null) {
+        if (elementEvent.element === "train") {
           setSelectedPanelTabBarLeft(() => ({
             isOpen: true,
             openTabName: "editando o trem",
+            data: elementEvent.data,
           }));
         }
       }

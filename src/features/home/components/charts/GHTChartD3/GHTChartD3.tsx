@@ -631,7 +631,21 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
           .style("cursor", "pointer")
           .on("click", function (event) {
             event.stopPropagation();
-            onClickInElement({ data: { id: train.prefixo, name: train.prefixo }, element: "train" });
+            onClickInElement({
+              data: {
+                id: train.id,
+                prefix: train.prefixo,
+                table: train.tabela,
+                tipo: train.tipoTrem,
+                length: train.comprimentoKm.toString(),
+                lotation: "",
+                segmentCut: mov.linha,
+                segmentEnd: mov.destino,
+                groupVPM: "",
+                vma: "",
+              },
+              element: "train",
+            });
           })
           .on("mouseover", function (event) {
             event.stopPropagation();

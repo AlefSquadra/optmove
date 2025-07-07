@@ -1,13 +1,24 @@
 import type { IOnGraphCoordinatesUpdateProps } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
+import type { TrainEditFormData } from "@features/home/components/tabPanelLeft/TrainEditForm/TrainEditForm";
 import type { IModalData } from "@shared/types/IModalData.type";
 
 export interface IHomeFTLayoutProvider {
   children: React.ReactNode;
 }
-export interface IOpenPanelTabBarLeft {
+
+export type IOpenPanelTabBarLeftTrainEdit = {
   isOpen: boolean;
   openTabName: string | "trens" | null;
-}
+  data?: any;
+};
+
+export type IOpenPanelTabBarLeftTrainEditGeneral = {
+  isOpen: boolean;
+  openTabName: "Editando o trem";
+  data?: TrainEditFormData;
+};
+
+export type IOpenPanelTabBarLeft = IOpenPanelTabBarLeftTrainEditGeneral | IOpenPanelTabBarLeftTrainEdit;
 
 export interface FTLayoutContext {
   selectedPanelTabBarLeft: IOpenPanelTabBarLeft;

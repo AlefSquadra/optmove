@@ -1,5 +1,6 @@
 import type { IContextMenuProps } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
 import type { IClickableElement } from "@features/home/components/charts/GHTChart/GHTChart.types";
+import type { TrainEditFormData } from "@features/home/components/tabPanelLeft/TrainEditForm/TrainEditForm";
 
 export interface IGHTChartContext {
   cursorPointer: React.CSSProperties["cursor"];
@@ -16,9 +17,8 @@ export interface IGHTChartProviderProps {
   children: React.ReactNode;
 }
 
-export interface TrainElementEventData {
+export interface TrainElementEventData extends TrainEditFormData {
   id: string;
-  name: string;
 }
 
 export interface RestrictionElementEventData {
