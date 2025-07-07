@@ -10,7 +10,7 @@ export interface TrainEditFormData {
   table: string;
   length: string;
   groupVPM: string;
-  lotation: "loaded" | "empty" | ""; // Melhor assim!
+  lotation: "loaded" | "empty" | "";
   vma: string;
   segmentCut: string;
   segmentEnd: string;
