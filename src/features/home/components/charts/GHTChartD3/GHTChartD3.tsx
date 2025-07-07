@@ -144,7 +144,8 @@ interface GHTChartD3Props {
   trains: TrainData[];
   restrictions?: RestrictionData[];
   dateTimeLine: Date;
-  onMouseMoveInRestriction: (data: IElementEventInPlotG<MouseEvent> | null) => void;
+  onMouseMoveInElement: (data: IElementEventInPlotG | null) => void;
+  onClickInElement: (data: IElementEventInPlotG | null) => void;
   onGraphTimeAndCoordenatesChange: (props: IOnGraphCoordinatesUpdateProps) => void;
 }
 
@@ -166,8 +167,9 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
     trains = [],
     restrictions = [],
     dateTimeLine,
-    onMouseMoveInRestriction,
+    onMouseMoveInElement,
     onGraphTimeAndCoordenatesChange: onGraphCoordenatesChange,
+    onClickInElement,
   } = props;
 
   const svgLeftRef = useRef<SVGSVGElement | null>(null);
@@ -282,13 +284,10 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
 
   const onMouseMoveInRestrictionCallback = useCallback(
     (element) => {
-      onMouseMoveInRestriction(element);
+      onMouseMoveInElement(element);
     },
-    [onMouseMoveInRestriction],
+    [onMouseMoveInElement],
   );
-  // useEffect(() => {
-  //   onMouseMoveInRestrictionCallback();
-  // }, [onMouseMoveInRestrictionCallback]);
 
   useEffect(() => {
     [svgLeftRef, svgPlotRef, svgRightRef].forEach((r) => d3.select(r.current!).selectAll("*").remove());
@@ -626,6 +625,10 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
           .attr("stroke-width", 2)
           .attr("stroke-dasharray", "3,2")
           .style("cursor", "pointer")
+          .on("click", function (event) {
+            event.stopPropagation();
+            onClickInElement({ data: { id: train.prefixo, name: train.prefixo }, element: "train" });
+          })
           .on("mouseover", function (event) {
             event.stopPropagation();
             d3.select(this).raise().attr("stroke", "steelblue").attr("stroke-width", 3);

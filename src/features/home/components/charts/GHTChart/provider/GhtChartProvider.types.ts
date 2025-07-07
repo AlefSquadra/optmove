@@ -8,8 +8,8 @@ export interface IGHTChartContext {
   setSelectedElementClickable: React.Dispatch<IClickableElement>;
   openContextMenu: Omit<IContextMenuProps, "onAction" | "onClose"> | null;
   setOpenContextMenu: React.Dispatch<React.SetStateAction<Omit<IContextMenuProps, "onAction" | "onClose"> | null>>;
-  mouseOverInElementData: IElementEventInPlotG<MouseEvent> | null;
-  setMouseOverInElementData: React.Dispatch<React.SetStateAction<IElementEventInPlotG<MouseEvent> | null>>;
+  mouseOverInElementData: IElementEventInPlotG | null;
+  setMouseOverInElementData: React.Dispatch<React.SetStateAction<IElementEventInPlotG | null>>;
 }
 
 export interface IGHTChartProviderProps {
@@ -30,7 +30,7 @@ export interface SbEventData {
   color: string;
 }
 
-export type IElementEventInPlotG<T = any> =
-  | { element: "train"; data: TrainElementEventData; event: T }
-  | { element: "restriction"; data: RestrictionElementEventData; event: T }
-  | { element: "sb"; data: SbEventData; event: T };
+export type IElementEventInPlotG =
+  | { element: "train"; data: TrainElementEventData }
+  | { element: "restriction"; data: RestrictionElementEventData }
+  | { element: "sb"; data: SbEventData };

@@ -16,15 +16,21 @@ import {
 } from "@features/home/layouts/HomeLayout";
 import { HomeFTLayoutProvider } from "@features/home/providers/HomeFTLayoutProvider/HomeFTLayoutProvider";
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
-import { Text } from "@fluentui/react-components";
+import { Spinner, Text } from "@fluentui/react-components";
 import type { IModalData } from "@shared/types/IModalData.type";
 
+import { useApplicationContext } from "@app/providers/ApplicationProvider/useApplication";
 import {
   GHTChartProvider,
   useGHTChartContext,
 } from "@features/home/components/charts/GHTChart/provider/GHTChartProvider";
+import type { IElementEventInPlotG } from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
 import { GHTChartD3 } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import { ChartRestrictionsMock, ChartTrainsMock, ChartYLabelMock } from "@features/home/components/FTV/json";
+import { GHTChartMainService } from "@features/home/services/GHTChartMainService";
+import { WindowModal } from "@shared/components/windowModal/WindowModal";
+import { DateFormat } from "@shared/utils/DateFormat";
+import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 
 const FTVLayout = () => {
@@ -40,6 +46,39 @@ const FTVLayout = () => {
     openSystemParams,
     setGraphTimeAndCoordinates,
   } = useFTLayout();
+  const [loadingStage, setLoadingStage] = useState<string>("");
+
+  const { selectedOfficialization } = useApplicationContext();
+
+  const fetchDataGHT = useQuery({
+    queryKey: ["ghtData", selectedOfficialization],
+    queryFn: async () => {
+      setLoadingStage("Carregando trens da malha...");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const data = await GHTChartMainService.getTrains({
+        dateGhtTimeline: selectedOfficialization?.officializationForm.timelineDatetime as string,
+        officializations:
+          selectedOfficialization?.listOfficialization.map((o) =>
+            DateFormat.isoToSpace(o.dateOfficialization).toString(),
+          ) ?? [],
+      });
+
+      setLoadingStage("Processando dados...");
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      setLoadingStage("Plotando gráfico...");
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      setLoadingStage("");
+      return {
+        data: data.trains,
+        database: "2025-06-03T09:09:22",
+        restrictions: data.restrictions,
+        yLabels: data.yards,
+      };
+    },
+    enabled: Object.keys(selectedOfficialization || {}).length > 0,
+  });
 
   useEffect(() => {
     setCursorPointer("auto");
@@ -52,11 +91,25 @@ const FTVLayout = () => {
       setMouseOverInElementData(data);
     },
     [setMouseOverInElementData],
-  ); // A dependência é a função de set do estado
+  );
 
   const handleGraphTimeChange = useCallback((props) => {
     setGraphTimeAndCoordinates(props);
   }, []);
+
+  const handleOnClickInElement = useCallback(
+    (data: IElementEventInPlotG | null) => {
+      if (data !== null) {
+        if (data.element === "train") {
+          setOpenTrainMovements({
+            isOpen: true,
+            // data: data,
+          });
+        }
+      }
+    },
+    [setOpenTrainMovements],
+  );
 
   return (
     <>
@@ -74,7 +127,7 @@ const FTVLayout = () => {
             </Text>
           </div>
           <div className="h-full w-full overflow-hidden">
-            {/* {fetchDataGHT.isLoading && (
+            {fetchDataGHT.isLoading && (
               <WindowModal
                 showButtonsHeader={false}
                 open={true}
@@ -88,21 +141,23 @@ const FTVLayout = () => {
                   <div className="mt-1 text-lg text-gray-600">{loadingStage || "Carregando..."}</div>
                 </div>
               </WindowModal>
-            )} */}
-
-            <GHTChartD3
-              trains={ChartTrainsMock as any}
-              yLabels={ChartYLabelMock}
-              height={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
-              hourWidth={80}
-              yAxisWidth={80}
-              initialDate={initialDate}
-              restrictions={[ChartRestrictionsMock]}
-              dateTimeLine={new Date("2025-06-30T16:12:32+00:00")}
-              finalDate={new Date("2025-07-01T16:12:32+00:00")}
-              onGraphTimeAndCoordenatesChange={handleGraphTimeChange}
-              onMouseMoveInRestriction={handleMouseMoveInRestriction}
-            />
+            )}
+            {!fetchDataGHT.isLoading && (
+              <GHTChartD3
+                trains={ChartTrainsMock as any}
+                yLabels={ChartYLabelMock}
+                height={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
+                hourWidth={80}
+                yAxisWidth={80}
+                initialDate={initialDate}
+                restrictions={[ChartRestrictionsMock]}
+                dateTimeLine={new Date("2025-06-30T16:12:32+00:00")}
+                finalDate={new Date("2025-07-01T16:12:32+00:00")}
+                onGraphTimeAndCoordenatesChange={handleGraphTimeChange}
+                onMouseMoveInElement={handleMouseMoveInRestriction}
+                onClickInElement={handleOnClickInElement}
+              />
+            )}
           </div>
         </FTLayoutContent>
 

@@ -13,9 +13,7 @@ const GHTChartProvider = (props: IGHTChartProviderProps) => {
   const [cursorPointer, setCursorPointer] = useState<React.CSSProperties["cursor"]>("default");
   const [selectedElementClickable, setSelectedElementClickable] = useState<IClickableElement>({} as IClickableElement);
   const [openContextMenu, setOpenContextMenu] = useState<Omit<IContextMenuProps, "onAction" | "onClose"> | null>(null);
-  const [onMouseOverInElementData, setOnMouseOverInElementData] = useState<IElementEventInPlotG<MouseEvent> | null>(
-    null,
-  );
+  const [onMouseOverInElementData, setOnMouseOverInElementData] = useState<IElementEventInPlotG | null>(null);
 
   return (
     <GHTChartContext.Provider

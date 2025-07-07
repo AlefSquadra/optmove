@@ -1,3 +1,4 @@
+import { useApplicationContext } from "@app/providers/ApplicationProvider/useApplication";
 import type { IOnGraphCoordinatesUpdateProps } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import { FtlContext } from "@features/home/providers/HomeFTLayoutProvider/HomeFtLayoutContext";
 import type {
@@ -8,6 +9,7 @@ import type { IModalData } from "@shared/types/IModalData.type";
 import { useState } from "react";
 
 export const HomeFTLayoutProvider = ({ children }: IHomeFTLayoutProvider) => {
+  const { selectZoneParams } = useApplicationContext();
   const [selectedPanelTabBarLeft, setSelectedPanelTabBarLeft] = useState<IOpenPanelTabBarLeft>({
     isOpen: false,
     openTabName: "",
@@ -16,7 +18,9 @@ export const HomeFTLayoutProvider = ({ children }: IHomeFTLayoutProvider) => {
   const [isOpenPanelTabBarDown, setIsPanelOpenDown] = useState<boolean>(false);
   const [showAccomplished, setShowAccomplished] = useState<boolean>(true);
   const [showTimelineView, setShowTimelineView] = useState<boolean>(true);
-  const [openSelectOfficialization, setOpenSelectOfficialization] = useState<boolean>(false);
+  const [openSelectOfficialization, setOpenSelectOfficialization] = useState<boolean>(
+    selectZoneParams.profileZone == "2" ? true : false,
+  );
   const [openSystemParams, setOpenSystemParams] = useState<IModalData<any>>({ isOpen: false });
   const [graphTimeAndCoordinates, setGraphTimeAndCoordinates] = useState<IOnGraphCoordinatesUpdateProps>({
     date: "",

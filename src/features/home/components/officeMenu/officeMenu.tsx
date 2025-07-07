@@ -65,8 +65,8 @@ const FTVOfficeMenu = () => {
           <Input
             type="datetime-local"
             value={selectedOfficialization?.officializationForm.timelineDatetime}
-            disabled
-            className="h-[1.750rem] w-[11rem] md:w-[8rem]"
+            readOnly
+            className="h-[1.750rem] w-[11rem] md:w-[8rem] lg:w-[10rem]"
           />
           <ToolbarButton
             icon={<img src={refresh} width={24} alt="Icon" />}
@@ -228,9 +228,10 @@ const FTVOfficeMenu = () => {
         <span className="text-sm text-gray-500 md:text-xs">Controles</span>
       </div>
 
-      <div className="hidden flex-1 xl:flex">
+      <div className="hidden flex-1 lg:flex">
         <ToolbarDivider />
       </div>
+
       <ToolbarDivider />
 
       {/* Grupo Oficialização */}
