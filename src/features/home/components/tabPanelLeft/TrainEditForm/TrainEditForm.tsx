@@ -43,7 +43,7 @@ const TrainEditForm = () => {
             control={control}
             render={({ field }) => (
               <Field label="Prefixo" validationMessage={errors.prefix?.message}>
-                <Input {...field} placeholder="Digite o prefixo" />
+                <Input readOnly {...field} placeholder="Digite o prefixo" />
               </Field>
             )}
           />
@@ -76,7 +76,7 @@ const TrainEditForm = () => {
             control={control}
             render={({ field }) => (
               <Field label="Prefixo" validationMessage={errors.prefix?.message}>
-                <Input {...field} placeholder="Digite o prefixo" />
+                <Input readOnly {...field} placeholder="Digite o prefixo" />
               </Field>
             )}
           />
@@ -85,8 +85,8 @@ const TrainEditForm = () => {
             name="groupVPM"
             control={control}
             render={({ field }) => (
-              <Field label="Prefixo" validationMessage={errors.prefix?.message}>
-                <Input {...field} placeholder="Digite o prefixo" />
+              <Field label="Grupo VMP" validationMessage={errors.prefix?.message}>
+                <Input readOnly {...field} placeholder="Digite o prefixo" />
               </Field>
             )}
           />
@@ -96,14 +96,16 @@ const TrainEditForm = () => {
             control={control}
             rules={{ required: "Selecione uma opção" }}
             render={({ field }) => (
-              <RadioGroup {...field} value={field.value} onChange={(_, data) => field.onChange(data.value)}>
-                {[
-                  { label: "Carregado", value: "loaded" },
-                  { label: "Vazio", value: "empty" },
-                ].map((opt) => (
-                  <Radio key={opt.value} value={opt.value} label={opt.label} />
-                ))}
-              </RadioGroup>
+              <Field label="Lotação" validationMessage={errors.prefix?.message}>
+                <RadioGroup {...field} value={field.value} onChange={(_, data) => field.onChange(data.value)}>
+                  {[
+                    { label: "Carregado", value: "loaded" },
+                    { label: "Vazio", value: "empty" },
+                  ].map((opt) => (
+                    <Radio key={opt.value} value={opt.value} label={opt.label} />
+                  ))}
+                </RadioGroup>
+              </Field>
             )}
           />
 
@@ -112,7 +114,7 @@ const TrainEditForm = () => {
             control={control}
             render={({ field }) => (
               <Field label="Comprimento" validationMessage={errors.prefix?.message}>
-                <Input {...field} placeholder="," disabled />
+                <Input readOnly {...field} placeholder="," disabled />
               </Field>
             )}
           />
@@ -122,7 +124,7 @@ const TrainEditForm = () => {
             control={control}
             render={({ field }) => (
               <Field label="Prefixo" validationMessage={errors.prefix?.message}>
-                <Input {...field} placeholder="__" disabled />
+                <Input readOnly {...field} placeholder="__" disabled />
               </Field>
             )}
           />
@@ -132,7 +134,7 @@ const TrainEditForm = () => {
             control={control}
             render={({ field }) => (
               <Field label="Seg. Corte" validationMessage={errors.prefix?.message}>
-                <Input {...field} placeholder="ICZ" disabled />
+                <Input readOnly {...field} placeholder="ICZ" disabled />
               </Field>
             )}
           />
@@ -142,7 +144,7 @@ const TrainEditForm = () => {
             control={control}
             render={({ field }) => (
               <Field label="Seg. Fim" validationMessage={errors.prefix?.message}>
-                <Input {...field} placeholder="ZPG" disabled />
+                <Input readOnly {...field} placeholder="ZPG" disabled />
               </Field>
             )}
           />

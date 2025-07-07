@@ -203,9 +203,7 @@ const FTVLayout = () => {
         </FTLayoutTabPanelDown>
       </FTLayoutRoot>
       <ModalSelectOfficialization
-        onSelectedPlans={() => {
-          // setPlanParams(plans);
-        }}
+        onSelectedPlans={() => {}}
         openSelectOfficialization={openSelectOfficialization}
         setOpenSelectOfficialization={setOpenSelectOfficialization}
       />
