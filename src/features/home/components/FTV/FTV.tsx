@@ -26,7 +26,6 @@ import {
 } from "@features/home/components/charts/GHTChart/provider/GHTChartProvider";
 import type { IElementEventInPlotG } from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
 import { GHTChartD3 } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
-import { ChartRestrictionsMock, ChartTrainsMock, ChartYLabelMock } from "@features/home/components/FTV/json";
 import { GHTChartMainService } from "@features/home/services/GHTChartMainService";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import { DateFormat } from "@shared/utils/DateFormat";
@@ -53,28 +52,31 @@ const FTVLayout = () => {
   const fetchDataGHT = useQuery({
     queryKey: ["ghtData", selectedOfficialization],
     queryFn: async () => {
-      setLoadingStage("Carregando trens da malha...");
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      const data = await GHTChartMainService.getTrains({
+      const parameters = {
         dateGhtTimeline: selectedOfficialization?.officializationForm.timelineDatetime as string,
         officializations:
           selectedOfficialization?.listOfficialization.map((o) =>
             DateFormat.isoToSpace(o.dateOfficialization).toString(),
           ) ?? [],
-      });
+      };
 
-      setLoadingStage("Processando dados...");
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setLoadingStage("Carregando lista de SBS...");
 
-      setLoadingStage("Plotando gráfico...");
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const sbs = await GHTChartMainService.getSbs("ICZ-ISN Baixada Conceição-Santos");
+
+      setLoadingStage("Buscando trens...");
+
+      const trains = await GHTChartMainService.getTrains(parameters);
+
+      setLoadingStage("Buscando restrições");
+
+      const rectangles = await GHTChartMainService.getRectangles(parameters);
 
       setLoadingStage("");
       return {
-        data: data.trains,
-        database: "2025-06-03T09:09:22",
-        restrictions: data.restrictions,
-        yLabels: data.yards,
+        trains,
+        rectangles,
+        sbs,
       };
     },
     enabled: Object.keys(selectedOfficialization || {}).length > 0,
@@ -142,22 +144,26 @@ const FTVLayout = () => {
                 </div>
               </WindowModal>
             )}
-            {!fetchDataGHT.isLoading && (
-              <GHTChartD3
-                trains={ChartTrainsMock as any}
-                yLabels={ChartYLabelMock}
-                height={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
-                hourWidth={80}
-                yAxisWidth={80}
-                initialDate={initialDate}
-                restrictions={[ChartRestrictionsMock]}
-                dateTimeLine={new Date("2025-06-30T16:12:32+00:00")}
-                finalDate={new Date("2025-07-01T16:12:32+00:00")}
-                onGraphTimeAndCoordenatesChange={handleGraphTimeChange}
-                onMouseMoveInElement={handleMouseMoveInRestriction}
-                onClickInElement={handleOnClickInElement}
-              />
-            )}
+            {!fetchDataGHT.isLoading &&
+              fetchDataGHT.data?.trains &&
+              fetchDataGHT.data?.trains?.length > 0 &&
+              fetchDataGHT.data?.sbs.length > 0 &&
+              fetchDataGHT.data?.rectangles.length > 0 && (
+                <GHTChartD3
+                  trains={fetchDataGHT.data?.trains as any}
+                  yLabels={fetchDataGHT.data?.sbs as any}
+                  restrictions={fetchDataGHT.data?.rectangles as any}
+                  height={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
+                  hourWidth={80}
+                  yAxisWidth={80}
+                  initialDate={initialDate}
+                  dateTimeLine={new Date("2025-06-30T16:12:32+00:00")}
+                  finalDate={new Date("2025-07-01T16:12:32+00:00")}
+                  onGraphTimeAndCoordenatesChange={handleGraphTimeChange}
+                  onMouseMoveInElement={handleMouseMoveInRestriction}
+                  onClickInElement={handleOnClickInElement}
+                />
+              )}
           </div>
         </FTLayoutContent>
 

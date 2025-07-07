@@ -1,0 +1,12 @@
+{
+    "/SelecaoZonas/ZonePlanner": "/select-zone-planner",
+    "/SelecaoZonas/ProfilePlanne": "/select-profile-planner",
+    "/SelecaoZonas/TransferProfile": "/select-list-transfer-profile",
+    "/priorizarDestino/patios": "/patios",
+    "/priorizarDestino/produtos": "/produtos",
+    "/priorizarDestino/terminais": "/terminais",
+    "/priorizarDestino/prioridades": "/prioridades",
+    "/v1/ght/chart/sbs/:ramal": "/sbs",
+    "/v1/ght/chart/trains:others": "/trains",
+    "/v1/ght/chart/rectangles:others": "/rectangles"
+}
