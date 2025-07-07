@@ -205,7 +205,7 @@ const FTVOfficeMenu = () => {
               onChange={(_, data) => {
                 setSelectedPanelTabBarLeft(() => ({
                   isOpen: data.checked as boolean,
-                  openTabName: null,
+                  openTabName: "",
                 }));
               }}
               label={<Text className="text-sm md:!text-[.7rem]">Info's do trem</Text>}

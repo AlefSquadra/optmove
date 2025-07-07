@@ -24,7 +24,6 @@ interface SimpleContextMenuProps {
 function ChartGhtContextMenu({ x = 0, y = 0, groups = [], onClose }: SimpleContextMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
 
-  // Fechar ao clicar fora
   useEffect(() => {
     function handleClickOutside(e) {
       if (ref.current && !ref.current.contains(e.target)) onClose();
@@ -33,7 +32,6 @@ function ChartGhtContextMenu({ x = 0, y = 0, groups = [], onClose }: SimpleConte
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
-  // Atalhos do menu
   useEffect(() => {
     const normalizeKey = (key: string) => {
       const keyMap = {

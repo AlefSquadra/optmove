@@ -147,6 +147,7 @@ interface GHTChartD3Props {
   onMouseMoveInElement: (data: IElementEventInPlotG | null) => void;
   onClickInElement: (data: IElementEventInPlotG | null) => void;
   onGraphTimeAndCoordenatesChange: (props: IOnGraphCoordinatesUpdateProps) => void;
+  onClickMenuContext: (data: any | null) => void;
 }
 
 interface ZoomState {
@@ -170,6 +171,7 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
     onMouseMoveInElement,
     onGraphTimeAndCoordenatesChange: onGraphCoordenatesChange,
     onClickInElement,
+    onClickMenuContext,
   } = props;
 
   const svgLeftRef = useRef<SVGSVGElement | null>(null);
@@ -573,7 +575,9 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
                       id: "train_movements",
                       label: "Movimentos trem",
                       shortcut: "Ctrl+M",
-                      onClick: () => alert("Ação: train_movements"),
+                      onClick: (data) => {
+                        console.log(data);
+                      },
                     },
                     {
                       id: "select_restrictions",
@@ -670,7 +674,9 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
                         id: "train_movements",
                         label: "Movimentos trem",
                         shortcut: "Ctrl+M",
-                        onClick: () => {},
+                        onClick: () => {
+                          onClickMenuContext({ data: { id: train.prefixo, name: train.prefixo }, element: "train" });
+                        },
                       },
                       {
                         id: "train_ficha",

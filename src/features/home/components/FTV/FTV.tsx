@@ -46,9 +46,8 @@ const FTVLayout = () => {
     setGraphTimeAndCoordinates,
   } = useFTLayout();
   const [loadingStage, setLoadingStage] = useState<string>("");
-
   const { selectedOfficialization } = useApplicationContext();
-
+  const { setSelectedPanelTabBarLeft } = useFTLayout();
   const fetchDataGHT = useQuery({
     queryKey: ["ghtData", selectedOfficialization],
     queryFn: async () => {
@@ -103,10 +102,10 @@ const FTVLayout = () => {
     (data: IElementEventInPlotG | null) => {
       if (data !== null) {
         if (data.element === "train") {
-          setOpenTrainMovements({
+          setSelectedPanelTabBarLeft(() => ({
             isOpen: true,
-            // data: data,
-          });
+            openTabName: "editando o trem",
+          }));
         }
       }
     },
@@ -162,6 +161,12 @@ const FTVLayout = () => {
                   onGraphTimeAndCoordenatesChange={handleGraphTimeChange}
                   onMouseMoveInElement={handleMouseMoveInRestriction}
                   onClickInElement={handleOnClickInElement}
+                  onClickMenuContext={(data) => {
+                    setOpenTrainMovements({
+                      isOpen: true,
+                      data,
+                    });
+                  }}
                 />
               )}
           </div>
