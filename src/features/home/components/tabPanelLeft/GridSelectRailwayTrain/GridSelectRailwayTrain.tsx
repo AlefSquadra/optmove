@@ -1,36 +1,19 @@
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
-import {
-  Button,
-  DataGrid,
-  DataGridBody,
-  DataGridCell,
-  DataGridHeader,
-  DataGridHeaderCell,
-  DataGridRow,
-  Field,
-  Input,
-  Menu,
-  MenuItem,
-  MenuList,
-  MenuPopover,
-  MenuTrigger,
-  TableCellLayout,
-  createTableColumn,
-  type DataGridProps,
-  type TableColumnDefinition,
-  type TableRowId,
-} from "@fluentui/react-components";
+import { Button, Field, Input } from "@fluentui/react-components";
 import { Search20Regular } from "@fluentui/react-icons";
+import { OptGridTable } from "@shared/components/gridTable/GridTable";
 import { TabWindowHeader } from "@shared/components/tabWindowHeader/tabWindowHeader";
 import { useQuery } from "@tanstack/react-query";
-import React, { useState } from "react";
+import type { MRT_ColumnDef } from "mantine-react-table";
+import { MRT_Localization_PT_BR } from "mantine-react-table/locales/pt-BR/index.cjs";
+import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 interface IRailwayTrainData {
   id: string;
   prefix: string;
   type: string;
-  dateOfficialization: string;
+  destination: string;
 }
 
 interface ISearchFormData {
@@ -38,94 +21,45 @@ interface ISearchFormData {
   destination: string;
 }
 
-const columns: TableColumnDefinition<IRailwayTrainData>[] = [
-  createTableColumn<IRailwayTrainData>({
-    columnId: "prefix",
-    compare: (a, b) => {
-      return a.prefix.localeCompare(b.prefix);
-    },
-    renderHeaderCell: () => {
-      return "Prefixo";
-    },
-    renderCell: (item) => {
-      return <TableCellLayout truncate>{item.prefix}</TableCellLayout>;
-    },
-  }),
-  createTableColumn<IRailwayTrainData>({
-    columnId: "type",
-    compare: (a, b) => {
-      return a.type.localeCompare(b.type);
-    },
-    renderHeaderCell: () => {
-      return "Tipo";
-    },
-    renderCell: (item) => {
-      return <TableCellLayout truncate>{item.type}</TableCellLayout>;
-    },
-  }),
-  createTableColumn<IRailwayTrainData>({
-    columnId: "dateOfficialization",
-    compare: (a, b) => {
-      return a.dateOfficialization.localeCompare(b.dateOfficialization);
-    },
-    renderHeaderCell: () => {
-      return "Destino";
-    },
-    renderCell: (item) => {
-      return <TableCellLayout truncate>{item.dateOfficialization}</TableCellLayout>;
-    },
-  }),
-];
+const columns = [
+  { accessorKey: "prefix", header: "Prefixo" },
+  { accessorKey: "type", header: "Tipo" },
+  { accessorKey: "destination", header: "Destino" },
+] as MRT_ColumnDef<IRailwayTrainData>[];
 
 const GridSelectRailwayTrain = () => {
-  const [selectedRows, setSelectedRows] = useState(new Set<TableRowId>([]));
+  const [selectedRows, setSelectedRows] = useState<IRailwayTrainData[]>([]);
   const { setSelectedPanelTabBarLeft } = useFTLayout();
-  const refMap = React.useRef<Record<string, HTMLElement | null>>({});
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<ISearchFormData>({
-    defaultValues: {
-      prefix: "",
-      destination: "",
-    },
+    defaultValues: { prefix: "", destination: "" },
   });
 
-  const { data, refetch } = useQuery({
+  const [globalFilter, setGlobalFilter] = useState<string>("");
+
+  const { data } = useQuery({
     queryKey: ["gridSelectRailwayTrain"],
-    queryFn: async () => {
-      return [
-        {
-          id: "1",
-          prefix: "123",
-          type: "123",
-          dateOfficialization: "123",
-        },
-        {
-          id: "2",
-          prefix: "123",
-          type: "123",
-          dateOfficialization: "123",
-        },
-      ];
-    },
+    queryFn: async () => [
+      { id: "1", prefix: "123", type: "123", destination: "123" },
+      { id: "2", prefix: "prefix1", type: "prefix1type", destination: "destination" },
+    ],
   });
 
-  const stabilizedData = data || [];
-
-  const onSelectionChange: DataGridProps["onSelectionChange"] = (_, data) => {
-    setSelectedRows(data.selectedItems);
+  const onSelectionChange = (rows: IRailwayTrainData[]) => {
+    setSelectedRows(rows);
   };
+
+  const handleUnselectAll = () => setSelectedRows([]);
 
   const onSearch = (formData: ISearchFormData) => {
-    console.log("Search data:", formData);
-    refetch();
-  };
-
-  const handleUnselectAll = () => {
-    setSelectedRows(new Set());
+    // Junta os campos do formulário em uma string só para o filtro global
+    const filtro = `${formData.prefix ?? ""} ${formData.destination ?? ""}`.trim();
+    setGlobalFilter(filtro);
   };
 
   return (
@@ -165,59 +99,19 @@ const GridSelectRailwayTrain = () => {
           </Button>
         </form>
 
-        <div style={{ height: "100%", overflow: "auto" }}>
-          <DataGrid
-            items={stabilizedData}
+        <div className="flex h-full flex-col" ref={contentRef}>
+          <OptGridTable
+            defaultId="id"
             columns={columns}
-            sortable
-            getRowId={(item) => item.id}
-            selectionMode="multiselect"
-            resizableColumns
-            resizableColumnsOptions={{
-              autoFitColumns: true,
-            }}
-            selectedItems={selectedRows}
+            data={data ?? []}
+            preSelectedItems={selectedRows}
             onSelectionChange={onSelectionChange}
-          >
-            <DataGridHeader>
-              <DataGridRow
-                selectionCell={{
-                  checkboxIndicator: { "aria-label": "Select all rows" },
-                }}
-              >
-                {({ renderHeaderCell, columnId }, dataGrid) =>
-                  dataGrid.resizableColumns ?
-                    <Menu openOnContext>
-                      <MenuTrigger>
-                        <DataGridHeaderCell ref={(el) => (refMap.current[columnId] = el)}>
-                          {renderHeaderCell()}
-                        </DataGridHeaderCell>
-                      </MenuTrigger>
-                      <MenuPopover>
-                        <MenuList>
-                          <MenuItem onClick={dataGrid.columnSizing_unstable.enableKeyboardMode(columnId)}>
-                            Keyboard Column Resizing
-                          </MenuItem>
-                        </MenuList>
-                      </MenuPopover>
-                    </Menu>
-                  : <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
-                }
-              </DataGridRow>
-            </DataGridHeader>
-            <DataGridBody<IRailwayTrainData>>
-              {({ item, rowId }) => (
-                <DataGridRow<IRailwayTrainData>
-                  key={rowId}
-                  selectionCell={{
-                    checkboxIndicator: { "aria-label": "Select row" },
-                  }}
-                >
-                  {({ renderCell }) => <DataGridCell>{renderCell(item)}</DataGridCell>}
-                </DataGridRow>
-              )}
-            </DataGridBody>
-          </DataGrid>
+            localization={MRT_Localization_PT_BR}
+            mantineTableContainerProps={{ style: { height: contentRef.current?.clientHeight + "px", flex: 1 } }}
+            // O ponto principal:
+            state={{ globalFilter }}
+            onGlobalFilterChange={setGlobalFilter}
+          />
         </div>
       </div>
     </div>

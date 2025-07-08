@@ -110,8 +110,15 @@ const FTVLayout = () => {
         }
       }
     },
-    [setOpenTrainMovements],
+    [setSelectedPanelTabBarLeft],
   );
+
+  const handleOnClickMenuContext = useCallback((data) => {
+    setOpenTrainMovements({
+      isOpen: true,
+      data,
+    });
+  }, []);
 
   return (
     <>
@@ -162,12 +169,7 @@ const FTVLayout = () => {
                   onGraphTimeAndCoordenatesChange={handleGraphTimeChange}
                   onMouseMoveInElement={handleMouseMoveInRestriction}
                   onClickInElement={handleOnClickInElement}
-                  onClickMenuContext={(data) => {
-                    setOpenTrainMovements({
-                      isOpen: true,
-                      data,
-                    });
-                  }}
+                  onClickMenuContext={handleOnClickMenuContext}
                 />
               )}
           </div>

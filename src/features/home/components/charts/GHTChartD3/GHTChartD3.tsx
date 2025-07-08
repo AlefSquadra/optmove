@@ -3,7 +3,7 @@ import { ChartGhtContextMenu, type MenuGroup } from "@features/home/components/c
 import { useKeyPress } from "@shared/hooks/useKeyPress";
 import type { IModalData } from "@shared/types/IModalData.type";
 import * as d3 from "d3";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 export interface TrainMovementActivity {
   id: string;
@@ -157,7 +157,7 @@ interface ZoomState {
   yMax: number;
 }
 
-const GHTChartD3 = (props: GHTChartD3Props) => {
+const GHTChartD3 = memo((props: GHTChartD3Props) => {
   const {
     hourWidth = 60,
     height,
@@ -550,6 +550,7 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
         .attr("stroke-width", 1)
         .style("opacity", 0.4)
         .on("mouseover", function (event) {
+          event.preventDefault();
           event.stopPropagation();
           onMouseMoveInRestrictionCallback({
             data: { code: "codigo", description: "descricao" },
@@ -558,7 +559,8 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
         })
         .on("mouseout", function (event) {
           event.stopPropagation();
-          onMouseMoveInRestrictionCallback(null);
+          tooltip.transition().duration(100).style("opacity", 0);
+          // onMouseMoveInRestrictionCallback(null);
         })
         .on("contextmenu", function (event: MouseEvent) {
           event.preventDefault();
@@ -590,6 +592,19 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
               ],
             },
           });
+        })
+        .on("mousemove", function (event) {
+          tooltip
+            .html(
+              `<strong>Restrição:</strong> ${res.name}<br/>` +
+                res.info.map((i) => `<strong>${i.label}:</strong> ${i.value}`).join("<br/>"),
+            )
+            .style("left", event.offsetX + 10 + "px")
+            .style("top", event.offsetY + 10 + "px")
+            .transition()
+            .duration(100)
+            .style("opacity", 1);
+          tooltip.style("left", event.offsetX + 10 + "px").style("top", event.offsetY + 10 + "px");
         });
     });
 
@@ -891,6 +906,6 @@ const GHTChartD3 = (props: GHTChartD3Props) => {
       />
     </div>
   );
-};
+});
 
 export { GHTChartD3 };
