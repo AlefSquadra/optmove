@@ -45,6 +45,7 @@ const FTVOfficeMenu = () => {
     setIsPanelOpenDown,
     setOpenSelectOfficialization,
     setOpenSystemParams,
+    graphTimeAndCoordinates,
   } = useFTLayout();
   const { selectZoneParams, selectedOfficialization } = useApplicationContext();
   const [, setIsOpen] = useState(false);
@@ -64,8 +65,8 @@ const FTVOfficeMenu = () => {
           <Input
             type="datetime-local"
             value={selectedOfficialization?.officializationForm.timelineDatetime}
-            disabled
-            className="h-[1.750rem] w-[11rem] md:w-[8rem]"
+            readOnly
+            className="h-[1.750rem] w-[11rem] md:w-[8rem] lg:w-[10rem]"
           />
           <ToolbarButton
             icon={<img src={refresh} width={24} alt="Icon" />}
@@ -204,7 +205,7 @@ const FTVOfficeMenu = () => {
               onChange={(_, data) => {
                 setSelectedPanelTabBarLeft(() => ({
                   isOpen: data.checked as boolean,
-                  openTabName: null,
+                  openTabName: "",
                 }));
               }}
               label={<Text className="text-sm md:!text-[.7rem]">Info's do trem</Text>}
@@ -227,9 +228,10 @@ const FTVOfficeMenu = () => {
         <span className="text-sm text-gray-500 md:text-xs">Controles</span>
       </div>
 
-      <div className="hidden flex-1 xl:flex">
+      <div className="hidden flex-1 lg:flex">
         <ToolbarDivider />
       </div>
+
       <ToolbarDivider />
 
       {/* Grupo Oficialização */}
@@ -253,8 +255,9 @@ const FTVOfficeMenu = () => {
 
       {/* Grupo Coordenadas */}
       <div className="relative flex flex-col-reverse items-start justify-between gap-1">
-        <div style={{ padding: "8px" }}>
-          <Text style={{ fontSize: "12px" }}>SB: Fora do painel</Text>
+        <div className="flex flex-col items-start gap-1">
+          <Text className="text-sm md:!text-[.7rem]">SB: {graphTimeAndCoordinates.sbs || "Fora do painel"}</Text>
+          <Text className="text-sm md:!text-[.7rem]">SB: {graphTimeAndCoordinates.date}</Text>
         </div>
         <span className="text-sm text-gray-500 md:text-xs">Coordenadas Gráfico</span>
       </div>

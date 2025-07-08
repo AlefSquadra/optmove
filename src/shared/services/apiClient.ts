@@ -13,3 +13,5 @@ export const apiClient = new HttpClient(
     import.meta.env.VITE_APP_BASE_URL_BACKEND_LOCAL,
   () => backendToken,
 );
+
+export const apiClientMock = new HttpClient(import.meta.env.VITE_APP_BASE_URL_BACKEND_LOCAL, () => backendToken);

@@ -1,19 +1,11 @@
 import type { IContextMenuProps } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
+import type {
+  IElementEventInPlotG,
+  IGHTChartContext,
+  IGHTChartProviderProps,
+} from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
 import { createContext, useContext, useState } from "react";
 import type { IClickableElement } from "../GHTChart.types";
-
-interface IGHTChartContext {
-  cursorPointer: React.CSSProperties["cursor"];
-  setCursorPointer: React.Dispatch<React.SetStateAction<React.CSSProperties["cursor"]>>;
-  selectedElementClickable: IClickableElement;
-  setSelectedElementClickable: React.Dispatch<IClickableElement>;
-  openContextMenu: Omit<IContextMenuProps, "onAction" | "onClose"> | null;
-  setOpenContextMenu: React.Dispatch<React.SetStateAction<Omit<IContextMenuProps, "onAction" | "onClose"> | null>>;
-}
-
-interface IGHTChartProviderProps {
-  children: React.ReactNode;
-}
 
 const GHTChartContext = createContext<IGHTChartContext | null>(null);
 
@@ -21,6 +13,7 @@ const GHTChartProvider = (props: IGHTChartProviderProps) => {
   const [cursorPointer, setCursorPointer] = useState<React.CSSProperties["cursor"]>("default");
   const [selectedElementClickable, setSelectedElementClickable] = useState<IClickableElement>({} as IClickableElement);
   const [openContextMenu, setOpenContextMenu] = useState<Omit<IContextMenuProps, "onAction" | "onClose"> | null>(null);
+  const [onMouseOverInElementData, setOnMouseOverInElementData] = useState<IElementEventInPlotG | null>(null);
 
   return (
     <GHTChartContext.Provider
@@ -31,6 +24,8 @@ const GHTChartProvider = (props: IGHTChartProviderProps) => {
         openContextMenu,
         setOpenContextMenu,
         setSelectedElementClickable,
+        mouseOverInElementData: onMouseOverInElementData,
+        setMouseOverInElementData: setOnMouseOverInElementData,
       }}
     >
       {props.children}

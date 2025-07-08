@@ -1,11 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { useApplicationContext } from "@app/providers/ApplicationProvider/useApplication";
-import type {
-  ContextMenuItemAction,
-  IDataContextMenu,
-} from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
+import type { IDataContextMenu } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
 import { ModalSelectOfficialization } from "@features/home/components/modals/selectOfficialization/ModalSelectOfficialization";
 import { ModalSystemParams } from "@features/home/components/modals/systemParams/ModalSystemParams";
 import { ModalTrainMovements } from "@features/home/components/modals/trainMovements/ModalTrainMovements";
@@ -22,93 +17,116 @@ import {
 import { HomeFTLayoutProvider } from "@features/home/providers/HomeFTLayoutProvider/HomeFTLayoutProvider";
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
 import { Spinner, Text } from "@fluentui/react-components";
-import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import type { IModalData } from "@shared/types/IModalData.type";
 
-import { GHTChart } from "@features/home/components/charts/GHTChart/GHTChart";
+import { useApplicationContext } from "@app/providers/ApplicationProvider/useApplication";
 import {
   GHTChartProvider,
   useGHTChartContext,
 } from "@features/home/components/charts/GHTChart/provider/GHTChartProvider";
+import type { IElementEventInPlotG } from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
+import { GHTChartD3 } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
+import { ChartRestrictionsMock, ChartTrainsMock, ChartYLabelMock } from "@features/home/components/FTV/json";
 import { GHTChartMainService } from "@features/home/services/GHTChartMainService";
+import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import { DateFormat } from "@shared/utils/DateFormat";
+import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
+
 const FTVLayout = () => {
-  const { setCursorPointer, selectedElementClickable: lineTrainSelected } = useGHTChartContext();
+  const { setCursorPointer, mouseOverInElementData, setMouseOverInElementData } = useGHTChartContext();
   const FTContentRef = useRef<HTMLDivElement>(null);
-  const [loadingStage, setLoadingStage] = useState("");
   const [openTrainMovements, setOpenTrainMovements] = useState<IModalData<IDataContextMenu>>({
     isOpen: false,
   });
   const {
-    showAccomplished,
-    showTimelineView,
     setOpenSelectOfficialization,
     openSelectOfficialization,
     setOpenSystemParams,
     openSystemParams,
+    setGraphTimeAndCoordinates,
   } = useFTLayout();
-
+  const [loadingStage, setLoadingStage] = useState<string>("");
   const { selectedOfficialization } = useApplicationContext();
-
+  const { setSelectedPanelTabBarLeft } = useFTLayout();
   const fetchDataGHT = useQuery({
     queryKey: ["ghtData", selectedOfficialization],
     queryFn: async () => {
-      setLoadingStage("Carregando trens da malha...");
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      const data = await GHTChartMainService.getTrains({
+      const parameters = {
         dateGhtTimeline: selectedOfficialization?.officializationForm.timelineDatetime as string,
         officializations:
           selectedOfficialization?.listOfficialization.map((o) =>
             DateFormat.isoToSpace(o.dateOfficialization).toString(),
           ) ?? [],
-      });
+      };
 
-      setLoadingStage("Processando dados...");
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setLoadingStage("Carregando lista de SBS...");
 
-      setLoadingStage("Plotando gráfico...");
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const sbs = await GHTChartMainService.getSbs("ICZ-ISN Baixada Conceição-Santos");
+
+      setLoadingStage("Buscando trens...");
+
+      const trains = await GHTChartMainService.getTrains(parameters);
+
+      setLoadingStage("Buscando restrições");
+
+      const rectangles = await GHTChartMainService.getRectangles(parameters);
 
       setLoadingStage("");
       return {
-        data: data.trains,
-        database: "2025-06-03T09:09:22",
-        restrictions: data.restrictions,
-        yLabels: data.yards,
+        trains,
+        rectangles,
+        sbs,
       };
     },
     enabled: Object.keys(selectedOfficialization || {}).length > 0,
   });
 
-  const handleContextMenu = (action: ContextMenuItemAction, menuItem: IDataContextMenu) => {
-    switch (action) {
-      case "train_movements":
-        console.log(menuItem);
-        setOpenTrainMovements({ isOpen: true, data: menuItem });
-    }
-  };
-
   useEffect(() => {
     setCursorPointer("auto");
   }, [setCursorPointer]);
 
-  const database = dayjs(selectedOfficialization?.officializationForm.timelineDatetime, "YYYY-MM-DD HH:mm:ss")?.add(
-    -6,
-    "hour",
+  const { initialDate, dateTimeLine, finalDate } = useMemo(() => {
+    const baseDate = new Date("2025-06-30T16:12:32+00:00");
+    return {
+      initialDate: dayjs(baseDate).subtract(6, "hour").toDate(),
+      dateTimeLine: baseDate,
+      finalDate: new Date("2025-07-01T16:12:32+00:00"),
+    };
+  }, []);
+
+  const handleMouseMoveInRestriction = useCallback(
+    (data) => {
+      setMouseOverInElementData(data);
+    },
+    [setMouseOverInElementData],
   );
 
-  const databaseOfficialization = dayjs(
-    selectedOfficialization?.officializationForm.timelineDatetime,
-    "YYYY-MM-DD HH:mm:ss",
+  const handleGraphTimeChange = useCallback((props) => {
+    setGraphTimeAndCoordinates(props);
+  }, []);
+
+  const handleOnClickInElement = useCallback(
+    (elementEvent: IElementEventInPlotG | null) => {
+      if (elementEvent !== null) {
+        if (elementEvent.element === "train") {
+          setSelectedPanelTabBarLeft(() => ({
+            isOpen: true,
+            openTabName: "editando o trem",
+            data: elementEvent.data,
+          }));
+        }
+      }
+    },
+    [setSelectedPanelTabBarLeft],
   );
 
-  const canRenderGHTChart =
-    !fetchDataGHT.isLoading &&
-    fetchDataGHT.isSuccess &&
-    fetchDataGHT.data?.data &&
-    fetchDataGHT.data?.restrictions &&
-    fetchDataGHT.data?.yLabels;
+  const handleOnClickMenuContext = useCallback((data) => {
+    setOpenTrainMovements({
+      isOpen: true,
+      data,
+    });
+  }, []);
 
   return (
     <>
@@ -141,32 +159,63 @@ const FTVLayout = () => {
                 </div>
               </WindowModal>
             )}
+            {!fetchDataGHT.isLoading &&
+              fetchDataGHT.data?.trains &&
+              fetchDataGHT.data?.trains?.length > 0 &&
+              fetchDataGHT.data?.sbs.length > 0 &&
+              fetchDataGHT.data?.rectangles.length > 0 && (
+                <GHTChartD3
+                  trains={fetchDataGHT.data?.trains as any}
+                  yLabels={fetchDataGHT.data?.sbs as any}
+                  restrictions={fetchDataGHT.data?.rectangles as any}
+                  height={FTContentRef?.current?.offsetHeight ? FTContentRef.current.offsetHeight - 47 : 0}
+                  hourWidth={80}
+                  yAxisWidth={80}
+                  initialDate={initialDate}
+                  dateTimeLine={dateTimeLine}
+                  finalDate={finalDate}
+                  onGraphTimeAndCoordenatesChange={handleGraphTimeChange}
+                  onMouseMoveInElement={handleMouseMoveInRestriction}
+                  onClickInElement={handleOnClickInElement}
+                  onClickMenuContext={handleOnClickMenuContext}
+                />
+              )}
 
-            {canRenderGHTChart && (
-              <GHTChart
-                data={fetchDataGHT?.data?.data}
-                dataOfficialization={databaseOfficialization.toDate()}
-                database={database.toDate()}
-                restrictions={fetchDataGHT?.data?.restrictions}
-                yLabels={fetchDataGHT?.data?.yLabels}
-                defaultHeight={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
-                onContextMenuAction={handleContextMenu}
-                showAccomplished={showAccomplished}
-                showTimelineView={showTimelineView}
-              />
+            {!fetchDataGHT.isFetching && !fetchDataGHT.isError && (
+              <>
+                <GHTChartD3
+                  trains={ChartTrainsMock as any}
+                  yLabels={ChartYLabelMock}
+                  restrictions={ChartRestrictionsMock as any}
+                  height={FTContentRef?.current?.offsetHeight ? FTContentRef.current.offsetHeight - 47 : 0}
+                  hourWidth={80}
+                  yAxisWidth={80}
+                  initialDate={initialDate}
+                  dateTimeLine={dateTimeLine}
+                  finalDate={finalDate}
+                  onGraphTimeAndCoordenatesChange={handleGraphTimeChange}
+                  onMouseMoveInElement={handleMouseMoveInRestriction}
+                  onClickInElement={handleOnClickInElement}
+                  onClickMenuContext={handleOnClickMenuContext}
+                />
+              </>
             )}
           </div>
         </FTLayoutContent>
 
         <FTLayoutFooter className="row-auto flex items-center justify-center">
-          {lineTrainSelected.name && (
-            <Text className="text-center text-red-700">
-              {`${lineTrainSelected.name} (${lineTrainSelected.data.type}) | Chegada: ${lineTrainSelected.data?.xi} | Saída: ${lineTrainSelected?.data?.xf} Destino: ${
+          <Text className="text-center text-red-700">
+            {mouseOverInElementData?.element === "train" && (
+              <>
+                {/* {`${lineTrainSelected.name} (${lineTrainSelected.data.type}) | Chegada: ${lineTrainSelected.data?.xi} | Saída: ${lineTrainSelected?.data?.xf} Destino: ${
                 lineTrainSelected.data?.info.find((x: { label: string; value: string }) => x?.label === "Destino")
                   ?.value
-              }`}
-            </Text>
-          )}
+              }`} */}
+                {JSON.stringify(mouseOverInElementData?.data)}
+              </>
+            )}
+            {mouseOverInElementData?.element === "restriction" && <> {JSON.stringify(mouseOverInElementData?.data)}</>}
+          </Text>
         </FTLayoutFooter>
         <FTLayoutTabPanelDown>
           <div className="relative">
@@ -185,9 +234,7 @@ const FTVLayout = () => {
         </FTLayoutTabPanelDown>
       </FTLayoutRoot>
       <ModalSelectOfficialization
-        onSelectedPlans={() => {
-          // setPlanParams(plans);
-        }}
+        onSelectedPlans={() => {}}
         openSelectOfficialization={openSelectOfficialization}
         setOpenSelectOfficialization={setOpenSelectOfficialization}
       />

@@ -67,7 +67,7 @@ const SelectZonePage = () => {
   }, [perfilSelecionado, setValue]);
 
   useEffect(() => {
-    if (mesaSelecionada?.find((t) => t?.name?.toLocaleLowerCase() === "baixada santista") && zonasData) {
+    if (mesaSelecionada?.find((t) => t?.id == "7") && zonasData) {
       setValue("zona", zonasData);
     }
   }, [mesaSelecionada, setValue, zonasData]);
