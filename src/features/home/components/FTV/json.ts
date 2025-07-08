@@ -2014,17 +2014,19 @@ export const ChartTrainsMock = [
   },
 ];
 
-export const ChartRestrictionsMock = {
-  name: "CONDICIONAL ",
-  color: "#FFFF00CC",
-  xi: "2025-06-30T16:22:32Z",
-  xf: "2025-06-30T18:22:32Z",
-  linha: "IBA-IUF-1", // yi
-  destino: "IUF-1", // yf
-  info: [
-    {
-      label: "SB",
-      value: "ZPG-1",
-    },
-  ],
-};
+export const ChartRestrictionsMock = [
+  {
+    name: "CONDICIONAL ",
+    color: "#FFFF00CC",
+    xi: "2025-06-30T16:22:32Z",
+    xf: "2025-06-30T18:22:32Z",
+    linha: "IBA-IUF-1", // yi
+    destino: "IUF-1", // yf
+    info: [
+      {
+        label: "SB",
+        value: "ZPG-1",
+      },
+    ],
+  },
+];

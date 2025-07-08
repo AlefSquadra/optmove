@@ -26,6 +26,7 @@ import {
 } from "@features/home/components/charts/GHTChart/provider/GHTChartProvider";
 import type { IElementEventInPlotG } from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
 import { GHTChartD3 } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
+import { ChartRestrictionsMock, ChartTrainsMock, ChartYLabelMock } from "@features/home/components/FTV/json";
 import { GHTChartMainService } from "@features/home/services/GHTChartMainService";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import { DateFormat } from "@shared/utils/DateFormat";
@@ -179,6 +180,26 @@ const FTVLayout = () => {
                   onClickMenuContext={handleOnClickMenuContext}
                 />
               )}
+
+            {fetchDataGHT.isError && (
+              <>
+                <GHTChartD3
+                  trains={ChartTrainsMock as any}
+                  yLabels={ChartYLabelMock}
+                  restrictions={ChartRestrictionsMock as any}
+                  height={FTContentRef?.current?.offsetHeight ? FTContentRef.current.offsetHeight - 47 : 0}
+                  hourWidth={80}
+                  yAxisWidth={80}
+                  initialDate={initialDate}
+                  dateTimeLine={dateTimeLine}
+                  finalDate={finalDate}
+                  onGraphTimeAndCoordenatesChange={handleGraphTimeChange}
+                  onMouseMoveInElement={handleMouseMoveInRestriction}
+                  onClickInElement={handleOnClickInElement}
+                  onClickMenuContext={handleOnClickMenuContext}
+                />
+              </>
+            )}
           </div>
         </FTLayoutContent>
 
