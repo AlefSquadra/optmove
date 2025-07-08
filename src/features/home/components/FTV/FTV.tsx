@@ -181,7 +181,7 @@ const FTVLayout = () => {
                 />
               )}
 
-            {!fetchDataGHT.isFetching && !fetchDataGHT.isError && (
+            {fetchDataGHT.isError && (
               <>
                 <GHTChartD3
                   trains={ChartTrainsMock as any}
