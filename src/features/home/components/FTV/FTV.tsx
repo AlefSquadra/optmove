@@ -4,7 +4,6 @@ import type { IDataContextMenu } from "@features/home/components/charts/GHTChart
 import { ModalSelectOfficialization } from "@features/home/components/modals/selectOfficialization/ModalSelectOfficialization";
 import { ModalSystemParams } from "@features/home/components/modals/systemParams/ModalSystemParams";
 import { ModalTrainMovements } from "@features/home/components/modals/trainMovements/ModalTrainMovements";
-import { FTVOfficeMenu } from "@features/home/components/officeMenu/officeMenu";
 import { FTVTabLeft } from "@features/home/components/tabPanelLeft/FTVTabLeft";
 import {
   FTLayoutContent,
@@ -27,6 +26,8 @@ import {
 import type { IElementEventInPlotG } from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
 import { GHTChartD3 } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import { ChartRestrictionsMock, ChartTrainsMock, ChartYLabelMock } from "@features/home/components/FTV/json";
+import { FTVOfficeMenu } from "@features/home/components/officeMenu/OfficeMenu";
+import { OfficeMenuProvider } from "@features/home/providers/OfficeMenuProvider/OfficeMenuProvider";
 import { GHTChartMainService } from "@features/home/services/GHTChartMainService";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import { DateFormat } from "@shared/utils/DateFormat";
@@ -135,7 +136,7 @@ const FTVLayout = () => {
           <FTVTabLeft />
         </FTLayoutTabPanelLeft>
         <FTLayoutHeader>
-          <FTVOfficeMenu />
+          <FTVOfficeMenu handlePrefixSearchChange={() => {}} />
         </FTLayoutHeader>
         <FTLayoutContent ref={FTContentRef} className="flex flex-col">
           <div className="grid w-full grid-cols-12 grid-rows-[32px] place-items-center bg-yellow-50">
@@ -249,7 +250,9 @@ const FTV = () => {
   return (
     <HomeFTLayoutProvider>
       <GHTChartProvider>
-        <FTVLayout />
+        <OfficeMenuProvider>
+          <FTVLayout />
+        </OfficeMenuProvider>
       </GHTChartProvider>
     </HomeFTLayoutProvider>
   );
