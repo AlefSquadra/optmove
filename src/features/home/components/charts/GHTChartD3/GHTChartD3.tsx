@@ -552,15 +552,21 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
         .on("mouseover", function (event) {
           event.preventDefault();
           event.stopPropagation();
-          onMouseMoveInRestrictionCallback({
-            data: { code: "codigo", description: "descricao" },
-            element: "restriction",
-          });
+          onMouseMoveInRestrictionCallback({ data: res, element: "restriction" });
+          tooltip
+            .html(
+              `<strong>Restrição:</strong> ${res.name}<br/>` +
+                res.info.map((i) => `<strong>${i.label}:</strong> ${i.value}`).join("<br/>"),
+            )
+            .style("left", event.offsetX + 10 + "px")
+            .style("top", event.offsetY + 10 + "px")
+            .transition()
+            .duration(200)
+            .style("opacity", 1);
         })
-        .on("mouseout", function (event) {
-          event.stopPropagation();
+        .on("mouseout", function () {
           tooltip.transition().duration(100).style("opacity", 0);
-          // onMouseMoveInRestrictionCallback(null);
+          onMouseMoveInRestrictionCallback(null);
         })
         .on("contextmenu", function (event: MouseEvent) {
           event.preventDefault();
@@ -594,16 +600,6 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
           });
         })
         .on("mousemove", function (event) {
-          tooltip
-            .html(
-              `<strong>Restrição:</strong> ${res.name}<br/>` +
-                res.info.map((i) => `<strong>${i.label}:</strong> ${i.value}`).join("<br/>"),
-            )
-            .style("left", event.offsetX + 10 + "px")
-            .style("top", event.offsetY + 10 + "px")
-            .transition()
-            .duration(100)
-            .style("opacity", 1);
           tooltip.style("left", event.offsetX + 10 + "px").style("top", event.offsetY + 10 + "px");
         });
     });
@@ -665,6 +661,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
           .on("mouseover", function (event) {
             event.stopPropagation();
             d3.select(this).raise().attr("stroke", "steelblue").attr("stroke-width", 3);
+            onMouseMoveInRestrictionCallback({ data: { id: train.prefixo, name: train.prefixo }, element: "train" });
             tooltip
               .html(
                 `<strong>Prefixo:</strong> ${train.prefixo}<br/><strong>Segmento:</strong> ${mov.segmento}<br/><strong>Chegada:</strong> ${mov.chegada}<br/><strong>Partida:</strong> ${mov.partida}`,
@@ -672,16 +669,12 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
               .style("left", event.offsetX + 10 + "px")
               .style("top", event.offsetY + 10 + "px")
               .transition()
-              .duration(100)
+              .duration(200)
               .style("opacity", 1);
           })
           .on("mousemove", function (event) {
             event.stopPropagation();
             tooltip.style("left", event.offsetX + 10 + "px").style("top", event.offsetY + 10 + "px");
-            onMouseMoveInRestrictionCallback({
-              data: { id: mov.segmento, name: mov.segmento },
-              element: "train",
-            });
           })
           .on("mouseout", function () {
             d3.select(this).attr("stroke", trainColor).attr("stroke-width", 2);

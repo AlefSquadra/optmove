@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { IDataContextMenu } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
 import { ModalSelectOfficialization } from "@features/home/components/modals/selectOfficialization/ModalSelectOfficialization";
@@ -85,7 +85,14 @@ const FTVLayout = () => {
     setCursorPointer("auto");
   }, [setCursorPointer]);
 
-  const initialDate = dayjs(new Date("2025-06-30T16:12:32+00:00")).subtract(6, "hour").toDate();
+  const { initialDate, dateTimeLine, finalDate } = useMemo(() => {
+    const baseDate = new Date("2025-06-30T16:12:32+00:00");
+    return {
+      initialDate: dayjs(baseDate).subtract(6, "hour").toDate(),
+      dateTimeLine: baseDate,
+      finalDate: new Date("2025-07-01T16:12:32+00:00"),
+    };
+  }, []);
 
   const handleMouseMoveInRestriction = useCallback(
     (data) => {
@@ -160,12 +167,12 @@ const FTVLayout = () => {
                   trains={fetchDataGHT.data?.trains as any}
                   yLabels={fetchDataGHT.data?.sbs as any}
                   restrictions={fetchDataGHT.data?.rectangles as any}
-                  height={FTContentRef?.current?.offsetHeight ? FTContentRef?.current?.offsetHeight - 47 : 0}
+                  height={FTContentRef?.current?.offsetHeight ? FTContentRef.current.offsetHeight - 47 : 0}
                   hourWidth={80}
                   yAxisWidth={80}
                   initialDate={initialDate}
-                  dateTimeLine={new Date("2025-06-30T16:12:32+00:00")}
-                  finalDate={new Date("2025-07-01T16:12:32+00:00")}
+                  dateTimeLine={dateTimeLine}
+                  finalDate={finalDate}
                   onGraphTimeAndCoordenatesChange={handleGraphTimeChange}
                   onMouseMoveInElement={handleMouseMoveInRestriction}
                   onClickInElement={handleOnClickInElement}
