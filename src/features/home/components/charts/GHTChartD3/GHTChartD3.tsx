@@ -148,6 +148,7 @@ interface GHTChartD3Props {
   onClickInElement: (data: IElementEventInPlotG | null) => void;
   onGraphTimeAndCoordenatesChange: (props: IOnGraphCoordinatesUpdateProps) => void;
   onClickMenuContext: (data: any | null) => void;
+  highlightedPrefix?: string | null; // Add this new prop
 }
 
 interface ZoomState {
@@ -172,6 +173,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     onGraphTimeAndCoordenatesChange: onGraphCoordenatesChange,
     onClickInElement,
     onClickMenuContext,
+    highlightedPrefix,
   } = props;
 
   const svgLeftRef = useRef<SVGSVGElement | null>(null);
@@ -607,7 +609,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     const trainGroup = plotG.append("g").attr("class", "trains-group");
 
     trains.forEach((train) => {
-      const singleTrainGroup = trainGroup.append("g").attr("class", `train-path train-${train.prefixo}`);
+      const singleTrainGroup = trainGroup.append("g").attr("class", `train-path train-prefix-${train.prefixo}`);
       const trainColor = `rgb(${train.cor.slice(0, -1)})`;
 
       let firstVisibleMovement = true;
@@ -856,7 +858,6 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     timelinePlot.raise();
     trainGroup.raise();
     restrictionsGroup.raise();
-    // --- INÍCIO: ADICIONANDO `restrictions` AO ARRAY DE DEPENDÊNCIAS ---
   }, [
     hourWidth,
     height,
@@ -871,7 +872,65 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     keyPressCtrl,
     onMouseMoveInRestrictionCallback,
   ]);
-  // --- FIM: ADICIONANDO `restrictions` AO ARRAY DE DEPENDÊNCIAS ---
+
+  useEffect(() => {
+    alert(highlightedPrefix);
+    const trainGroup = d3.select(svgPlotRef.current).select(".trains-group");
+    if (trainGroup.empty()) return;
+
+    // Reset all train styles to their original colors
+    trainGroup.selectAll("g.train-path").each(function () {
+      const singleTrainGroup = d3.select(this);
+      const trainClass = singleTrainGroup.attr("class") || "";
+      const prefixMatch = trainClass.match(/train-prefix-([^\s]+)/);
+      if (!prefixMatch) return;
+
+      const prefix = prefixMatch[1];
+      const trainData = trains.find((t) => t.prefixo === prefix);
+
+      if (trainData) {
+        const originalColor = `rgb(${trainData.cor.slice(0, -1)})`;
+        singleTrainGroup.selectAll("line").attr("stroke", originalColor).attr("stroke-width", 2);
+        singleTrainGroup.selectAll("text").attr("fill", originalColor);
+      }
+    });
+
+    if (!highlightedPrefix || highlightedPrefix.trim() === "") {
+      return; // Exit if no prefix is provided
+    }
+
+    const searchPrefix = highlightedPrefix.trim().toUpperCase();
+
+    // Filter trains based on the prefix
+    const matchingTrains = trainGroup.selectAll("g.train-path").filter(function () {
+      const trainClass = d3.select(this).attr("class") || "";
+      const prefixMatch = trainClass.match(/train-prefix-([^\s]+)/);
+      if (!prefixMatch) return false;
+      const trainPrefix = prefixMatch[1].toUpperCase();
+      return trainPrefix.startsWith(searchPrefix);
+    });
+
+    // Highlight matched trains
+    matchingTrains.selectAll("line").attr("stroke", "blue").attr("stroke-width", 3).raise();
+    matchingTrains.selectAll("text").attr("fill", "blue").raise();
+
+    alert(JSON.stringify(matchingTrains));
+
+    // Scroll to the first matched train
+    const firstTrainNode = matchingTrains.node();
+    if (firstTrainNode) {
+      const firstLine = d3.select(firstTrainNode).select("line");
+      if (!firstLine.empty()) {
+        const xPosition = +firstLine.attr("x1");
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTo({
+            left: xPosition - scrollContainerRef.current.clientWidth / 2,
+            behavior: "smooth",
+          });
+        }
+      }
+    }
+  }, [highlightedPrefix, trains]);
 
   return (
     <div

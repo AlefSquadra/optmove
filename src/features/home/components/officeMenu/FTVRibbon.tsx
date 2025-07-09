@@ -92,7 +92,10 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
           <Tooltip withArrow content="Pesquisar por prefixo ou tabela" relationship="label">
             <ToolbarButton
               icon={<img src={searchEye} width={24} alt="Icon" />}
-              onClick={() => handlePrefixSearchChange && handlePrefixSearchChange(prefix)}
+              onClick={() => {
+                alert(prefix);
+                if (handlePrefixSearchChange) handlePrefixSearchChange(prefix);
+              }}
             />
           </Tooltip>
 

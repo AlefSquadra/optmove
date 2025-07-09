@@ -40,6 +40,7 @@ const FTVLayout = () => {
   const [openTrainMovements, setOpenTrainMovements] = useState<IModalData<IDataContextMenu>>({
     isOpen: false,
   });
+  const [highlightedPrefix, setHighlightedPrefix] = useState<string | null>(null);
   const {
     setOpenSelectOfficialization,
     openSelectOfficialization,
@@ -129,6 +130,12 @@ const FTVLayout = () => {
     });
   }, []);
 
+  // New function to handle prefix search change
+  const handlePrefixSearchChange = (prefix: string) => {
+    alert("ftv:" + prefix);
+    setHighlightedPrefix(prefix);
+  };
+
   return (
     <>
       <FTLayoutRoot>
@@ -136,7 +143,7 @@ const FTVLayout = () => {
           <FTVTabLeft />
         </FTLayoutTabPanelLeft>
         <FTLayoutHeader>
-          <FTVOfficeMenu handlePrefixSearchChange={() => {}} />
+          <FTVOfficeMenu handlePrefixSearchChange={handlePrefixSearchChange} />
         </FTLayoutHeader>
         <FTLayoutContent ref={FTContentRef} className="flex flex-col">
           <div className="grid w-full grid-cols-12 grid-rows-[32px] place-items-center bg-yellow-50">
@@ -179,6 +186,7 @@ const FTVLayout = () => {
                   onMouseMoveInElement={handleMouseMoveInRestriction}
                   onClickInElement={handleOnClickInElement}
                   onClickMenuContext={handleOnClickMenuContext}
+                  highlightedPrefix={highlightedPrefix}
                 />
               )}
 
@@ -198,6 +206,7 @@ const FTVLayout = () => {
                   onMouseMoveInElement={handleMouseMoveInRestriction}
                   onClickInElement={handleOnClickInElement}
                   onClickMenuContext={handleOnClickMenuContext}
+                  highlightedPrefix={highlightedPrefix}
                 />
               </>
             )}
