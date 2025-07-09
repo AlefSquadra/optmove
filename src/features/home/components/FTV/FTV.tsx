@@ -92,7 +92,7 @@ const FTVLayout = () => {
     return {
       initialDate: dayjs(baseDate).subtract(6, "hour").toDate(),
       dateTimeLine: baseDate,
-      finalDate: new Date("2025-07-01T16:12:32+00:00"),
+      finalDate: new Date("2025-07-01T23:12:32+00:00"),
     };
   }, []);
 
