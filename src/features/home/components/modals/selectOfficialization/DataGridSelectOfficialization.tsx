@@ -4,8 +4,8 @@ import type { IOfficializationFormData } from "@shared/types/Officialization.typ
 import { DateFormat } from "@shared/utils/DateFormat";
 import { type MRT_Cell, type MRT_ColumnDef } from "mantine-react-table";
 import { MRT_Localization_PT_BR } from "mantine-react-table/locales/pt-BR/index.cjs";
-import { useMemo, useRef } from "react";
-import { useFormContext } from "react-hook-form";
+import { useCallback, useMemo, useRef } from "react";
+import { useFormContext, type UseFormGetValues, type UseFormSetValue } from "react-hook-form";
 
 export interface ISelectOfficializationDataGrid {
   id: string;
@@ -25,6 +25,30 @@ interface ISelectOfficializationDataGridProps {
   isLoading?: boolean;
 }
 
+const buildTimelineCell =
+  (setValue: UseFormSetValue<IOfficializationFormData>) =>
+  ({ cell }: { cell: MRT_Cell<ISelectOfficializationDataGrid, string> }) => (
+    <span
+      className="cursor-pointer"
+      onClick={() => setValue("timelineDatetime", DateFormat.formatToISO(cell.getValue()))}
+    >
+      {cell.getValue()}
+    </span>
+  );
+
+const onSelectionChange = (props: {
+  getValues: UseFormGetValues<IOfficializationFormData>;
+  row: ISelectOfficializationDataGrid[];
+  setValue: UseFormSetValue<IOfficializationFormData>;
+  handleSelectionChange?: (a: ISelectOfficializationDataGrid[]) => void;
+}) => {
+  const { row, setValue, getValues } = props;
+  if (row.length > 0 && !getValues("timelineDatetime")) {
+    setValue("timelineDatetime", DateFormat.formatToISO(row[0].timeline));
+  }
+  props?.handleSelectionChange?.(row);
+};
+
 const DataGridSelectOfficialization = (props: ISelectOfficializationDataGridProps) => {
   const { data = [], isLoading } = props;
   const contentRef = useRef<HTMLDivElement>(null);
@@ -32,56 +56,31 @@ const DataGridSelectOfficialization = (props: ISelectOfficializationDataGridProp
 
   const { selectedOfficialization } = useApplicationContext();
 
+  const timelineCell = useCallback(buildTimelineCell(setValue), [setValue]);
+  const handleSelectionChange = useCallback(
+    (row: any) => onSelectionChange({ getValues, row, handleSelectionChange: props.handleSelectionChange, setValue }),
+    [getValues, setValue, props.handleSelectionChange],
+  );
+
   const columns = useMemo<MRT_ColumnDef<ISelectOfficializationDataGrid>[]>(
     () => [
-      {
-        accessorKey: "trainsOfficialization",
-        header: "Trens oficializados",
-      },
-      {
-        accessorKey: "user",
-        header: "Usuário",
-      },
-      {
-        accessorKey: "dateOfficialization",
-        header: "Data oficialização",
-      },
-      {
-        accessorKey: "mesa",
-        header: "Mesa",
-      },
+      { accessorKey: "trainsOfficialization", header: "Trens oficializados" },
+      { accessorKey: "user", header: "Usuário" },
+      { accessorKey: "dateOfficialization", header: "Data oficialização" },
+      { accessorKey: "mesa", header: "Mesa" },
       {
         accessorKey: "timeline",
-
-        Cell: ({ cell }: { cell: MRT_Cell<ISelectOfficializationDataGrid, string> }) => {
-          const isSelected = cell.row.getIsSelected();
-
-          return (
-            <span
-              className="cursor-pointer"
-              onClick={() => {
-                if (isSelected) {
-                  setValue("timelineDatetime", DateFormat.formatToISO(cell?.getValue()));
-                }
-              }}
-            >
-              {cell?.getValue()}
-            </span>
-          );
-        },
         header: "Linha do tempo",
+        Cell: timelineCell,
       },
-      {
-        accessorKey: "officializationType",
-        header: "Tipo de oficialização",
-      },
+      { accessorKey: "officializationType", header: "Tipo de oficialização" },
       {
         accessorKey: "versionModel",
         header: "Modelo de versão",
         enableResizing: false,
       },
     ],
-    [],
+    [timelineCell],
   );
 
   return (
@@ -105,13 +104,7 @@ const DataGridSelectOfficialization = (props: ISelectOfficializationDataGridProp
         }}
         state={{ isLoading }}
         localization={MRT_Localization_PT_BR}
-        onSelectionChange={(row) => {
-          console.log(getValues("timelineDatetime"), row);
-          if (!getValues("timelineDatetime")) {
-            setValue("timelineDatetime", DateFormat.formatToISO(row[0]?.timeline));
-          }
-          props?.handleSelectionChange?.(row);
-        }}
+        onSelectionChange={handleSelectionChange}
         mantineTableContainerProps={{ style: { height: contentRef.current?.clientHeight + "px", flex: 1 } }}
       />
     </div>

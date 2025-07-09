@@ -59,10 +59,11 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
         <div className="relative flex items-start gap-1">
           <Input
             type="datetime-local"
-            value={selectedOfficialization?.officializationForm.timelineDatetime}
+            // value={selectedOfficialization?.officializationForm.timelineDatetime}
             readOnly
             className="h-[1.750rem] w-[11rem] md:w-[8rem] lg:w-[10rem]"
           />
+          {selectedOfficialization?.officializationForm.timelineDatetime}
           <ToolbarButton
             icon={<img src={refresh} width={24} alt="Icon" />}
             onClick={() => {
@@ -93,7 +94,6 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
             <ToolbarButton
               icon={<img src={searchEye} width={24} alt="Icon" />}
               onClick={() => {
-                alert(prefix);
                 if (handlePrefixSearchChange) handlePrefixSearchChange(prefix);
               }}
             />

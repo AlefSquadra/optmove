@@ -1,3 +1,4 @@
+import { useGlobalDialog } from "@app/providers/GlobalDialogProvider/UseGlobalDialogContext";
 import { Button, Text } from "@fluentui/react-components";
 import { OptGridTable } from "@shared/components/gridTable/GridTable";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
@@ -44,13 +45,21 @@ export const ModalSearchTrainChartGhtForTable = ({
   data,
 }: IModalSearchTrainChartGhtForTableProps) => {
   const [selectedItem, setSelectedItem] = useState<TrainDataItem | null>(null);
+  const { showDialog } = useGlobalDialog();
 
   const handleOkClick = () => {
-    if (selectedItem) {
+    if (selectedItem?.prefixo) {
       HandleOkChange(selectedItem);
+      setSelectedItem(null);
       onClose();
     } else {
-      alert("Por favor, selecione um trem.");
+      showDialog({
+        title: "Atenção",
+        content: "Por favor, selecione um trem.",
+        onCancel: () => {},
+        confirmText: "Fechar",
+        onConfirm: () => {},
+      });
     }
   };
 

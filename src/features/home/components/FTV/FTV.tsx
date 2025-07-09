@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { IDataContextMenu } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
-import { ModalSearchTrainChartGhtForTable } from "@features/home/components/modals/ModalSearchTrainChartGhtForTable/ModalSearchTrainChartGhtForTable";
+import { ModalSearchTrainChartGhtForTable } from "@features/home/components/modals/modalSearchTrainChartGhtForTable/ModalSearchTrainChartGhtForTable";
 import { ModalSelectOfficialization } from "@features/home/components/modals/selectOfficialization/ModalSelectOfficialization";
 import { ModalSystemParams } from "@features/home/components/modals/systemParams/ModalSystemParams";
 import { ModalTrainMovements } from "@features/home/components/modals/trainMovements/ModalTrainMovements";

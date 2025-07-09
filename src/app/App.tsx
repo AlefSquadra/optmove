@@ -1,5 +1,6 @@
 import { ApplicationProvider } from "@app/providers/ApplicationProvider/ApplicationProvider";
 import { msalInstance } from "@app/providers/AuthProvider/msalConfig";
+import { GlobalDialogProvider } from "@app/providers/GlobalDialogProvider/GlobalDialogProvider";
 import { AppRoutes } from "@app/router/Routes";
 import { MsalProvider } from "@azure/msal-react";
 import { FluentProvider, webLightTheme } from "@fluentui/react-components";
@@ -17,9 +18,11 @@ function App() {
           <QueryClientProvider client={queryClient}>
             {/* <StyleProvider> */}
             <FluentProvider theme={webLightTheme}>
-              <MantineProvider>
-                <AppRoutes />
-              </MantineProvider>
+              <GlobalDialogProvider>
+                <MantineProvider>
+                  <AppRoutes />
+                </MantineProvider>
+              </GlobalDialogProvider>
             </FluentProvider>
 
             {/* </StyleProvider> */}
