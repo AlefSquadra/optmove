@@ -11,8 +11,6 @@ export interface TrainMovementActivity {
   tyoe: string;
   color: string;
 }
-
-// --- INÍCIO: NOVAS TIPAGENS PARA OS DADOS DOS TRENS ---
 export interface TrainMovement {
   id: string;
   segmento: string;
@@ -49,9 +47,7 @@ export interface TrainData {
   movimentos: TrainMovement[];
   nomeSbl: string;
 }
-// --- FIM: NOVAS TIPAGENS ---
 
-// --- INÍCIO: NOVA TIPAGEM PARA AS RESTRIÇÕES ---
 export interface RestrictionInfo {
   label: string;
   value: string;
@@ -874,7 +870,6 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
   ]);
 
   useEffect(() => {
-    alert(highlightedPrefix);
     const trainGroup = d3.select(svgPlotRef.current).select(".trains-group");
     if (trainGroup.empty()) return;
 
@@ -913,8 +908,6 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     // Highlight matched trains
     matchingTrains.selectAll("line").attr("stroke", "blue").attr("stroke-width", 3).raise();
     matchingTrains.selectAll("text").attr("fill", "blue").raise();
-
-    alert(JSON.stringify(matchingTrains));
 
     // Scroll to the first matched train
     const firstTrainNode = matchingTrains.node();

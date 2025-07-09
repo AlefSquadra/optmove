@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { IDataContextMenu } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
+import { ModalSearchTrainChartGhtForTable } from "@features/home/components/modals/ModalSearchTrainChartGhtForTable/ModalSearchTrainChartGhtForTable";
 import { ModalSelectOfficialization } from "@features/home/components/modals/selectOfficialization/ModalSelectOfficialization";
 import { ModalSystemParams } from "@features/home/components/modals/systemParams/ModalSystemParams";
 import { ModalTrainMovements } from "@features/home/components/modals/trainMovements/ModalTrainMovements";
@@ -49,7 +50,7 @@ const FTVLayout = () => {
     setGraphTimeAndCoordinates,
   } = useFTLayout();
   const [loadingStage, setLoadingStage] = useState<string>("");
-  const { selectedOfficialization } = useApplicationContext();
+  const { selectedOfficialization, setTrainsInGhtChart, trainsInGhtChart } = useApplicationContext();
   const { setSelectedPanelTabBarLeft } = useFTLayout();
   const fetchDataGHT = useQuery({
     queryKey: ["ghtData", selectedOfficialization],
@@ -74,6 +75,7 @@ const FTVLayout = () => {
 
       const rectangles = await GHTChartMainService.getRectangles(parameters);
 
+      setTrainsInGhtChart(trains);
       setLoadingStage("");
       return {
         trains,
@@ -82,6 +84,9 @@ const FTVLayout = () => {
       };
     },
     enabled: Object.keys(selectedOfficialization || {}).length > 0,
+  });
+  const [openModalSearchTrainChartGhtForTable, setOpenModalSearchTrainChartGhtForTable] = useState<IModalData<any>>({
+    isOpen: false,
   });
 
   useEffect(() => {
@@ -130,11 +135,38 @@ const FTVLayout = () => {
     });
   }, []);
 
-  // New function to handle prefix search change
-  const handlePrefixSearchChange = (prefix: string) => {
-    alert("ftv:" + prefix);
-    setHighlightedPrefix(prefix);
-  };
+  const handlePrefixSearchChange = useCallback(
+    (prefix: string) => {
+      const searchPrefix = prefix.trim().toUpperCase();
+
+      if (searchPrefix) {
+        const tableExists = trainsInGhtChart.some((train) => train.tabela.toUpperCase().startsWith(searchPrefix));
+
+        if (tableExists) {
+          const groupedTrains = Object.groupBy(trainsInGhtChart, ({ tabela }) => tabela);
+          const trainsData = groupedTrains[searchPrefix]!.map((train) => ({
+            prefixo: train.prefixo,
+            local: train.patioExterno,
+            dataChegada: train.dataOficializacao,
+          }));
+
+          setOpenModalSearchTrainChartGhtForTable({
+            isOpen: true,
+            data: trainsData,
+          });
+        } else {
+          const matchExists = trainsInGhtChart.some((train) => train.prefixo.toUpperCase().startsWith(searchPrefix));
+
+          if (matchExists) {
+            setHighlightedPrefix(searchPrefix);
+          } else {
+            setHighlightedPrefix(null); // Clear highlights if no match is found
+          }
+        }
+      }
+    },
+    [trainsInGhtChart],
+  );
 
   return (
     <>
@@ -168,12 +200,11 @@ const FTVLayout = () => {
               </WindowModal>
             )}
             {!fetchDataGHT.isLoading &&
-              fetchDataGHT.data?.trains &&
-              fetchDataGHT.data?.trains?.length > 0 &&
+              fetchDataGHT.data &&
               fetchDataGHT.data?.sbs.length > 0 &&
               fetchDataGHT.data?.rectangles.length > 0 && (
                 <GHTChartD3
-                  trains={fetchDataGHT.data?.trains as any}
+                  trains={trainsInGhtChart as any}
                   yLabels={fetchDataGHT.data?.sbs as any}
                   restrictions={fetchDataGHT.data?.rectangles as any}
                   height={FTContentRef?.current?.offsetHeight ? FTContentRef.current.offsetHeight - 47 : 0}
@@ -250,6 +281,17 @@ const FTVLayout = () => {
       />
       <ModalTrainMovements openTrainMovements={openTrainMovements} setOpenTrainMovements={setOpenTrainMovements} />
       <ModalSystemParams openSystemParams={openSystemParams} setOpenSystemParams={setOpenSystemParams} />
+      <ModalSearchTrainChartGhtForTable
+        open={openModalSearchTrainChartGhtForTable.isOpen}
+        onClose={() => setOpenModalSearchTrainChartGhtForTable({ isOpen: false })}
+        HandleOkChange={(selected) => {
+          console.log(selected);
+          if (selected?.prefixo) {
+            setHighlightedPrefix(selected.prefixo);
+          }
+        }}
+        data={openModalSearchTrainChartGhtForTable.data || []}
+      />
       {/* <PriorizarDestinoModal onClose={() => {}} open={false} /> */}
     </>
   );
