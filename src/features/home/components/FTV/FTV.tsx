@@ -98,7 +98,7 @@ const FTVLayout = () => {
     return {
       initialDate: dayjs(baseDate).subtract(6, "hour").toDate(),
       dateTimeLine: baseDate,
-      finalDate: new Date("2025-07-01T23:12:32+00:00"),
+      finalDate: new Date("2025-07-02T23:12:32+00:00"),
     };
   }, []);
 
@@ -208,7 +208,7 @@ const FTVLayout = () => {
                   yLabels={fetchDataGHT.data?.sbs as any}
                   restrictions={fetchDataGHT.data?.rectangles as any}
                   height={FTContentRef?.current?.offsetHeight ? FTContentRef.current.offsetHeight - 47 : 0}
-                  hourWidth={80}
+                  hourWidth={42}
                   yAxisWidth={80}
                   initialDate={initialDate}
                   dateTimeLine={dateTimeLine}
