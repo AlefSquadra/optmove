@@ -1,10 +1,20 @@
 import { useApplicationContext } from "@app/providers/ApplicationProvider/useApplication";
 import {
   binoculars,
+  circleMinusRed,
+  cursor,
+  excel,
   graphBlockSearch,
   growingGraph,
+  lightGray,
+  likeYellow,
+  lockedRed,
+  pGreen,
   refresh,
+  saveDiskBlue,
   searchEye,
+  velocity,
+  warningConstruction,
   windowFolder,
   windowList,
   windowPage,
@@ -23,7 +33,6 @@ import {
   MenuPopover,
   MenuTrigger,
   Option,
-  Select,
   Text,
   ToolbarButton,
   ToolbarDivider,
@@ -58,7 +67,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
   const methods = useForm({
     defaultValues: {
       inputTimelineDatetime: "",
-      mesa: "1",
+      mesa: "7",
       prefix: "",
       plan: "",
       infoTrem: "",
@@ -82,7 +91,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
           .toLocaleString(),
       );
     }
-  }, [selectedOfficialization, setValue]);
+  }, [selectedOfficialization, setValue, selectZoneParams.mesaZone]);
 
   useEffect(() => {
     setPrefix(prefixValue);
@@ -90,7 +99,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
 
   return (
     <FormProvider {...methods}>
-      <form className="border-bottom flex flex-wrap gap-4 bg-[#f8f9fa] px-4 py-2 md:gap-2 md:px-2 md:py-1">
+      <form className="border-bottom flex flex-wrap gap-4 bg-[#f8f9fa] px-4 py-2 md:gap-0 md:px-2 md:py-1">
         {/* Grupo Filtros */}
         <div className="relative flex flex-col-reverse items-start justify-between gap-1 md:gap-0">
           <div className="relative flex items-start gap-1">
@@ -107,14 +116,26 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
                 setOpenSelectOfficialization(true);
               }}
             ></ToolbarButton>
-            <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("PlanejadorCCO").result}>
+            <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("1").result}>
               <Controller
                 name="mesa"
                 control={control}
-                render={({ field }) => (
-                  <Select {...field} style={{ width: "150px" }}>
-                    <Option value="1">Mesa de programação</Option>
-                  </Select>
+                render={({ field: { value, onChange } }) => (
+                  <Dropdown
+                    selectedOptions={value ? [value] : []}
+                    onOptionSelect={(_, data) => onChange(data.optionValue)}
+                    className="w-[11rem] !min-w-0 md:w-[16rem] lg:w-[13rem]"
+                    id="dropdown-mesa"
+                    placeholder="Mesa"
+                  >
+                    {/* use keys diferentes para evitar warn de React */}
+                    <Option key="MP" value="7">
+                      Mesa de programação
+                    </Option>
+                    <Option key="AU" value="A">
+                      Automático
+                    </Option>
+                  </Dropdown>
                 )}
               />
             </SecurityComponent>
@@ -138,6 +159,8 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
                 />
               )}
             />
+            <ToolbarButton icon={<img src={binoculars} width={24} alt="Icon" />}></ToolbarButton>
+
             <Tooltip withArrow content="Pesquisar por prefixo ou tabela" relationship="label">
               <ToolbarButton
                 icon={<img src={searchEye} width={24} alt="Icon" />}
@@ -172,7 +195,6 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
                 </MenuList>
               </MenuPopover>
             </Menu>
-            <ToolbarButton icon={<img src={binoculars} width={24} alt="Icon" />}></ToolbarButton>
           </div>
           <span className="text-sm text-gray-500 md:text-xs">Busca</span>
         </div>
@@ -182,18 +204,11 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
         {/* Grupo Controle */}
         <div className="relative flex flex-col-reverse items-start justify-between gap-1 md:gap-0">
           <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("1").result}>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "4px",
-                alignItems: "center",
-              }}
-            >
+            <div className="flex items-center gap-1">
               <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
                 <Menu>
                   <MenuTrigger disableButtonEnhancement>
-                    <ToolbarButton>Programar</ToolbarButton>
+                    <ToolbarButton icon={<img src={pGreen} width={20} alt="Icon" />}></ToolbarButton>
                   </MenuTrigger>
                   <MenuPopover>
                     <MenuList>
@@ -203,13 +218,14 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
                   </MenuPopover>
                 </Menu>
 
-                <ToolbarButton onClick={() => setIsOpen(true)}>
-                  <img src="/optmove-icons-svg/tile020.svg" width={20} alt="Icon" />
-                </ToolbarButton>
+                <ToolbarButton
+                  onClick={() => setIsOpen(true)}
+                  icon={<img src={cursor} width={20} alt="Icon" />}
+                ></ToolbarButton>
 
                 <Menu>
                   <MenuTrigger disableButtonEnhancement>
-                    <ToolbarButton>Interdições</ToolbarButton>
+                    <ToolbarButton icon={<img src={warningConstruction} width={20} alt="Icon" />}></ToolbarButton>
                   </MenuTrigger>
                   <MenuPopover>
                     <MenuList>
@@ -220,18 +236,16 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
                 </Menu>
               </div>
               <div style={{ display: "flex", gap: "4px" }}>
-                <ToolbarButton>
-                  <img src="/optmove-icons-svg/tile015.svg" width={20} alt="Icon" />
-                </ToolbarButton>
-                <ToolbarButton>
-                  <img src="/optmove-icons-svg/tile035.svg" width={20} alt="Icon" />
-                </ToolbarButton>
-                <ToolbarButton>
-                  <img src="/optmove-icons-svg/tile008.svg" width={20} alt="Icon" />
-                </ToolbarButton>
-                <ToolbarButton onClick={() => setIsPanelOpenDown((prev) => !prev)}>
-                  <img src="/optmove-icons-svg/tile031.svg" width={20} alt="Ocupação" />
-                </ToolbarButton>
+                <ToolbarButton icon={<img src={circleMinusRed} width={20} alt="Icon" />}></ToolbarButton>
+                <ToolbarButton icon={<img src={velocity} width={20} alt="Icon" />}></ToolbarButton>
+                <ToolbarButton icon={<img src={growingGraph} width={20} alt="Icon" />}></ToolbarButton>
+                <ToolbarButton icon={<img src={windowPage} width={20} alt="Icon" />}></ToolbarButton>
+                <ToolbarButton icon={<img src={windowPlot} width={20} alt="Icon" />}></ToolbarButton>
+                <ToolbarButton icon={<img src={saveDiskBlue} width={20} alt="Icon" />}></ToolbarButton>
+                <ToolbarButton icon={<img src={lockedRed} width={20} alt="Icon" />}></ToolbarButton>
+                <ToolbarButton icon={<img src={likeYellow} width={20} alt="Icon" />}></ToolbarButton>
+                <ToolbarButton icon={<img src={excel} width={20} alt="Icon" />}></ToolbarButton>
+                <ToolbarButton icon={<img src={lightGray} width={20} alt="Icon" />}></ToolbarButton>
               </div>
             </div>
           </SecurityComponent>
@@ -339,9 +353,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
           </div>
         </SecurityComponent>
 
-        <div className="hidden flex-1 lg:flex">
-          <ToolbarDivider />
-        </div>
+        <div className="flex-1">{/* <ToolbarDivider /> */}</div>
 
         <ToolbarDivider />
 
@@ -375,10 +387,10 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
           <span className="text-sm text-gray-500 md:text-xs">Coordenadas Gráfico</span>
         </div>
 
-        <ToolbarDivider />
+        <ToolbarDivider className="!m-0 !pr-0" />
 
         {/* Grupo Monitoramento */}
-        <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("1").result}>
+        {/* <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("1").result}>
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             <Menu>
               <MenuTrigger disableButtonEnhancement>
@@ -393,7 +405,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
             </Menu>
             <span style={{ fontSize: "11px", color: "#666" }}>Planos</span>
           </div>
-        </SecurityComponent>
+        </SecurityComponent> */}
       </form>
     </FormProvider>
   );

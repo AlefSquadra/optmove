@@ -36,6 +36,10 @@ const buildTimelineCell =
     </span>
   );
 
+const buildOfficializationDateCell = ({ cell }: { cell: MRT_Cell<ISelectOfficializationDataGrid, string> }) => (
+  <span>{DateFormat.dayjs(cell.getValue()).format("DD/MM/YYYY HH:mm:ss")}</span>
+);
+
 const onSelectionChange = (props: {
   getValues: UseFormGetValues<IOfficializationFormData>;
   row: ISelectOfficializationDataGrid[];
@@ -57,6 +61,7 @@ const DataGridSelectOfficialization = (props: ISelectOfficializationDataGridProp
   const { selectedOfficialization } = useApplicationContext();
 
   const timelineCell = useCallback(buildTimelineCell(setValue), [setValue]);
+  const officializationDateCell = useCallback(buildOfficializationDateCell, []);
   const handleSelectionChange = useCallback(
     (row: any) => onSelectionChange({ getValues, row, handleSelectionChange: props.handleSelectionChange, setValue }),
     [getValues, setValue, props.handleSelectionChange],
@@ -66,7 +71,7 @@ const DataGridSelectOfficialization = (props: ISelectOfficializationDataGridProp
     () => [
       { accessorKey: "trainsOfficialization", header: "Trens oficializados" },
       { accessorKey: "user", header: "Usuário" },
-      { accessorKey: "dateOfficialization", header: "Data oficialização" },
+      { accessorKey: "dateOfficialization", header: "Data oficialização", Cell: officializationDateCell },
       { accessorKey: "mesa", header: "Mesa" },
       {
         accessorKey: "timeline",

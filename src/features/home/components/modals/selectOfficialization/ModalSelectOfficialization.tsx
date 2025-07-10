@@ -100,7 +100,7 @@ const ModalSelectOfficialization = (props: IModalSelectOfficializationProps) => 
 
           <WindowModal.Footer>
             <div className="flex justify-end gap-2">
-              <Button>Cancelar</Button>
+              <Button onClick={() => setOpenSelectOfficialization(false)}>Cancelar</Button>
               <Button appearance="primary" onClick={handleCloseModal}>
                 Ok
               </Button>

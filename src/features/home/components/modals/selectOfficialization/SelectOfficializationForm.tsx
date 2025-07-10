@@ -114,7 +114,7 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
           control={control}
           render={({ field }) => (
             <Field label="Linha do tempo" validationMessage={errors.timelineDatetime?.message}>
-              <Input {...field} type="datetime-local" className="w-[9.5rem] md:w-[14rem] lg:w-[11.5rem]" />
+              <Input {...field} type="datetime-local" className="w-[9.5rem] md:w-[14rem] lg:w-[12.5rem]" />
             </Field>
           )}
         />
