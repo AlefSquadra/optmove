@@ -1,4 +1,5 @@
 import { useApplicationContext } from "@app/providers/ApplicationProvider/useApplication";
+import { useGlobalDialog } from "@app/providers/GlobalDialogProvider/UseGlobalDialogContext";
 import {
   DataGridSelectOfficialization,
   type ISelectOfficializationDataGrid,
@@ -35,6 +36,7 @@ const ModalSelectOfficialization = (props: IModalSelectOfficializationProps) => 
       prefix: "",
     },
   });
+  const { showDialog } = useGlobalDialog();
 
   const officializationQuery = useQuery({
     queryKey: ["officialization", filters],
@@ -43,9 +45,15 @@ const ModalSelectOfficialization = (props: IModalSelectOfficializationProps) => 
   });
 
   const handleCloseModal = () => {
-    console.log(selection);
     if (selection?.length === 0) {
-      alert("Selecione uma oficialização");
+      showDialog({
+        title: "Atenção",
+        content: "Selecione pelo menos uma oficialização",
+        confirmText: "Ok",
+        style: {
+          width: "20%",
+        },
+      });
       return;
     }
     onSelectedPlans(selection);
@@ -92,7 +100,7 @@ const ModalSelectOfficialization = (props: IModalSelectOfficializationProps) => 
 
           <WindowModal.Footer>
             <div className="flex justify-end gap-2">
-              <Button>Cancelar</Button>
+              <Button onClick={() => setOpenSelectOfficialization(false)}>Cancelar</Button>
               <Button appearance="primary" onClick={handleCloseModal}>
                 Ok
               </Button>

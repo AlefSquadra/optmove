@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { IDataContextMenu } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
+import { ModalSearchTrainChartGhtForTable } from "@features/home/components/modals/modalSearchTrainChartGhtForTable/ModalSearchTrainChartGhtForTable";
 import { ModalSelectOfficialization } from "@features/home/components/modals/selectOfficialization/ModalSelectOfficialization";
 import { ModalSystemParams } from "@features/home/components/modals/systemParams/ModalSystemParams";
 import { ModalTrainMovements } from "@features/home/components/modals/trainMovements/ModalTrainMovements";
-import { FTVOfficeMenu } from "@features/home/components/officeMenu/officeMenu";
 import { FTVTabLeft } from "@features/home/components/tabPanelLeft/FTVTabLeft";
 import {
   FTLayoutContent,
@@ -27,6 +27,8 @@ import {
 import type { IElementEventInPlotG } from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
 import { GHTChartD3 } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import { ChartRestrictionsMock, ChartTrainsMock, ChartYLabelMock } from "@features/home/components/FTV/json";
+import { FTVOfficeMenu } from "@features/home/components/officeMenu/OfficeMenu";
+import { OfficeMenuProvider } from "@features/home/providers/OfficeMenuProvider/OfficeMenuProvider";
 import { GHTChartMainService } from "@features/home/services/GHTChartMainService";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import { DateFormat } from "@shared/utils/DateFormat";
@@ -39,6 +41,7 @@ const FTVLayout = () => {
   const [openTrainMovements, setOpenTrainMovements] = useState<IModalData<IDataContextMenu>>({
     isOpen: false,
   });
+  const [highlightedPrefix, setHighlightedPrefix] = useState<string | null>(null);
   const {
     setOpenSelectOfficialization,
     openSelectOfficialization,
@@ -47,7 +50,7 @@ const FTVLayout = () => {
     setGraphTimeAndCoordinates,
   } = useFTLayout();
   const [loadingStage, setLoadingStage] = useState<string>("");
-  const { selectedOfficialization } = useApplicationContext();
+  const { selectedOfficialization, setTrainsInGhtChart, trainsInGhtChart } = useApplicationContext();
   const { setSelectedPanelTabBarLeft } = useFTLayout();
   const fetchDataGHT = useQuery({
     queryKey: ["ghtData", selectedOfficialization],
@@ -72,6 +75,7 @@ const FTVLayout = () => {
 
       const rectangles = await GHTChartMainService.getRectangles(parameters);
 
+      setTrainsInGhtChart(trains);
       setLoadingStage("");
       return {
         trains,
@@ -80,6 +84,9 @@ const FTVLayout = () => {
       };
     },
     enabled: Object.keys(selectedOfficialization || {}).length > 0,
+  });
+  const [openModalSearchTrainChartGhtForTable, setOpenModalSearchTrainChartGhtForTable] = useState<IModalData<any>>({
+    isOpen: false,
   });
 
   useEffect(() => {
@@ -91,7 +98,7 @@ const FTVLayout = () => {
     return {
       initialDate: dayjs(baseDate).subtract(6, "hour").toDate(),
       dateTimeLine: baseDate,
-      finalDate: new Date("2025-07-01T16:12:32+00:00"),
+      finalDate: new Date("2025-07-01T23:12:32+00:00"),
     };
   }, []);
 
@@ -128,6 +135,39 @@ const FTVLayout = () => {
     });
   }, []);
 
+  const handlePrefixSearchChange = useCallback(
+    (prefix: string) => {
+      const searchPrefix = prefix.trim().toUpperCase();
+
+      if (searchPrefix) {
+        const tableExists = trainsInGhtChart.some((train) => train.tabela.toUpperCase().startsWith(searchPrefix));
+
+        if (tableExists) {
+          const groupedTrains = Object.groupBy(trainsInGhtChart, ({ tabela }) => tabela);
+          const trainsData = groupedTrains[searchPrefix]!.map((train) => ({
+            prefixo: train.prefixo,
+            local: train.patioExterno,
+            dataChegada: train.dataOficializacao,
+          }));
+
+          setOpenModalSearchTrainChartGhtForTable({
+            isOpen: true,
+            data: trainsData,
+          });
+        } else {
+          const matchExists = trainsInGhtChart.some((train) => train.prefixo.toUpperCase().startsWith(searchPrefix));
+
+          if (matchExists) {
+            setHighlightedPrefix(searchPrefix);
+          } else {
+            setHighlightedPrefix(null); // Clear highlights if no match is found
+          }
+        }
+      }
+    },
+    [trainsInGhtChart],
+  );
+
   return (
     <>
       <FTLayoutRoot>
@@ -135,7 +175,7 @@ const FTVLayout = () => {
           <FTVTabLeft />
         </FTLayoutTabPanelLeft>
         <FTLayoutHeader>
-          <FTVOfficeMenu />
+          <FTVOfficeMenu handlePrefixSearchChange={handlePrefixSearchChange} />
         </FTLayoutHeader>
         <FTLayoutContent ref={FTContentRef} className="flex flex-col">
           <div className="grid w-full grid-cols-12 grid-rows-[32px] place-items-center bg-yellow-50">
@@ -160,12 +200,11 @@ const FTVLayout = () => {
               </WindowModal>
             )}
             {!fetchDataGHT.isLoading &&
-              fetchDataGHT.data?.trains &&
-              fetchDataGHT.data?.trains?.length > 0 &&
+              fetchDataGHT.data &&
               fetchDataGHT.data?.sbs.length > 0 &&
               fetchDataGHT.data?.rectangles.length > 0 && (
                 <GHTChartD3
-                  trains={fetchDataGHT.data?.trains as any}
+                  trains={trainsInGhtChart as any}
                   yLabels={fetchDataGHT.data?.sbs as any}
                   restrictions={fetchDataGHT.data?.rectangles as any}
                   height={FTContentRef?.current?.offsetHeight ? FTContentRef.current.offsetHeight - 47 : 0}
@@ -178,6 +217,7 @@ const FTVLayout = () => {
                   onMouseMoveInElement={handleMouseMoveInRestriction}
                   onClickInElement={handleOnClickInElement}
                   onClickMenuContext={handleOnClickMenuContext}
+                  highlightedPrefix={highlightedPrefix}
                 />
               )}
 
@@ -197,6 +237,7 @@ const FTVLayout = () => {
                   onMouseMoveInElement={handleMouseMoveInRestriction}
                   onClickInElement={handleOnClickInElement}
                   onClickMenuContext={handleOnClickMenuContext}
+                  highlightedPrefix={highlightedPrefix}
                 />
               </>
             )}
@@ -240,6 +281,17 @@ const FTVLayout = () => {
       />
       <ModalTrainMovements openTrainMovements={openTrainMovements} setOpenTrainMovements={setOpenTrainMovements} />
       <ModalSystemParams openSystemParams={openSystemParams} setOpenSystemParams={setOpenSystemParams} />
+      <ModalSearchTrainChartGhtForTable
+        open={openModalSearchTrainChartGhtForTable.isOpen}
+        onClose={() => setOpenModalSearchTrainChartGhtForTable({ isOpen: false })}
+        HandleOkChange={(selected) => {
+          console.log(selected);
+          if (selected?.prefixo) {
+            setHighlightedPrefix(selected.prefixo);
+          }
+        }}
+        data={openModalSearchTrainChartGhtForTable.data || []}
+      />
       {/* <PriorizarDestinoModal onClose={() => {}} open={false} /> */}
     </>
   );
@@ -249,7 +301,9 @@ const FTV = () => {
   return (
     <HomeFTLayoutProvider>
       <GHTChartProvider>
-        <FTVLayout />
+        <OfficeMenuProvider>
+          <FTVLayout />
+        </OfficeMenuProvider>
       </GHTChartProvider>
     </HomeFTLayoutProvider>
   );

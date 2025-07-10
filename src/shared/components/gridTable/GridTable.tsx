@@ -3,7 +3,7 @@ import { MantineProvider } from "@mantine/core";
 import { IconsGridTableIMantineToFluent } from "@styles/iconsGridTableIMantineToFluent/iconsGridTableIMantineToFluent";
 import { MantineReactTable, type MRT_RowSelectionState, type MRT_TableOptions } from "mantine-react-table";
 import { MRT_Localization_PT_BR } from "mantine-react-table/locales/pt-BR/index.cjs";
-import { useCallback, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export interface ISelectOfficializationDataGrid {
   id: string;
@@ -45,24 +45,15 @@ export const OptGridTable = <T extends Record<string, any>>(props: IGridTablePro
     return map;
   }, [optGridProps.data, defaultId]);
 
-  // Callback de mudança de seleção: atualiza estado e dispara callback
-  const handleRowSelectionChange = useCallback(
-    (updaterOrValue: MRT_RowSelectionState | ((prev: MRT_RowSelectionState) => MRT_RowSelectionState)) => {
-      setRowSelection((prev) => {
-        const newSelection = typeof updaterOrValue === "function" ? updaterOrValue(prev) : updaterOrValue;
-
-        if (onSelectionChange) {
-          const selectedRows = Object.keys(newSelection)
-            .map((id) => dataLookup.get(id)!)
-            .filter(Boolean);
-          onSelectionChange(selectedRows);
-        }
-
-        return newSelection;
-      });
-    },
-    [onSelectionChange, dataLookup],
-  );
+  useEffect(() => {
+    if (onSelectionChange) {
+      const selectedRows = Object.keys(rowSelection)
+        .filter((id) => rowSelection[id] === true)
+        .map((id) => dataLookup.get(id)!)
+        .filter(Boolean);
+      onSelectionChange(selectedRows);
+    }
+  }, [onSelectionChange, rowSelection, dataLookup]);
 
   return (
     <MantineProvider>
@@ -70,7 +61,7 @@ export const OptGridTable = <T extends Record<string, any>>(props: IGridTablePro
         {...optGridProps}
         getRowId={(row) => row[defaultId]}
         state={{ rowSelection, ...optGridProps.state }}
-        onRowSelectionChange={handleRowSelectionChange}
+        onRowSelectionChange={setRowSelection}
         enableRowSelection
         enableSelectAll
         selectAllMode="all"
@@ -85,41 +76,16 @@ export const OptGridTable = <T extends Record<string, any>>(props: IGridTablePro
         initialState={{ density: "xs", ...optGridProps.initialState }}
         displayColumnDefOptions={{
           "mrt-row-select": {
-            Cell: ({ row }) => (
-              <Checkbox
-                checked={row.getIsSelected()}
-                onChange={() => {
-                  const id = row.id;
-                  handleRowSelectionChange((prev) => ({
-                    ...prev,
-                    [id]: !row.getIsSelected(),
-                  }));
-                }}
-              />
-            ),
+            Cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onChange={row.getToggleSelectedHandler()} />,
             Header: ({ table }) => {
-              const isAll = table.getIsAllRowsSelected();
-              const isSome = table.getIsSomeRowsSelected();
-              const rowIds = table.getRowModel().rows.map((r) => r.id);
-              // Use 'mixed' for indeterminate state via checked prop
               const checkedProp =
-                isAll ? true
-                : isSome ? "mixed"
+                table.getIsAllRowsSelected() ? true
+                : table.getIsSomeRowsSelected() ? "mixed"
                 : false;
               return (
                 <Checkbox
                   checked={checkedProp}
-                  onChange={() => {
-                    if (isAll) {
-                      handleRowSelectionChange({});
-                    } else {
-                      const newSel: MRT_RowSelectionState = {};
-                      rowIds.forEach((id) => {
-                        newSel[id] = true;
-                      });
-                      handleRowSelectionChange(newSel);
-                    }
-                  }}
+                  onChange={table.getToggleAllRowsSelectedHandler()} // <-- Usar handler da própria tabela
                 />
               );
             },

@@ -2053,17 +2053,130 @@
           "partida": "2025-06-30T17:10:34Z",
           "fimOcupacao": "2025-06-30T17:15:46Z",
           "idFicha": "BFICA0000000dj2"
+        }
+      ]
+    },
+    {
+      "dataOficializacao": "2025-06-30T20:16:45",
+      "cor": "128,0,0,",
+      "tipoTrem": "CARGA GERAL",
+      "comprimentoKm": 1.3,
+      "id": "BTREM0000000A4z",
+      "idExterno": "0000gF000000B5a2",
+      "prefixo": "IIN2161",
+      "prefixoOutraFerrovia": "V32",
+      "dataProntidao": "2025-06-30T09:15:00Z",
+      "estado": 1,
+      "origem": "ZPG",
+      "destino": "ISN",
+      "patioExterno": "ZPG",
+      "previsaoPartida": "2025-06-30T09:15:00Z",
+      "previsaoSaida": "2025-07-01T20:36:57Z",
+      "tabela": "ICXMP",
+      "dataBaseCarregamento": "2025-07-01T20:12:32Z",
+      "zonaOficial": "MESA4",
+      "movimentos": [
+        {
+          "id": "104",
+          "segmento": "ZPG",
+          "alias": "ZPG",
+          "linha": "ZPG-1",
+          "destino": "ZPG-ICB-1",
+          "chegada": "2025-07-01T20:22:32Z",
+          "fimCurso": "2025-07-01T20:32:05Z",
+          "partida": "2025-07-01T20:32:05Z",
+          "fimOcupacao": "2025-07-01T20:36:57Z",
+          "idFicha": "BFICA0000000dj2"
         },
         {
-          "id": "904",
-          "segmento": "ISN",
-          "alias": "ISN",
-          "linha": "ISN-1",
+          "id": "204",
+          "segmento": "ZPG-ICB",
+          "alias": "ZPG-ICB",
+          "linha": "ZPG-ICB-1",
+          "destino": "ICB-KM10-1",
+          "chegada": "2025-07-01T20:32:05Z",
+          "fimCurso": "2025-07-01T20:37:44Z",
+          "partida": "2025-07-01T20:37:44Z",
+          "fimOcupacao": "2025-07-01T20:42:53Z",
+          "idFicha": "BFICA0000000dj2"
+        },
+        {
+          "id": "304",
+          "segmento": "ICB",
+          "alias": "ICB",
+          "linha": "ICB-KM10-1",
+          "destino": "ICB-KM10-1",
+          "chegada": "2025-07-01T20:37:44Z",
+          "fimCurso": "2025-07-01T20:38:25Z",
+          "partida": "2025-07-01T20:38:25Z",
+          "fimOcupacao": "2025-07-01T20:43:37Z",
+          "idFicha": "BFICA0000000dj2",
+          "activity": [
+            {
+              "type": "parada",
+              "name": "parada",
+              "color": "red"
+            }
+          ]
+        },
+        {
+          "id": "404",
+          "segmento": "ICB-KM10",
+          "alias": "ICB-KM10",
+          "linha": "ICB-KM10-1",
+          "destino": "ICB-KM8-1",
+          "chegada": "2025-07-01T20:38:25Z",
+          "fimCurso": "2025-07-01T20:45:45Z",
+          "partida": "2025-07-01T20:45:45Z",
+          "fimOcupacao": "2025-07-01T20:50:57Z",
+          "idFicha": "BFICA0000000dj2"
+        },
+        {
+          "id": "504",
+          "segmento": "ICB-KM8",
+          "alias": "ICB-KM8",
+          "linha": "ICB-KM8-1",
+          "destino": "ICB-KM8-IQA-1",
+          "chegada": "2025-07-01T20:45:45Z",
+          "fimCurso": "2025-07-01T20:52:41Z",
+          "partida": "2025-07-01T20:52:41Z",
+          "fimOcupacao": "2025-07-01T20:57:53Z",
+          "idFicha": "BFICA0000000dj2"
+        },
+        {
+          "id": "604",
+          "segmento": "ICB-KM8-IQA",
+          "alias": "ICB-KK8-IQA",
+          "linha": "ICB-KM8-IQA-1",
+          "destino": "IQA-1",
+          "chegada": "2025-07-01T20:52:41Z",
+          "fimCurso": "2025-07-01T21:04:31Z",
+          "partida": "2025-07-01T21:04:31Z",
+          "fimOcupacao": "2025-07-01T21:09:23Z",
+          "idFicha": "BFICA0000000dj2"
+        },
+        {
+          "id": "704",
+          "segmento": "IQA",
+          "alias": "IQA",
+          "linha": "IQA-1",
+          "destino": "IQA-ISN-1",
+          "chegada": "2025-07-01T21:04:31Z",
+          "fimCurso": "2025-07-01T21:05:07Z",
+          "partida": "2025-07-01T21:05:07Z",
+          "fimOcupacao": "2025-07-01T21:09:59Z",
+          "idFicha": "BFICA0000000dj2"
+        },
+        {
+          "id": "804",
+          "segmento": "IQA-ISN",
+          "alias": "IQA-ISN",
+          "linha": "IQA-ISN-1",
           "destino": "ISN-1",
-          "chegada": "2025-06-30T17:10:34Z",
-          "fimCurso": "2025-06-30T17:18:09Z",
-          "partida": "2025-06-30T17:18:09Z",
-          "fimOcupacao": "2025-06-30T17:18:09Z",
+          "chegada": "2025-07-01T21:05:07Z",
+          "fimCurso": "2025-07-01T21:10:34Z",
+          "partida": "2025-07-01T21:10:34Z",
+          "fimOcupacao": "2025-07-01T21:15:46Z",
           "idFicha": "BFICA0000000dj2"
         }
       ]

@@ -11,8 +11,6 @@ export interface TrainMovementActivity {
   tyoe: string;
   color: string;
 }
-
-// --- INÍCIO: NOVAS TIPAGENS PARA OS DADOS DOS TRENS ---
 export interface TrainMovement {
   id: string;
   segmento: string;
@@ -49,9 +47,7 @@ export interface TrainData {
   movimentos: TrainMovement[];
   nomeSbl: string;
 }
-// --- FIM: NOVAS TIPAGENS ---
 
-// --- INÍCIO: NOVA TIPAGEM PARA AS RESTRIÇÕES ---
 export interface RestrictionInfo {
   label: string;
   value: string;
@@ -130,6 +126,12 @@ interface ProcessedSegment {
   backgroundType: BackgroundType;
 }
 
+interface LabelItem {
+  position: number;
+  label: string;
+  data: any;
+}
+
 export interface IOnGraphCoordinatesUpdateProps {
   sbs: string;
   date: string;
@@ -148,6 +150,7 @@ interface GHTChartD3Props {
   onClickInElement: (data: IElementEventInPlotG | null) => void;
   onGraphTimeAndCoordenatesChange: (props: IOnGraphCoordinatesUpdateProps) => void;
   onClickMenuContext: (data: any | null) => void;
+  highlightedPrefix?: string | null; // Add this new prop
 }
 
 interface ZoomState {
@@ -172,6 +175,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     onGraphTimeAndCoordenatesChange: onGraphCoordenatesChange,
     onClickInElement,
     onClickMenuContext,
+    highlightedPrefix,
   } = props;
 
   const svgLeftRef = useRef<SVGSVGElement | null>(null);
@@ -344,31 +348,73 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     pattern.append("rect").attr("width", 8).attr("height", 8).attr("fill", "rgba(235, 225, 225, 1)");
     pattern.append("path").attr("d", "M 0,0 l 8,0").attr("stroke", "rgba(210, 200, 200, 1)").attr("stroke-width", 4);
 
+    // Function to filter overlapping labels
+    const filterOverlappingLabels = (items: LabelItem[], minDistance: number): LabelItem[] => {
+      const sortedItems = items.sort((a, b) => a.position - b.position);
+      const filteredItems: LabelItem[] = [];
+      let lastPosition = -Infinity;
+
+      for (const item of sortedItems) {
+        if (item.position - lastPosition >= minDistance) {
+          filteredItems.push(item);
+          lastPosition = item.position;
+        }
+      }
+
+      return filteredItems;
+    };
+
     if (showDetailedLabels) {
       const visibleItems = processedData.filter(
         (d) => d.indexGraficoI !== undefined && d.indexGraficoI >= yDomain[0] && d.indexGraficoI <= yDomain[1],
       );
-      const itemTicks = visibleItems.map((d) => d.indexGraficoI!);
+
+      // Calculate minimum distance between labels to prevent overlap (in pixels)
+      const minLabelDistance = 15; // Adjust this value as needed
+      const minDistanceInDomain = (minLabelDistance / innerH) * (yDomain[1] - yDomain[0]);
+
+      const labelItems = visibleItems.map((d) => ({
+        position: d.indexGraficoI!,
+        label: d.nomeSbl || d.nomeApelido,
+        data: d,
+      }));
+
+      const filteredLabels = filterOverlappingLabels(labelItems, minDistanceInDomain);
+      const itemTicks = filteredLabels.map((d) => d.position);
+
       const axisYLeft = d3
         .axisLeft(yScale)
         .tickValues(itemTicks)
         .tickFormat((d) => {
-          const item = visibleItems.find((item) => item.indexGraficoI === d);
-          return item ? item.nomeSbl || item.nomeApelido : "";
+          const item = filteredLabels.find((item) => item.position === d);
+          return item ? item.label : "";
         });
       d3.select(svgLeftRef.current)
         .append("g")
         .attr("transform", `translate(${yAxisWidth - 1},${margin.top})`)
         .call(axisYLeft);
     } else {
-      const visibleSegments = segmentData.filter((seg) => seg.midY >= yDomain[0] && seg.midY <= yDomain[1]);
-      const segmentTicks = visibleSegments.map((seg) => seg.midY);
+      const visibleSegments = segmentData.filter((seg) => seg.startY >= yDomain[0] && seg.startY <= yDomain[1]);
+
+      // Apply same filtering logic to segment labels
+      const minLabelDistance = 20; // Slightly larger for segment labels
+      const minDistanceInDomain = (minLabelDistance / innerH) * (yDomain[1] - yDomain[0]);
+
+      const labelItems = visibleSegments.map((seg) => ({
+        position: seg.startY,
+        label: seg.name,
+        data: seg,
+      }));
+
+      const filteredLabels = filterOverlappingLabels(labelItems, minDistanceInDomain);
+      const segmentTicks = filteredLabels.map((d) => d.position);
+
       const axisYLeft = d3
         .axisLeft(yScale)
         .tickValues(segmentTicks)
         .tickFormat((d) => {
-          const segment = visibleSegments.find((seg) => seg.midY === d);
-          return segment ? segment.name : "";
+          const segment = filteredLabels.find((seg) => seg.position === d);
+          return segment ? segment.label : "";
         });
       d3.select(svgLeftRef.current)
         .append("g")
@@ -376,34 +422,56 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
         .call(axisYLeft);
     }
 
-    const axisYRightGroup = d3.select(svgRightRef.current).append("g").attr("transform", `translate(1,${margin.top})`);
     if (showDetailedLabels) {
-      processedData.forEach((item) => {
-        if (item.indexGraficoS !== undefined && item.indexGraficoS >= yDomain[0] && item.indexGraficoS <= yDomain[1]) {
-          axisYRightGroup
-            .append("text")
-            .attr("x", 5)
-            .attr("y", yScale(item.indexGraficoS))
-            .attr("dy", "0.35em")
-            .text(item.nomeSbl || item.nomeApelido)
-            .attr("font-size", 11)
-            .attr("fill", "#555");
-        }
-      });
+      const visibleItems = processedData.filter(
+        (d) => d.indexGraficoS !== undefined && d.indexGraficoS >= yDomain[0] && d.indexGraficoS <= yDomain[1],
+      );
+
+      // Apply same filtering logic to right axis labels
+      const minLabelDistance = 15;
+      const minDistanceInDomain = (minLabelDistance / innerH) * (yDomain[1] - yDomain[0]);
+
+      const labelItems = visibleItems.map((d) => ({
+        position: d.indexGraficoS!,
+        label: d.nomeSbl || d.nomeApelido,
+        data: d,
+      }));
+
+      const filteredLabels = filterOverlappingLabels(labelItems, minDistanceInDomain);
+      const rightTicks = filteredLabels.map((d) => d.position);
+
+      const axisYRight = d3
+        .axisRight(yScale)
+        .tickValues(rightTicks)
+        .tickFormat((d) => {
+          const item = filteredLabels.find((item) => item.position === d);
+          return item ? item.label : "";
+        });
+      d3.select(svgRightRef.current).append("g").attr("transform", `translate(1,${margin.top})`).call(axisYRight);
     } else {
-      segmentData.forEach((segment) => {
-        if (segment.midY >= yDomain[0] && segment.midY <= yDomain[1]) {
-          axisYRightGroup
-            .append("text")
-            .attr("x", 5)
-            .attr("y", yScale(segment.midY))
-            .attr("dy", "0.35em")
-            .text(segment.name)
-            .attr("font-size", 12)
-            .attr("font-weight", "bold")
-            .attr("fill", "#111");
-        }
-      });
+      const visibleSegments = segmentData.filter((seg) => seg.endY >= yDomain[0] && seg.endY <= yDomain[1]);
+
+      // Apply same filtering logic to segment labels
+      const minLabelDistance = 20;
+      const minDistanceInDomain = (minLabelDistance / innerH) * (yDomain[1] - yDomain[0]);
+
+      const labelItems = visibleSegments.map((seg) => ({
+        position: seg.endY,
+        label: seg.name,
+        data: seg,
+      }));
+
+      const filteredLabels = filterOverlappingLabels(labelItems, minDistanceInDomain);
+      const rightTicks = filteredLabels.map((d) => d.position);
+
+      const axisYRight = d3
+        .axisRight(yScale)
+        .tickValues(rightTicks)
+        .tickFormat((d) => {
+          const segment = filteredLabels.find((seg) => seg.position === d);
+          return segment ? segment.label : "";
+        });
+      d3.select(svgRightRef.current).append("g").attr("transform", `translate(1,${margin.top})`).call(axisYRight);
     }
 
     const hourInterval = 1;
@@ -607,7 +675,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     const trainGroup = plotG.append("g").attr("class", "trains-group");
 
     trains.forEach((train) => {
-      const singleTrainGroup = trainGroup.append("g").attr("class", `train-path train-${train.prefixo}`);
+      const singleTrainGroup = trainGroup.append("g").attr("class", `train-path train-prefix-${train.prefixo}`);
       const trainColor = `rgb(${train.cor.slice(0, -1)})`;
 
       let firstVisibleMovement = true;
@@ -856,7 +924,6 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     timelinePlot.raise();
     trainGroup.raise();
     restrictionsGroup.raise();
-    // --- INÍCIO: ADICIONANDO `restrictions` AO ARRAY DE DEPENDÊNCIAS ---
   }, [
     hourWidth,
     height,
@@ -871,7 +938,62 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     keyPressCtrl,
     onMouseMoveInRestrictionCallback,
   ]);
-  // --- FIM: ADICIONANDO `restrictions` AO ARRAY DE DEPENDÊNCIAS ---
+
+  useEffect(() => {
+    const trainGroup = d3.select(svgPlotRef.current).select(".trains-group");
+    if (trainGroup.empty()) return;
+
+    // Reset all train styles to their original colors
+    trainGroup.selectAll("g.train-path").each(function () {
+      const singleTrainGroup = d3.select(this);
+      const trainClass = singleTrainGroup.attr("class") || "";
+      const prefixMatch = trainClass.match(/train-prefix-([^\s]+)/);
+      if (!prefixMatch) return;
+
+      const prefix = prefixMatch[1];
+      const trainData = trains.find((t) => t.prefixo === prefix);
+
+      if (trainData) {
+        const originalColor = `rgb(${trainData.cor.slice(0, -1)})`;
+        singleTrainGroup.selectAll("line").attr("stroke", originalColor).attr("stroke-width", 2);
+        singleTrainGroup.selectAll("text").attr("fill", originalColor);
+      }
+    });
+
+    if (!highlightedPrefix || highlightedPrefix.trim() === "") {
+      return; // Exit if no prefix is provided
+    }
+
+    const searchPrefix = highlightedPrefix.trim().toUpperCase();
+
+    // Filter trains based on the prefix
+    const matchingTrains = trainGroup.selectAll("g.train-path").filter(function () {
+      const trainClass = d3.select(this).attr("class") || "";
+      const prefixMatch = trainClass.match(/train-prefix-([^\s]+)/);
+      if (!prefixMatch) return false;
+      const trainPrefix = prefixMatch[1].toUpperCase();
+      return trainPrefix.startsWith(searchPrefix);
+    });
+
+    // Highlight matched trains
+    matchingTrains.selectAll("line").attr("stroke", "blue").attr("stroke-width", 3).raise();
+    matchingTrains.selectAll("text").attr("fill", "blue").raise();
+
+    // Scroll to the first matched train
+    const firstTrainNode = matchingTrains.node();
+    if (firstTrainNode) {
+      const firstLine = d3.select(firstTrainNode).select("line");
+      if (!firstLine.empty()) {
+        const xPosition = +firstLine.attr("x1");
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTo({
+            left: xPosition - scrollContainerRef.current.clientWidth / 2,
+            behavior: "smooth",
+          });
+        }
+      }
+    }
+  }, [highlightedPrefix, trains]);
 
   return (
     <div
