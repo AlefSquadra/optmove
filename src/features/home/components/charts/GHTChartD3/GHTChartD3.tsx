@@ -532,8 +532,75 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
         const clickedSegment = segmentData.find((d) => yVal >= d.startY && yVal <= d.endY);
 
         if (clickedSegment) {
-          alert(`Menu de contexto para o segmento: ${clickedSegment.name}`);
-          // setContextMenuData(...)
+          setContextMenuData({
+            isOpen: true,
+            data: {
+              x: event.clientX,
+              y: event.clientY,
+              menuGroup: [
+                {
+                  section: "selection",
+                  items: [
+                    {
+                      id: "select_trains",
+                      label: "Modo Seleção Trens",
+                      shortcut: "Alt+T",
+                      data: { icon: "▶", disabled: true, action: "select_trains" },
+                      onClick: () => alert("select_trains"),
+                    },
+                    {
+                      id: "select_restrictions",
+                      label: "Modo Seleção Restrições",
+                      shortcut: "Alt+I",
+                      data: { icon: "⚡", disabled: true, action: "select_restrictions" },
+                      onClick: () => alert("select_restrictions"),
+                    },
+                  ],
+                },
+                {
+                  section: "actions",
+                  items: [
+                    {
+                      id: "schedule",
+                      label: "Programar",
+                      data: { icon: "⏱️", disabled: true, action: "schedule" },
+                      onClick: () => alert("schedule"),
+                    },
+                    {
+                      id: "load",
+                      label: "Carregar",
+                      shortcut: "Ctrl+A",
+                      data: { icon: "🔄", action: "load" },
+                      onClick: () => alert("load"),
+                    },
+                  ],
+                },
+                {
+                  section: "creation",
+                  items: [
+                    {
+                      id: "create_interdiction",
+                      label: "Criar Interdição",
+                      data: { icon: "⚠️", disabled: true, action: "create_interdiction" },
+                      onClick: () => alert("create_interdiction"),
+                    },
+                    {
+                      id: "create_restriction",
+                      label: "Criar Restrição",
+                      data: { icon: "⚡", disabled: true, action: "create_restriction" },
+                      onClick: () => alert("create_restriction"),
+                    },
+                    {
+                      id: "create_train",
+                      label: "Criar Trem",
+                      data: { icon: "➕", disabled: true, action: "create_train" },
+                      onClick: () => alert("create_train"),
+                    },
+                  ],
+                },
+              ],
+            },
+          });
         }
       });
 
