@@ -26,8 +26,8 @@ import {
 import type { IElementEventInPlotG } from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
 import { GHTChartD3 } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import { ChartRestrictionsMock, ChartTrainsMock, ChartYLabelMock } from "@features/home/components/FTV/json";
-import { ModalSearchTrainChartGhtForTable } from "@features/home/components/modals/modalSearchTrainChartGhtForTable/ModalSearchTrainChartGhtForTable";
-import { FTVOfficeMenu } from "@features/home/components/officeMenu/OfficeMenu";
+import { FTVOfficeMenu } from "@features/home/components/headerOfficeMenu/OfficeMenu";
+import { ModalSearchTrainChartGhtForTable } from "@features/home/components/modals/modalSearchTrainChartGhtTable/ModalSearchTrainChartGhtTable";
 import { OfficeMenuProvider } from "@features/home/providers/OfficeMenuProvider/OfficeMenuProvider";
 import { GHTChartMainService } from "@features/home/services/GHTChartMainService";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";

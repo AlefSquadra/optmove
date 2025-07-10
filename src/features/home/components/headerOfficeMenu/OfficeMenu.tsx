@@ -1,5 +1,5 @@
 import { logo } from "@assets/images";
-import { FTVRibbon, type IFTVRibbonProps } from "@features/home/components/officeMenu/FTVRibbon";
+import { FTVRibbon, type IFTVRibbonProps } from "@features/home/components/headerOfficeMenu/FTVRibbon";
 import { useOfficeMenuContext } from "@features/home/providers/OfficeMenuProvider/useOfficeMenu";
 
 interface IOfficeMenuProps extends Partial<IFTVRibbonProps> {
