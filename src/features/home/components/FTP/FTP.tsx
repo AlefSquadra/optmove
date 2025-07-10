@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { IDataContextMenu } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
-import { ModalSearchTrainChartGhtForTable } from "@features/home/components/modals/modalSearchTrainChartGhtForTable/ModalSearchTrainChartGhtForTable";
+
 import { ModalSelectOfficialization } from "@features/home/components/modals/selectOfficialization/ModalSelectOfficialization";
 import { ModalSystemParams } from "@features/home/components/modals/systemParams/ModalSystemParams";
 import { ModalTrainMovements } from "@features/home/components/modals/trainMovements/ModalTrainMovements";
@@ -27,6 +27,7 @@ import {
 import type { IElementEventInPlotG } from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
 import { GHTChartD3 } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import { ChartRestrictionsMock, ChartTrainsMock, ChartYLabelMock } from "@features/home/components/FTV/json";
+import { ModalSearchTrainChartGhtForTable } from "@features/home/components/modals/modalSearchTrainChartGhtForTable/ModalSearchTrainChartGhtForTable";
 import { FTVOfficeMenu } from "@features/home/components/officeMenu/OfficeMenu";
 import { OfficeMenuProvider } from "@features/home/providers/OfficeMenuProvider/OfficeMenuProvider";
 import { GHTChartMainService } from "@features/home/services/GHTChartMainService";
