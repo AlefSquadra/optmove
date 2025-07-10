@@ -13,8 +13,8 @@ const FTVOfficeMenu = (props: IOfficeMenuProps) => {
   return (
     <div className="w-full bg-white">
       <div className="flex items-center border-b border-[#e1e5e9] bg-[#f3f2f1] px-2 py-1">
-        <img src={logo} alt="OptMove" width={24} />
-        <span className="text-sm">
+        <img src={logo} alt="OptMove" style={{ width: "1.5rem", height: "1.5rem" }} />
+        <span style={{ fontSize: "0.875rem" }}>
           OptMove - Baixada Santista - Versão 0.0.1 - Usuário: Alef Santos Soares (CT008311) - AMBIENTE: ORAFH15
           (ADM_THP1)
         </span>
@@ -22,7 +22,10 @@ const FTVOfficeMenu = (props: IOfficeMenuProps) => {
 
       {/* Menu Superior */}
       <div className="flex items-center border-b border-[#e1e5e9] bg-[#f3f2f1]">
-        <span className="ml-2 rounded-t-lg border-x border-t border-[#e1e5e9] bg-[#f8f9fa] p-1 px-3 text-xs text-gray-600">
+        <span
+          className="ml-2 rounded-t-lg border-x border-t border-[#e1e5e9] bg-[#f8f9fa] p-1 px-3 text-gray-600"
+          style={{ fontSize: "0.75rem" }}
+        >
           ICZ-ISN Baixada conceição - santos
         </span>
 

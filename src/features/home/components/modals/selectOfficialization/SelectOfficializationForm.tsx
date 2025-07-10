@@ -54,7 +54,7 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
           placeholder="__/__/__"
           label="Data Início"
           errorMessage={errors.dataInicial?.message}
-          className="w-[9.5rem] md:w-[7.5rem] lg:w-[9.5rem]"
+          className="w-[9.5rem] md:w-[10rem] lg:w-[9.5rem]"
         />
 
         <DatePickerField
@@ -64,7 +64,7 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
           label="Até"
           errorMessage={errors.dataFinal?.message}
           size="medium"
-          className="w-[9.5rem] md:w-[7.5rem] lg:w-[9.5rem]"
+          className="w-[9.5rem] md:w-[10rem] lg:w-[9.5rem]"
         />
 
         <Controller
@@ -72,7 +72,7 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
           control={control}
           render={({ field }) => (
             <Field label="Prefixo" validationMessage={errors.prefix?.message}>
-              <Input {...field} placeholder="Digite o prefixo" className="w-[9.5rem] md:w-[7.5rem] lg:w-[9.5rem]" />
+              <Input {...field} placeholder="Digite o prefixo" className="w-[9.5rem] md:w-[10rem] lg:w-[9.5rem]" />
             </Field>
           )}
         />
@@ -90,7 +90,7 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
                 onOptionSelect={(_, data) => {
                   if (data.optionValue) field.onChange(data.optionValue);
                 }}
-                className="w-[9.5rem] !min-w-[9.5rem] md:w-[7.5rem] lg:w-[9.5rem] lg:!min-w-[9.5rem]"
+                className="w-[9.5rem] !min-w-[9.5rem] md:w-[10rem] lg:w-[9.5rem] lg:!min-w-[9.5rem]"
               >
                 {typeOptions.map((option) => (
                   <Option key={option.key} value={option.key}>
@@ -114,7 +114,7 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
           control={control}
           render={({ field }) => (
             <Field label="Linha do tempo" validationMessage={errors.timelineDatetime?.message}>
-              <Input {...field} type="datetime-local" className="w-[9.5rem] md:w-[11rem] lg:w-[11.5rem]" />
+              <Input {...field} type="datetime-local" className="w-[9.5rem] md:w-[14rem] lg:w-[11.5rem]" />
             </Field>
           )}
         />

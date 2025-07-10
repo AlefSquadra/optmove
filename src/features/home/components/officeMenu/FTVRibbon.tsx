@@ -90,7 +90,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
 
   return (
     <FormProvider {...methods}>
-      <form className="border-bottom flex flex-wrap gap-4 bg-[#f8f9fa] px-4 py-2 md:gap-0">
+      <form className="border-bottom flex flex-wrap gap-4 bg-[#f8f9fa] px-4 py-2 md:gap-2 md:px-2 md:py-1">
         {/* Grupo Filtros */}
         <div className="relative flex flex-col-reverse items-start justify-between gap-1 md:gap-0">
           <div className="relative flex items-start gap-1">
@@ -98,7 +98,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
               name="inputTimelineDatetime"
               control={control}
               render={({ field }) => (
-                <Input {...field} type="datetime-local" className="w-[9.5rem] md:w-[11rem] lg:w-[11.5rem]" />
+                <Input {...field} type="datetime-local" className="w-[9.5rem] md:w-[9rem] lg:w-[11.5rem]" />
               )}
             />
             <ToolbarButton
@@ -131,7 +131,11 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
               name="prefix"
               control={control}
               render={({ field }) => (
-                <Input {...field} placeholder="Prefixo / Tabela" className="h-[1.750rem] w-[11rem] md:w-[8rem]" />
+                <Input
+                  {...field}
+                  placeholder="Prefixo / Tabela"
+                  className="h-[1.750rem] w-[11rem] md:w-[7rem] lg:w-[8rem]"
+                />
               )}
             />
             <Tooltip withArrow content="Pesquisar por prefixo ou tabela" relationship="label">
@@ -317,7 +321,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
                 render={({ field }) => (
                   <Dropdown
                     {...field}
-                    className="w-[180px] !min-w-0"
+                    className="w-[11rem] !min-w-0 md:w-[15rem] lg:w-[12rem]"
                     id={"dropdown-plan"}
                     placeholder="Plano"
                     onOptionSelect={(_, data) => field.onChange(data.optionText ?? "")}
