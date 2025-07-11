@@ -1,5 +1,5 @@
 import type { IFormParamsSystemZod } from "@features/home/components/modals/systemParams/SystemParamsZod";
-import { Checkbox, Field, Input } from "@fluentui/react-components";
+import { OptCheckbox, OptField, OptInput } from "@shared/components/fluentui";
 import { TransferListField } from "@shared/components/forms/TransferListField";
 import type { TransferListItem } from "@shared/components/transferList/TransferList.type";
 import { Controller, useFormContext } from "react-hook-form";
@@ -20,7 +20,7 @@ const TabQueueManagement = () => {
         name="simulation.enableOptmoveSpeedCalculation"
         control={control}
         render={({ field }) => (
-          <Checkbox
+          <OptCheckbox
             checked={field.value}
             onChange={(_, data) => field.onChange(data.checked)}
             label="Desativar a gestão de fila: Exportação"
@@ -43,7 +43,7 @@ const TabQueueManagement = () => {
         name="simulation.enableOptmoveSpeedCalculation"
         control={control}
         render={({ field }) => (
-          <Checkbox
+          <OptCheckbox
             checked={field.value}
             onChange={(_, data) => field.onChange(data.checked)}
             label="Desativar a gestão de fila: Importação"
@@ -61,13 +61,13 @@ const TabQueueManagement = () => {
         disabled
       />
 
-      <Field>
+      <OptField>
         <div className="flex items-center gap-2">
           <span className="min-w-[240px]">Cadenciamento de chegada de trens ZPG</span>
-          <Input type="number" placeholder="0" className="my-2 w-[80px]" aria-label="inline" />
+          <OptInput type="number" placeholder="0" className="my-2 w-[80px]" aria-label="inline" />
           <span>minutos</span>
         </div>
-      </Field>
+      </OptField>
     </>
   );
 };

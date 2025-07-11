@@ -1,6 +1,6 @@
 import type { IPrioridadeParametrizada } from "@features/home/services/PriorizarDestinoService";
 import { PriorizarDestinoService } from "@features/home/services/PriorizarDestinoService";
-import { Button, Checkbox, Dropdown, Option } from "@fluentui/react-components";
+import { OptButton, OptCheckbox, OptDropdown, OptOption } from "@shared/components/fluentui";
 import { OptGridTable } from "@shared/components/gridTable/GridTable";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -89,7 +89,7 @@ export const PriorizarDestinoModal: React.FC<IPriorizarDestinoModalProps> = ({ o
         header: "Pátio",
         enableEditing: true,
         editComponent: ({ cell, column, row, table }) => (
-          <Dropdown
+          <OptDropdown
             placeholder="Selecione"
             value={cell.getValue() ?? ""}
             onOptionSelect={(_, data) =>
@@ -101,11 +101,11 @@ export const PriorizarDestinoModal: React.FC<IPriorizarDestinoModalProps> = ({ o
             }
           >
             {patios.map((p) => (
-              <Option key={p} value={p} text={p}>
+              <OptOption key={p} value={p} text={p}>
                 {p}
-              </Option>
+              </OptOption>
             ))}
-          </Dropdown>
+          </OptDropdown>
         ),
       },
       {
@@ -113,7 +113,7 @@ export const PriorizarDestinoModal: React.FC<IPriorizarDestinoModalProps> = ({ o
         header: "Origem/Destino",
         enableEditing: true,
         editComponent: ({ cell, column, row, table }) => (
-          <Dropdown
+          <OptDropdown
             value={cell.getValue() ?? ""}
             onOptionSelect={(_, data) =>
               (table.options.meta as any).updateMyData(
@@ -123,10 +123,10 @@ export const PriorizarDestinoModal: React.FC<IPriorizarDestinoModalProps> = ({ o
               )
             }
           >
-            <Option value="" text=" " />
-            <Option value="Destino" text="Destino" />
-            <Option value="Origem" text="Origem" />
-          </Dropdown>
+            <OptOption value="" text=" " />
+            <OptOption value="Destino" text="Destino" />
+            <OptOption value="Origem" text="Origem" />
+          </OptDropdown>
         ),
       },
       {
@@ -134,7 +134,7 @@ export const PriorizarDestinoModal: React.FC<IPriorizarDestinoModalProps> = ({ o
         header: "Lotação",
         enableEditing: true,
         editComponent: ({ cell, column, row, table }) => (
-          <Dropdown
+          <OptDropdown
             value={cell.getValue() ?? ""}
             onOptionSelect={(_, data) =>
               (table.options.meta as any).updateMyData(
@@ -144,10 +144,10 @@ export const PriorizarDestinoModal: React.FC<IPriorizarDestinoModalProps> = ({ o
               )
             }
           >
-            <Option value="" text=" " />
-            <Option value="Carregado" text="Carregado" />
-            <Option value="Vazio" text="Vazio" />
-          </Dropdown>
+            <OptOption value="" text=" " />
+            <OptOption value="Carregado" text="Carregado" />
+            <OptOption value="Vazio" text="Vazio" />
+          </OptDropdown>
         ),
       },
       {
@@ -155,7 +155,7 @@ export const PriorizarDestinoModal: React.FC<IPriorizarDestinoModalProps> = ({ o
         header: "Produto",
         enableEditing: true,
         editComponent: ({ cell, column, row, table }) => (
-          <Dropdown
+          <OptDropdown
             value={cell.getValue() ?? ""}
             onOptionSelect={(_, data) =>
               (table.options.meta as any).updateMyData(
@@ -166,11 +166,11 @@ export const PriorizarDestinoModal: React.FC<IPriorizarDestinoModalProps> = ({ o
             }
           >
             {produtos.map((p) => (
-              <Option key={p} value={p} text={p}>
+              <OptOption key={p} value={p} text={p}>
                 {p}
-              </Option>
+              </OptOption>
             ))}
-          </Dropdown>
+          </OptDropdown>
         ),
       },
       {
@@ -178,7 +178,7 @@ export const PriorizarDestinoModal: React.FC<IPriorizarDestinoModalProps> = ({ o
         header: "Terminal",
         enableEditing: true,
         editComponent: ({ cell, column, row, table }) => (
-          <Dropdown
+          <OptDropdown
             value={cell.getValue() ?? ""}
             onOptionSelect={(_, data) =>
               (table.options.meta as any).updateMyData(
@@ -189,11 +189,11 @@ export const PriorizarDestinoModal: React.FC<IPriorizarDestinoModalProps> = ({ o
             }
           >
             {terminais.map((t) => (
-              <Option key={t} value={t} text={t}>
+              <OptOption key={t} value={t} text={t}>
                 {t}
-              </Option>
+              </OptOption>
             ))}
-          </Dropdown>
+          </OptDropdown>
         ),
       },
     ],
@@ -205,7 +205,7 @@ export const PriorizarDestinoModal: React.FC<IPriorizarDestinoModalProps> = ({ o
       {/* Toolbar */}
       <WindowModal.Header>
         <div className="flex items-center gap-2 p-2">
-          <Button
+          <OptButton
             onClick={() =>
               setGridData((old) => [
                 ...old,
@@ -221,8 +221,8 @@ export const PriorizarDestinoModal: React.FC<IPriorizarDestinoModalProps> = ({ o
             }
           >
             Adicionar
-          </Button>
-          <Button
+          </OptButton>
+          <OptButton
             onClick={() => {
               const ids = Object.keys(rowSelection);
               setGridData((old) => old.filter((r) => !ids.includes(r.id)));
@@ -230,10 +230,10 @@ export const PriorizarDestinoModal: React.FC<IPriorizarDestinoModalProps> = ({ o
             }}
           >
             Remover
-          </Button>
-          <Button onClick={() => refreshMemoryMutation.mutate()}>Recarregar Memória</Button>
-          <Button onClick={() => refreshDBMutation.mutate()}>Recarregar BD</Button>
-          <Checkbox label="Itens Ordenados" checked={ordered} onChange={(_, d) => setOrdered(d.checked === true)} />
+          </OptButton>
+          <OptButton onClick={() => refreshMemoryMutation.mutate()}>Recarregar Memória</OptButton>
+          <OptButton onClick={() => refreshDBMutation.mutate()}>Recarregar BD</OptButton>
+          <OptCheckbox label="Itens Ordenados" checked={ordered} onChange={(_, d) => setOrdered(d.checked === true)} />
         </div>
       </WindowModal.Header>
 
@@ -271,8 +271,8 @@ export const PriorizarDestinoModal: React.FC<IPriorizarDestinoModalProps> = ({ o
       {/* Footer */}
       <WindowModal.Footer>
         <div className="flex justify-end gap-2 p-2">
-          <Button onClick={onClose}>Cancelar</Button>
-          <Button
+          <OptButton onClick={onClose}>Cancelar</OptButton>
+          <OptButton
             appearance="primary"
             disabled={saveMutation.isPending}
             onClick={() =>
@@ -281,7 +281,7 @@ export const PriorizarDestinoModal: React.FC<IPriorizarDestinoModalProps> = ({ o
             }
           >
             {saveMutation.isPending ? "Salvando..." : "Ok"}
-          </Button>
+          </OptButton>
         </div>
       </WindowModal.Footer>
     </WindowModal>

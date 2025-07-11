@@ -1,25 +1,25 @@
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
 import {
-  Button,
-  DataGrid,
-  DataGridBody,
-  DataGridCell,
-  DataGridHeader,
-  DataGridHeaderCell,
-  DataGridRow,
-  Field,
-  Input,
-  Menu,
-  MenuItem,
-  MenuList,
-  MenuPopover,
-  MenuTrigger,
-  TableCellLayout,
-  createTableColumn,
-  type DataGridProps,
-  type TableColumnDefinition,
-  type TableRowId,
-} from "@fluentui/react-components";
+  OptButton,
+  OptDataGrid,
+  OptDataGridBody,
+  OptDataGridCell,
+  OptDataGridHeader,
+  OptDataGridHeaderCell,
+  OptDataGridRow,
+  OptField,
+  OptInput,
+  OptMenu,
+  OptMenuItem,
+  OptMenuList,
+  OptMenuPopover,
+  OptMenuTrigger,
+  OptTableCellLayout,
+  optCreateTableColumn,
+  type OptDataGridProps,
+  type OptTableColumnDefinition,
+  type OptTableRowId,
+} from "@shared/components/fluentui";
 import { ArrowSyncRegular, Search20Regular } from "@fluentui/react-icons";
 import { TabWindowHeader } from "@shared/components/tabWindowHeader/tabWindowHeader";
 import { useQuery } from "@tanstack/react-query";
@@ -39,8 +39,8 @@ interface ISearchFormData {
   destination: string;
 }
 
-const columns: TableColumnDefinition<IActivitiesAltersData>[] = [
-  createTableColumn<IActivitiesAltersData>({
+const columns: OptTableColumnDefinition<IActivitiesAltersData>[] = [
+  optCreateTableColumn<IActivitiesAltersData>({
     columnId: "trem",
     compare: (a, b) => {
       return a.trem.localeCompare(b.trem);
@@ -49,10 +49,10 @@ const columns: TableColumnDefinition<IActivitiesAltersData>[] = [
       return "Trem";
     },
     renderCell: (item) => {
-      return <TableCellLayout truncate>{item.trem}</TableCellLayout>;
+      return <OptTableCellLayout truncate>{item.trem}</OptTableCellLayout>;
     },
   }),
-  createTableColumn<IActivitiesAltersData>({
+  optCreateTableColumn<IActivitiesAltersData>({
     columnId: "location",
     compare: (a, b) => {
       return a.location.localeCompare(b.location);
@@ -61,10 +61,10 @@ const columns: TableColumnDefinition<IActivitiesAltersData>[] = [
       return "location";
     },
     renderCell: (item) => {
-      return <TableCellLayout truncate>{item.location}</TableCellLayout>;
+      return <OptTableCellLayout truncate>{item.location}</OptTableCellLayout>;
     },
   }),
-  createTableColumn<IActivitiesAltersData>({
+  optCreateTableColumn<IActivitiesAltersData>({
     columnId: "duration",
     compare: (a, b) => {
       return a.duration.localeCompare(b.duration);
@@ -73,10 +73,10 @@ const columns: TableColumnDefinition<IActivitiesAltersData>[] = [
       return "duration";
     },
     renderCell: (item) => {
-      return <TableCellLayout truncate>{item.duration}</TableCellLayout>;
+      return <OptTableCellLayout truncate>{item.duration}</OptTableCellLayout>;
     },
   }),
-  createTableColumn<IActivitiesAltersData>({
+  optCreateTableColumn<IActivitiesAltersData>({
     columnId: "endDate",
     compare: (a, b) => {
       return a.endDate.localeCompare(b.endDate);
@@ -85,13 +85,13 @@ const columns: TableColumnDefinition<IActivitiesAltersData>[] = [
       return "Destino";
     },
     renderCell: (item) => {
-      return <TableCellLayout truncate>{item.endDate}</TableCellLayout>;
+      return <OptTableCellLayout truncate>{item.endDate}</OptTableCellLayout>;
     },
   }),
 ];
 
 const GridChangedActivities = () => {
-  const [selectedRows, setSelectedRows] = useState(new Set<TableRowId>([]));
+  const [selectedRows, setSelectedRows] = useState(new Set<OptTableRowId>([]));
   const { setSelectedPanelTabBarLeft } = useFTLayout();
   const refMap = React.useRef<Record<string, HTMLElement | null>>({});
 
@@ -122,7 +122,7 @@ const GridChangedActivities = () => {
 
   const stabilizedData = data || [];
 
-  const onSelectionChange: DataGridProps["onSelectionChange"] = (_, data) => {
+  const onSelectionChange: OptDataGridProps["onSelectionChange"] = (_, data) => {
     setSelectedRows(data.selectedItems);
   };
 
@@ -146,9 +146,9 @@ const GridChangedActivities = () => {
             name="prefix"
             control={control}
             render={({ field }) => (
-              <Field validationMessage={errors.prefix?.message}>
-                <Input {...field} placeholder="Prefixo trem" style={{ width: 100 }} />
-              </Field>
+              <OptField validationMessage={errors.prefix?.message}>
+                <OptInput {...field} placeholder="Prefixo trem" style={{ width: 100 }} />
+              </OptField>
             )}
           />
 
@@ -156,19 +156,19 @@ const GridChangedActivities = () => {
             name="destination"
             control={control}
             render={({ field }) => (
-              <Field validationMessage={errors.destination?.message}>
-                <Input {...field} placeholder="local" style={{ width: 100 }} />
-              </Field>
+              <OptField validationMessage={errors.destination?.message}>
+                <OptInput {...field} placeholder="local" style={{ width: 100 }} />
+              </OptField>
             )}
           />
 
-          <Button type="submit" appearance="primary" icon={<Search20Regular />} />
+          <OptButton type="submit" appearance="primary" icon={<Search20Regular />} />
 
-          <Button type="button" appearance="secondary" onClick={() => {}} icon={<ArrowSyncRegular />}></Button>
+          <OptButton type="button" appearance="secondary" onClick={() => {}} icon={<ArrowSyncRegular />}></OptButton>
         </form>
 
         <div style={{ height: "100%", overflow: "auto" }}>
-          <DataGrid
+          <OptDataGrid
             items={stabilizedData}
             columns={columns}
             sortable
@@ -181,45 +181,45 @@ const GridChangedActivities = () => {
             selectedItems={selectedRows}
             onSelectionChange={onSelectionChange}
           >
-            <DataGridHeader>
-              <DataGridRow
+            <OptDataGridHeader>
+              <OptDataGridRow
                 selectionCell={{
                   checkboxIndicator: { "aria-label": "Select all rows" },
                 }}
               >
                 {({ renderHeaderCell, columnId }, dataGrid) =>
                   dataGrid.resizableColumns ?
-                    <Menu openOnContext>
-                      <MenuTrigger>
-                        <DataGridHeaderCell ref={(el) => (refMap.current[columnId] = el)}>
-                          {renderHeaderCell()}
-                        </DataGridHeaderCell>
-                      </MenuTrigger>
-                      <MenuPopover>
-                        <MenuList>
-                          <MenuItem onClick={dataGrid.columnSizing_unstable.enableKeyboardMode(columnId)}>
+                    <OptMenu openOnContext>
+                      <OptMenuTrigger>
+                        <OptDataGridHeaderCell>
+                          <div ref={(el: any) => (refMap.current[columnId] = el)}>{renderHeaderCell()}</div>
+                        </OptDataGridHeaderCell>
+                      </OptMenuTrigger>
+                      <OptMenuPopover>
+                        <OptMenuList>
+                          <OptMenuItem onClick={dataGrid.columnSizing_unstable.enableKeyboardMode(columnId)}>
                             Keyboard Column Resizing
-                          </MenuItem>
-                        </MenuList>
-                      </MenuPopover>
-                    </Menu>
-                  : <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
+                          </OptMenuItem>
+                        </OptMenuList>
+                      </OptMenuPopover>
+                    </OptMenu>
+                  : <OptDataGridHeaderCell>{renderHeaderCell()}</OptDataGridHeaderCell>
                 }
-              </DataGridRow>
-            </DataGridHeader>
-            <DataGridBody<IActivitiesAltersData>>
+              </OptDataGridRow>
+            </OptDataGridHeader>
+            <OptDataGridBody>
               {({ item, rowId }) => (
-                <DataGridRow<IActivitiesAltersData>
+                <OptDataGridRow
                   key={rowId}
                   selectionCell={{
                     checkboxIndicator: { "aria-label": "Select row" },
                   }}
                 >
-                  {({ renderCell }) => <DataGridCell>{renderCell(item)}</DataGridCell>}
-                </DataGridRow>
+                  {({ renderCell }) => <OptDataGridCell>{renderCell(item)}</OptDataGridCell>}
+                </OptDataGridRow>
               )}
-            </DataGridBody>
-          </DataGrid>
+            </OptDataGridBody>
+          </OptDataGrid>
         </div>
       </div>
     </div>

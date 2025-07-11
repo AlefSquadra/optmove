@@ -1,4 +1,4 @@
-import { Text } from "@fluentui/react-components";
+import { OptText } from "@shared/components/fluentui";
 import type { TransferListItemRenderProps } from "@shared/components/transferList/TransferList.type";
 
 export const DefaultItemRenderer: React.FC<TransferListItemRenderProps> = ({
@@ -13,8 +13,8 @@ export const DefaultItemRenderer: React.FC<TransferListItemRenderProps> = ({
     } ${disabled ? "cursor-not-allowed opacity-50" : ""} ${item.disabled ? "cursor-not-allowed opacity-50" : ""} `}
     onClick={() => !disabled && !item.disabled && onToggle(item)}
   >
-    <Text size={300} weight="medium">
+    <OptText size={300} weight="medium">
       {item.label}
-    </Text>
+    </OptText>
   </div>
 );

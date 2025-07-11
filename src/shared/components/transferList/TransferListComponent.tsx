@@ -1,4 +1,4 @@
-import { Button, Input, Text } from "@fluentui/react-components";
+import { OptButton, OptInput, OptText } from "@shared/components/fluentui";
 import { Search24Regular } from "@fluentui/react-icons";
 import { DefaultItemRenderer } from "@shared/components/transferList/DefaultItemRenderer";
 import type { ITransferListComponentProps } from "@shared/components/transferList/TransferList.type";
@@ -26,18 +26,18 @@ export const TransferListComponent: React.FC<ITransferListComponentProps> = ({
       {showHeader && (
         <div className="flex-shrink-0 pb-3">
           <div className="flex items-center justify-between">
-            <Text size={200} weight="semibold" className="text-gray-800">
+            <OptText size={200} weight="semibold" className="text-gray-800">
               {title}
               {showCounts && (
-                <Text size={300} weight="regular" className="ml-2 text-gray-500">
+                <OptText size={300} weight="regular" className="ml-2 text-gray-500">
                   ({selectedItems.length}/{filteredItems.length})
-                </Text>
+                </OptText>
               )}
-            </Text>
+            </OptText>
             {filteredItems.length > 0 && (
-              <Button appearance="subtle" size="small" onClick={onToggleAll} disabled={disabled}>
-                <Text size={200}>{allSelected ? "Desmarcar todos" : "Marcar todos"}</Text>
-              </Button>
+              <OptButton appearance="subtle" size="small" onClick={onToggleAll} disabled={disabled}>
+                <OptText size={200}>{allSelected ? "Desmarcar todos" : "Marcar todos"}</OptText>
+              </OptButton>
             )}
           </div>
         </div>
@@ -45,7 +45,7 @@ export const TransferListComponent: React.FC<ITransferListComponentProps> = ({
 
       {showSearch && (
         <div className="flex-shrink-0 pb-3">
-          <Input
+          <OptInput
             contentBefore={<Search24Regular />}
             placeholder="Buscar itens..."
             value={searchValue}
@@ -60,9 +60,9 @@ export const TransferListComponent: React.FC<ITransferListComponentProps> = ({
         <div className="h-full overflow-y-auto p-2">
           {filteredItems.length === 0 ?
             <div className="flex h-32 items-center justify-center">
-              <Text size={300} className="text-gray-500">
+              <OptText size={300} className="text-gray-500">
                 Nenhum item encontrado
-              </Text>
+              </OptText>
             </div>
           : <div className="space-y-1">
               {filteredItems.map((item) => {

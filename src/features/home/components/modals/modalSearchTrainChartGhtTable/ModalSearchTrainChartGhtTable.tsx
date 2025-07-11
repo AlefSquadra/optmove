@@ -1,5 +1,5 @@
 import { useGlobalDialog } from "@app/providers/GlobalDialogProvider/UseGlobalDialogContext";
-import { Button, Text } from "@fluentui/react-components";
+import { OptButton, OptText } from "@shared/components/fluentui";
 import { OptGridTable } from "@shared/components/gridTable/GridTable";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import dayjs from "dayjs";
@@ -70,7 +70,7 @@ export const ModalSearchTrainChartGhtForTable = ({
   return (
     <WindowModal title="Busca por tabela" initialWidth={"35%"} initialHeight={"50%"} open={open} onClose={onClose}>
       <WindowModal.Header>
-        <Text>Os trens abaixo pertencem a tabela pesquisada. Qual deseja pesquisar?</Text>
+        <OptText>Os trens abaixo pertencem a tabela pesquisada. Qual deseja pesquisar?</OptText>
       </WindowModal.Header>
       <WindowModal.Body>
         <OptGridTable
@@ -92,10 +92,10 @@ export const ModalSearchTrainChartGhtForTable = ({
       </WindowModal.Body>
       <WindowModal.Footer>
         <div className="flex justify-end gap-2">
-          <Button onClick={handleCancelClick}>Cancelar</Button>
-          <Button appearance="primary" onClick={handleOkClick}>
+          <OptButton onClick={handleCancelClick}>Cancelar</OptButton>
+          <OptButton appearance="primary" onClick={handleOkClick}>
             Ok
-          </Button>
+          </OptButton>
         </div>
       </WindowModal.Footer>
     </WindowModal>

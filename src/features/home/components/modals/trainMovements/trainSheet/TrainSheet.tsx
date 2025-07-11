@@ -1,7 +1,7 @@
 import { GridEquipage } from "@features/home/components/modals/trainMovements/GridEquipage";
-import { Divider, Text } from "@fluentui/react-components";
+import { OptDivider, OptText } from "@shared/components/fluentui";
 import { MantineProvider } from "@mantine/core";
-import { OptTabList } from "@shared/components/optTabList/OptTabList";
+import { OptTabList } from "@shared/components/optTabList";
 import { TransferList } from "@shared/components/transferList/TransferList";
 
 const TrainSheet = () => {
@@ -30,58 +30,58 @@ const TrainSheet = () => {
         <OptTabList.Element value="trainSheet" className="grid h-full grid-cols-1 grid-rows-[auto_auto_1fr] px-4">
           <div className="grid grid-cols-4 gap-4">
             <div className="flex gap-2">
-              <Text>Prefixo: </Text>
-              <Text weight="bold">{data.prefix} </Text>
+              <OptText>Prefixo: </OptText>
+              <OptText weight="bold">{data.prefix} </OptText>
             </div>
             <div className="flex gap-2">
-              <Text>Origem: </Text>
-              <Text weight="bold">{data.origin} </Text>
+              <OptText>Origem: </OptText>
+              <OptText weight="bold">{data.origin} </OptText>
             </div>
             <div className="flex gap-2">
-              <Text>Previsão Saida: </Text>
-              <Text weight="bold">{data.previsionOut} </Text>
+              <OptText>Previsão Saida: </OptText>
+              <OptText weight="bold">{data.previsionOut} </OptText>
             </div>
             <div className="flex gap-2">
-              <Text>Carga geral: </Text>
-              <Text weight="bold">Não definida </Text>
-            </div>
-
-            <div className="flex gap-2">
-              <Text>Destino Plano: </Text>
-              <Text weight="bold">{data.destinePlan} </Text>
-            </div>
-            <div className="flex gap-2">
-              <Text>Destino trem: </Text>
-              <Text weight="bold">{data.destineTrain} </Text>
+              <OptText>Carga geral: </OptText>
+              <OptText weight="bold">Não definida </OptText>
             </div>
 
             <div className="flex gap-2">
-              <Text>Comprimento: </Text>
-              <Text weight="bold">{data.length} </Text>
+              <OptText>Destino Plano: </OptText>
+              <OptText weight="bold">{data.destinePlan} </OptText>
+            </div>
+            <div className="flex gap-2">
+              <OptText>Destino trem: </OptText>
+              <OptText weight="bold">{data.destineTrain} </OptText>
             </div>
 
             <div className="flex gap-2">
-              <Text>Peso: </Text>
-              <Text weight="bold">{data.weight} </Text>
+              <OptText>Comprimento: </OptText>
+              <OptText weight="bold">{data.length} </OptText>
             </div>
 
             <div className="flex gap-2">
-              <Text>VMA: </Text>
-              <Text weight="bold">{data.VMA} </Text>
+              <OptText>Peso: </OptText>
+              <OptText weight="bold">{data.weight} </OptText>
             </div>
 
             <div className="flex gap-2">
-              <Text>LXA: </Text>
-              <Text weight="bold">{data.LXA} </Text>
+              <OptText>VMA: </OptText>
+              <OptText weight="bold">{data.VMA} </OptText>
             </div>
 
             <div className="flex gap-2">
-              <Text>Necessidade porto: </Text>
-              <Text weight="bold">{data.port} </Text>
+              <OptText>LXA: </OptText>
+              <OptText weight="bold">{data.LXA} </OptText>
+            </div>
+
+            <div className="flex gap-2">
+              <OptText>Necessidade porto: </OptText>
+              <OptText weight="bold">{data.port} </OptText>
             </div>
           </div>
 
-          <Divider className="mt-4" />
+          <OptDivider className="mt-4" />
 
           <OptTabList
             items={[

@@ -1,5 +1,5 @@
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
-import { Dropdown, Field, Input, Option, Radio, RadioGroup } from "@fluentui/react-components";
+import { OptDropdown, OptField, OptInput, OptOption, OptRadio, OptRadioGroup } from "@shared/components/fluentui";
 import { TabWindowHeader } from "@shared/components/tabWindowHeader/tabWindowHeader";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -16,7 +16,7 @@ export interface TrainEditFormData {
   segmentEnd: string;
 }
 
-const typeOptions = [
+const typeOptOptions = [
   { key: "OFICIALIZADO", text: "OFICIALIZADO" },
   { key: "PUBLICADO", text: "PUBLICADO" },
   { key: "TODOS", text: "TODOS" },
@@ -75,9 +75,9 @@ const TrainEditForm = () => {
             name="prefix"
             control={control}
             render={({ field }) => (
-              <Field label="Prefixo" validationMessage={errors.prefix?.message}>
-                <Input readOnly {...field} placeholder="Digite o prefixo" />
-              </Field>
+              <OptField label="Prefixo" validationMessage={errors.prefix?.message}>
+                <OptInput readOnly {...field} placeholder="Digite o prefixo" />
+              </OptField>
             )}
           />
 
@@ -85,8 +85,8 @@ const TrainEditForm = () => {
             name="table"
             control={control}
             render={({ field }) => (
-              <Field label="Tabela" validationMessage={errors.table?.message} className="min-w-38">
-                <Dropdown
+              <OptField label="Tabela" validationMessage={errors.table?.message} className="min-w-38">
+                <OptDropdown
                   placeholder="Selecione"
                   value={field.value}
                   // selectedKey={field.value}
@@ -98,13 +98,13 @@ const TrainEditForm = () => {
                   // Remova disabled se quiser deixar editável
                   disabled
                 >
-                  {typeOptions.map((option) => (
-                    <Option key={option.key} value={option.key}>
+                  {typeOptOptions.map((option) => (
+                    <OptOption key={option.key} value={option.key}>
                       {option.text}
-                    </Option>
+                    </OptOption>
                   ))}
-                </Dropdown>
-              </Field>
+                </OptDropdown>
+              </OptField>
             )}
           />
 
@@ -112,9 +112,9 @@ const TrainEditForm = () => {
             name="tipo"
             control={control}
             render={({ field }) => (
-              <Field label="Tipo" validationMessage={errors.tipo?.message}>
-                <Input readOnly {...field} placeholder="Tipo do trem" />
-              </Field>
+              <OptField label="Tipo" validationMessage={errors.tipo?.message}>
+                <OptInput readOnly {...field} placeholder="Tipo do trem" />
+              </OptField>
             )}
           />
 
@@ -122,9 +122,9 @@ const TrainEditForm = () => {
             name="groupVPM"
             control={control}
             render={({ field }) => (
-              <Field label="Grupo VPM" validationMessage={errors.groupVPM?.message}>
-                <Input readOnly {...field} placeholder="Grupo VPM" />
-              </Field>
+              <OptField label="Grupo VPM" validationMessage={errors.groupVPM?.message}>
+                <OptInput readOnly {...field} placeholder="Grupo VPM" />
+              </OptField>
             )}
           />
 
@@ -133,12 +133,12 @@ const TrainEditForm = () => {
             control={control}
             rules={{ required: "Selecione uma opção" }}
             render={({ field }) => (
-              <Field label="Lotação" validationMessage={errors.lotation?.message}>
-                <RadioGroup {...field} value={field.value} onChange={(_, data) => field.onChange(data.value)}>
-                  <Radio value="loaded" label="Carregado" />
-                  <Radio value="empty" label="Vazio" />
-                </RadioGroup>
-              </Field>
+              <OptField label="Lotação" validationMessage={errors.lotation?.message}>
+                <OptRadioGroup {...field} value={field.value} onChange={(_, data) => field.onChange(data.value)}>
+                  <OptRadio value="loaded" label="Carregado" />
+                  <OptRadio value="empty" label="Vazio" />
+                </OptRadioGroup>
+              </OptField>
             )}
           />
 
@@ -146,9 +146,9 @@ const TrainEditForm = () => {
             name="length"
             control={control}
             render={({ field }) => (
-              <Field label="Comprimento" validationMessage={errors.length?.message}>
-                <Input readOnly {...field} placeholder="Comprimento" />
-              </Field>
+              <OptField label="Comprimento" validationMessage={errors.length?.message}>
+                <OptInput readOnly {...field} placeholder="Comprimento" />
+              </OptField>
             )}
           />
 
@@ -156,9 +156,9 @@ const TrainEditForm = () => {
             name="vma"
             control={control}
             render={({ field }) => (
-              <Field label="VMA" validationMessage={errors.vma?.message}>
-                <Input readOnly {...field} placeholder="VMA" />
-              </Field>
+              <OptField label="VMA" validationMessage={errors.vma?.message}>
+                <OptInput readOnly {...field} placeholder="VMA" />
+              </OptField>
             )}
           />
 
@@ -166,9 +166,9 @@ const TrainEditForm = () => {
             name="segmentCut"
             control={control}
             render={({ field }) => (
-              <Field label="Seg. Corte" validationMessage={errors.segmentCut?.message}>
-                <Input readOnly {...field} placeholder="ICZ" />
-              </Field>
+              <OptField label="Seg. Corte" validationMessage={errors.segmentCut?.message}>
+                <OptInput readOnly {...field} placeholder="ICZ" />
+              </OptField>
             )}
           />
 
@@ -176,9 +176,9 @@ const TrainEditForm = () => {
             name="segmentEnd"
             control={control}
             render={({ field }) => (
-              <Field label="Seg. Fim" validationMessage={errors.segmentEnd?.message}>
-                <Input readOnly {...field} placeholder="ZPG" />
-              </Field>
+              <OptField label="Seg. Fim" validationMessage={errors.segmentEnd?.message}>
+                <OptInput readOnly {...field} placeholder="ZPG" />
+              </OptField>
             )}
           />
         </form>

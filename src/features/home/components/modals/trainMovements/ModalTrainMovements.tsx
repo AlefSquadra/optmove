@@ -1,6 +1,6 @@
 import type { IDataContextMenu } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
 import Example from "@features/home/components/modals/trainMovements/GridTrainMovements";
-import { Button, type OnSelectionChangeData } from "@fluentui/react-components";
+import { OptButton, type OnSelectionChangeData } from "@shared/components/fluentui";
 import { MantineProvider } from "@mantine/core";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import type { IModalData } from "@shared/types/IModalData.type";
@@ -15,7 +15,7 @@ interface IModalTrainMovementsProps {
 import { GridEquipage } from "@features/home/components/modals/trainMovements/GridEquipage";
 import { TrainSheet } from "@features/home/components/modals/trainMovements/trainSheet/TrainSheet";
 import { createTheme } from "@mantine/core";
-import { OptTabList } from "@shared/components/optTabList/OptTabList";
+import { OptTabList } from "@shared/components/optTabList";
 
 const theme = createTheme({
   fontFamily:
@@ -73,10 +73,10 @@ const ModalTrainMovements = (props: IModalTrainMovementsProps) => {
 
         <WindowModal.Footer>
           <div className="flex justify-end gap-2">
-            <Button>Cancelar</Button>
-            <Button appearance="primary" onClick={handleCloseModal}>
+            <OptButton>Cancelar</OptButton>
+            <OptButton appearance="primary" onClick={handleCloseModal}>
               Salvar
-            </Button>
+            </OptButton>
           </div>
         </WindowModal.Footer>
       </WindowModal>

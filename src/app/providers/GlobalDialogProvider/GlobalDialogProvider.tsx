@@ -1,6 +1,12 @@
 import { GlobalDialogContext } from "@app/providers/GlobalDialogProvider/GlobalDialogContext";
 import type { DialogConfig } from "@app/providers/GlobalDialogProvider/GlobalDialogProvder.types";
-import { Button, DialogActions, DialogBody, DialogSurface, DialogTitle } from "@fluentui/react-components";
+import {
+  OptButton,
+  OptDialogActions,
+  OptDialogBody,
+  OptDialogSurface,
+  OptDialogTitle,
+} from "@shared/components/fluentui";
 import { useCallback, useEffect, useState } from "react";
 
 export const GlobalDialogProvider = ({ children }: { children: React.ReactNode }) => {
@@ -35,24 +41,24 @@ export const GlobalDialogProvider = ({ children }: { children: React.ReactNode }
 
       {open && dialogConfig && (
         <>
-          <DialogSurface style={dialogConfig.style}>
-            <DialogBody>
-              <DialogTitle>{dialogConfig.title}</DialogTitle>
+          <OptDialogSurface style={dialogConfig.style}>
+            <OptDialogBody>
+              <OptDialogTitle>{dialogConfig.title}</OptDialogTitle>
               <div className="col-span-2 w-full py-2">{dialogConfig.content}</div>
-              <DialogActions>
+              <OptDialogActions>
                 {dialogConfig.cancelText && (
-                  <Button onClick={closeDialog} appearance="secondary">
+                  <OptButton onClick={closeDialog} appearance="secondary">
                     {dialogConfig.cancelText}
-                  </Button>
+                  </OptButton>
                 )}
                 {dialogConfig.confirmText && (
-                  <Button onClick={handleConfirm} appearance="primary">
+                  <OptButton onClick={handleConfirm} appearance="primary">
                     {dialogConfig.confirmText}
-                  </Button>
+                  </OptButton>
                 )}
-              </DialogActions>
-            </DialogBody>
-          </DialogSurface>
+              </OptDialogActions>
+            </OptDialogBody>
+          </OptDialogSurface>
         </>
       )}
     </GlobalDialogContext.Provider>

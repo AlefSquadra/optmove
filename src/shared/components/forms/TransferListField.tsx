@@ -1,4 +1,4 @@
-import { Field } from "@fluentui/react-components";
+import { OptField } from "@shared/components/fluentui";
 import { TransferList } from "@shared/components/transferList/TransferList";
 import type { TransferListItem, TransferListProps } from "@shared/components/transferList/TransferList.type";
 import React from "react";
@@ -37,7 +37,7 @@ export const TransferListField: React.FC<TransferListFieldProps> = ({
         const currentRight = field.value;
 
         return (
-          <Field label={label} validationMessage={fieldError} validationState={fieldError ? "error" : "none"}>
+          <OptField label={label} validationMessage={fieldError} validationState={fieldError ? "error" : "none"}>
             <TransferList
               {...rest}
               leftItems={currentLeft}
@@ -46,7 +46,7 @@ export const TransferListField: React.FC<TransferListFieldProps> = ({
                 field.onChange(updatedRight);
               }}
             />
-          </Field>
+          </OptField>
         );
       }}
     />
