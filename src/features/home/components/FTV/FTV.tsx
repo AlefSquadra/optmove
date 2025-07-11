@@ -96,13 +96,22 @@ const FTVLayout = () => {
   }, [setCursorPointer]);
 
   const { initialDate, dateTimeLine, finalDate } = useMemo(() => {
-    const baseDate = new Date("2025-06-30T16:12:32+00:00");
+    const isoString = selectedOfficialization?.officializationForm.timelineDatetime;
+    if (!isoString)
+      return {
+        initialDate: new Date(),
+        dateTimeLine: new Date(),
+        finalDate: new Date(),
+      };
+
+    const baseDate = dayjs.utc(isoString); // garante que trabalha em UTC
+
     return {
-      initialDate: dayjs(baseDate).subtract(6, "hour").toDate(),
-      dateTimeLine: baseDate,
-      finalDate: new Date("2025-07-02T23:12:32+00:00"),
+      initialDate: baseDate.subtract(6, "hour").toDate(),
+      dateTimeLine: baseDate.toDate(),
+      finalDate: baseDate.add(2, "day").toDate(),
     };
-  }, []);
+  }, [selectedOfficialization]);
 
   const handleMouseMoveInRestriction = useCallback(
     (data) => {
