@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { IDataContextMenu } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
 import { ModalSelectOfficialization } from "@features/home/components/modals/selectOfficialization/ModalSelectOfficialization";
 import { ModalSystemParams } from "@features/home/components/modals/systemParams/ModalSystemParams";
 import { ModalTrainMovements } from "@features/home/components/modals/trainMovements/ModalTrainMovements";
@@ -23,7 +22,10 @@ import {
   GHTChartProvider,
   useGHTChartContext,
 } from "@features/home/components/charts/GHTChart/provider/GHTChartProvider";
-import type { IElementEventInPlotG } from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
+import type {
+  IElementEventInPlotG,
+  TrainMovementsElementEventDataType,
+} from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
 import { GHTChartD3 } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import { ChartRestrictionsMock, ChartTrainsMock, ChartYLabelMock } from "@features/home/components/FTV/json";
 import { FTVOfficeMenu } from "@features/home/components/headerOfficeMenu/OfficeMenu";
@@ -38,7 +40,7 @@ import dayjs from "dayjs";
 const FTVLayout = () => {
   const { setCursorPointer, mouseOverInElementData, setMouseOverInElementData } = useGHTChartContext();
   const FTContentRef = useRef<HTMLDivElement>(null);
-  const [openTrainMovements, setOpenTrainMovements] = useState<IModalData<IDataContextMenu>>({
+  const [openTrainMovements, setOpenTrainMovements] = useState<IModalData<TrainMovementsElementEventDataType>>({
     isOpen: false,
   });
   const [highlightedPrefix, setHighlightedPrefix] = useState<string | null>(null);

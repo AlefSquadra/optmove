@@ -1,38 +1,24 @@
-import type { IDataContextMenu } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
-import Example from "@features/home/components/modals/trainMovements/GridTrainMovements";
+import type { TrainMovementsElementEventDataType } from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
+import { GridEquipage } from "@features/home/components/modals/trainMovements/GridEquipage";
+import GridTrainMovements from "@features/home/components/modals/trainMovements/GridTrainMovements";
+import { TrainSheet } from "@features/home/components/modals/trainMovements/trainSheet/TrainSheet";
 import { OptButton, type OnSelectionChangeData } from "@shared/components/fluentui";
-import { MantineProvider } from "@mantine/core";
+import { OptTabList } from "@shared/components/optTabList";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import type { IModalData } from "@shared/types/IModalData.type";
 import { useState } from "react";
 
 interface IModalTrainMovementsProps {
   onSelectedPlans?: (data: OnSelectionChangeData) => void;
-  openTrainMovements: IModalData<IDataContextMenu>;
-  setOpenTrainMovements: React.Dispatch<React.SetStateAction<IModalData<IDataContextMenu>>>;
+  openTrainMovements: IModalData<TrainMovementsElementEventDataType>;
+  setOpenTrainMovements: React.Dispatch<React.SetStateAction<IModalData<TrainMovementsElementEventDataType>>>;
 }
-
-import { GridEquipage } from "@features/home/components/modals/trainMovements/GridEquipage";
-import { TrainSheet } from "@features/home/components/modals/trainMovements/trainSheet/TrainSheet";
-import { createTheme } from "@mantine/core";
-import { OptTabList } from "@shared/components/optTabList";
-
-const theme = createTheme({
-  fontFamily:
-    "'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif",
-  fontFamilyMonospace: "Courier New, monospace",
-});
 
 const ModalTrainMovements = (props: IModalTrainMovementsProps) => {
   const { onSelectedPlans, openTrainMovements, setOpenTrainMovements } = props;
   const [selection] = useState<OnSelectionChangeData>({} as OnSelectionChangeData);
 
   const handleCloseModal = () => {
-    if (!selection?.selectedItems?.size || selection?.selectedItems?.size === 0) {
-      alert("Selecione uma oficialização");
-      return;
-    }
-
     onSelectedPlans?.(selection);
     setOpenTrainMovements({ isOpen: false });
   };
@@ -40,7 +26,7 @@ const ModalTrainMovements = (props: IModalTrainMovementsProps) => {
   return (
     <>
       <WindowModal
-        title={`Movimentos do trem: ${openTrainMovements?.data?.name}`}
+        title={`Movimentos do trem: ${openTrainMovements?.data?.data.prefixo}`}
         initialWidth={"55%"}
         initialHeight={"80%"}
         open={openTrainMovements.isOpen}
@@ -56,17 +42,13 @@ const ModalTrainMovements = (props: IModalTrainMovementsProps) => {
             className="h-full"
           >
             <OptTabList.Element value="movements">
-              <MantineProvider theme={theme}>
-                <Example />
-              </MantineProvider>
+              <GridTrainMovements trainMovements={openTrainMovements.data?.data.movimentos} />
             </OptTabList.Element>
             <OptTabList.Element value="equipment">
-              <MantineProvider theme={theme}>
-                <GridEquipage />
-              </MantineProvider>
+              <GridEquipage />
             </OptTabList.Element>
             <OptTabList.Element value="record" className="px-4">
-              <TrainSheet />
+              <TrainSheet tremInfo={openTrainMovements.data?.data} />
             </OptTabList.Element>
           </OptTabList>
         </WindowModal.Body>

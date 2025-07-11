@@ -149,7 +149,7 @@ interface GHTChartD3Props {
   onMouseMoveInElement: (data: IElementEventInPlotG | null) => void;
   onClickInElement: (data: IElementEventInPlotG | null) => void;
   onGraphTimeAndCoordenatesChange: (props: IOnGraphCoordinatesUpdateProps) => void;
-  onClickMenuContext: (data: any | null) => void;
+  onClickMenuContext: (data: IElementEventInPlotG | null) => void;
   highlightedPrefix?: string | null; // Add this new prop
 }
 
@@ -863,7 +863,10 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
                         label: "Movimentos trem",
                         shortcut: "Ctrl+M",
                         onClick: () => {
-                          onClickMenuContext({ data: { id: train.prefixo, name: train.prefixo }, element: "train" });
+                          onClickMenuContext({
+                            data: train,
+                            element: "trainMovements",
+                          });
                         },
                       },
                       {

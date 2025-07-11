@@ -1,23 +1,17 @@
+import type { TrainData } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import { GridEquipage } from "@features/home/components/modals/trainMovements/GridEquipage";
-import { OptDivider, OptText } from "@shared/components/fluentui";
 import { MantineProvider } from "@mantine/core";
+import { OptDivider, OptText } from "@shared/components/fluentui";
 import { OptTabList } from "@shared/components/optTabList";
 import { TransferList } from "@shared/components/transferList/TransferList";
 
-const TrainSheet = () => {
-  const data = {
-    prefix: "WYU5608",
-    origin: "IPG-2",
-    previsionOut: "08:00",
-    type: "Escoteira",
-    destinePlan: "IBA",
-    destineTrain: "IBA",
-    length: 0.1,
-    weight: 100,
-    VMA: 65,
-    LXA: "Não encontrado",
-    port: "04/06/2025",
-  };
+interface TrainSheetProps {
+  tremInfo?: Exclude<TrainData, "movimentos">;
+}
+
+const TrainSheet = (props: TrainSheetProps) => {
+  const { tremInfo } = props;
+
   return (
     <>
       <OptTabList
@@ -31,53 +25,47 @@ const TrainSheet = () => {
           <div className="grid grid-cols-4 gap-4">
             <div className="flex gap-2">
               <OptText>Prefixo: </OptText>
-              <OptText weight="bold">{data.prefix} </OptText>
+              <OptText weight="bold">{tremInfo?.prefixo} </OptText>
             </div>
             <div className="flex gap-2">
               <OptText>Origem: </OptText>
-              <OptText weight="bold">{data.origin} </OptText>
+              <OptText weight="bold">{tremInfo?.origem} </OptText>
             </div>
             <div className="flex gap-2">
               <OptText>Previsão Saida: </OptText>
-              <OptText weight="bold">{data.previsionOut} </OptText>
+              <OptText weight="bold">{tremInfo?.previsaoSaida} </OptText>
             </div>
             <div className="flex gap-2">
               <OptText>Carga geral: </OptText>
               <OptText weight="bold">Não definida </OptText>
             </div>
-
             <div className="flex gap-2">
               <OptText>Destino Plano: </OptText>
-              <OptText weight="bold">{data.destinePlan} </OptText>
+              <OptText weight="bold">{tremInfo?.destino} </OptText>
             </div>
             <div className="flex gap-2">
               <OptText>Destino trem: </OptText>
-              <OptText weight="bold">{data.destineTrain} </OptText>
+              <OptText weight="bold">{tremInfo?.destino} </OptText>
             </div>
-
             <div className="flex gap-2">
               <OptText>Comprimento: </OptText>
-              <OptText weight="bold">{data.length} </OptText>
+              <OptText weight="bold">{tremInfo?.comprimentoKm} </OptText>
             </div>
-
             <div className="flex gap-2">
               <OptText>Peso: </OptText>
-              <OptText weight="bold">{data.weight} </OptText>
+              <OptText weight="bold">-</OptText>
             </div>
-
             <div className="flex gap-2">
               <OptText>VMA: </OptText>
-              <OptText weight="bold">{data.VMA} </OptText>
+              <OptText weight="bold">-</OptText>
             </div>
-
             <div className="flex gap-2">
               <OptText>LXA: </OptText>
-              <OptText weight="bold">{data.LXA} </OptText>
+              <OptText weight="bold">- </OptText>
             </div>
-
             <div className="flex gap-2">
               <OptText>Necessidade porto: </OptText>
-              <OptText weight="bold">{data.port} </OptText>
+              <OptText weight="bold">- </OptText>
             </div>
           </div>
 
