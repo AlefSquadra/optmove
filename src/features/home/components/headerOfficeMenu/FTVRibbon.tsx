@@ -23,11 +23,11 @@ import {
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
 import { useOfficeMenuContext } from "@features/home/providers/OfficeMenuProvider/useOfficeMenu";
 import {
+  OptButton,
   OptCheckbox,
   OptDropdown,
   OptInput,
   OptMenu,
-  OptMenuButton,
   OptMenuItem,
   OptMenuList,
   OptMenuPopover,
@@ -159,8 +159,6 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
                 />
               )}
             />
-            <OptToolbarButton icon={<img src={binoculars} width={24} alt="Icon" />}></OptToolbarButton>
-
             <OptTooltip withArrow content="Pesquisar por prefixo ou tabela" relationship="label">
               <OptToolbarButton
                 icon={<img src={searchEye} width={24} alt="Icon" />}
@@ -170,14 +168,16 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
               />
             </OptTooltip>
 
+            <OptToolbarButton icon={<img src={binoculars} width={24} alt="Icon" />}></OptToolbarButton>
+
             <OptMenu>
               <OptMenuTrigger disableButtonEnhancement>
-                <OptMenuButton
+                <OptButton
                   style={{ padding: "4px", maxWidth: "32px", minWidth: "56px" }}
                   icon={<img src={windowPage} width={24} alt="Icon" />}
                 >
-                  {" "}
-                </OptMenuButton>
+                  {"  "}
+                </OptButton>
               </OptMenuTrigger>
 
               <OptMenuPopover>
