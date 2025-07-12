@@ -359,19 +359,18 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
           </div>
         </SecurityComponent>
 
+        <OptToolbarDivider />
         <div className="flex-1">{/* <OptToolbarDivider /> */}</div>
-
         <OptToolbarDivider />
 
         {/* Grupo Oficialização */}
         <div className="relative flex flex-col-reverse items-start justify-between gap-1 md:gap-0">
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <OptText className="text-sm md:!text-[.7rem]">16/04/2025 17:39:23</OptText>
+              <OptText className="text-sm md:!text-[.7rem]">-</OptText>
               <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                 <div className="flex items-center justify-between gap-1 md:gap-0">
-                  <OptText className="text-sm md:!text-[.7rem]">Mesa4</OptText>
-                  <OptText className="text-sm md:!text-[.7rem]">100%</OptText>
+                  <OptText className="text-sm md:min-w-[4rem] md:!text-[.7rem] lg:min-w-[4.5rem]">-</OptText>
                 </div>
                 <OptToolbarButton icon={<img src={windowList} width={20} alt="Icon" />}></OptToolbarButton>
               </div>
