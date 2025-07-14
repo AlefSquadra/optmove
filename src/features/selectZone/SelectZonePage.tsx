@@ -121,7 +121,7 @@ const SelectZonePage = () => {
                   field.onChange(selected as DropdownOption[]);
                 }}
                 disabled={!isFetchedMesa}
-                options={mesaData ? [mesaData].map((mesa) => ({ id: mesa?.id, name: mesa?.name })) : []}
+                options={mesaData ? [{ id: mesaData.id, name: mesaData.name }] : []}
                 placeholder="Selecione uma ou mais mesas"
                 multiple={false}
                 error={!!errors.mesa}
@@ -143,7 +143,7 @@ const SelectZonePage = () => {
                   field.onChange(selected as DropdownOption);
                 }}
                 disabled={!isFetchedZonas}
-                options={zonasData ? [zonasData].map((zona) => ({ id: zona?.id, name: zona?.name })) : []}
+                options={zonasData ? [{ id: zonasData.id, name: zonasData.name }] : []}
                 placeholder="Selecione uma zona"
                 error={!!errors.zona}
                 className="zona-dropdown"
