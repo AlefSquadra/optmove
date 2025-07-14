@@ -1,15 +1,15 @@
 import type { RestrictionData, TrainData, YLabel } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
-import { apiClientMock } from "@shared/services/apiClient";
+import { apiClient, apiClientMock } from "@shared/services/apiClient";
 
 export const GHTChartMainService = {
   getSbs(ramal: string = "ICZ-ISN Baixada Conceição-Santos") {
-    return apiClientMock.get<YLabel[]>(`/v1/ght/chart/sbs/${ramal}`, {
+    return apiClient.get<YLabel[]>(`/v1/ght/sbs/${ramal}`, {
       notRequiresAuth: false,
     });
   },
 
   getTrains(data: { dateGhtTimeline: string; officializations: string[] }) {
-    return apiClientMock.get<TrainData[]>("v1/ght/chart/trains", {
+    return apiClient.get<TrainData[]>("v1/ght/trens", {
       params: {
         DateGHTTimeline: data.dateGhtTimeline,
         DateOfficializationList: data.officializations,

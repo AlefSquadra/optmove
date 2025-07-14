@@ -1,5 +1,5 @@
 import { wabtecLogin2 } from "@assets/images";
-import { Button, Text } from "@fluentui/react-components";
+import { OptButton, OptText } from "@shared/components/fluentui";
 import { useAuth } from "@shared/hooks/useAuth";
 import { Controller, useForm } from "react-hook-form";
 
@@ -34,9 +34,9 @@ const LoginPage = () => {
 
       <div className="flex w-[45%] items-center justify-center bg-white p-8">
         <form onSubmit={handleSubmit(onSubmit)} className="flex w-full max-w-md flex-col gap-6">
-          <Text weight="bold" size={600} align="center" className="text-primary-color tracking-[8px]">
+          <OptText weight="bold" size={600} align="center" className="text-primary-color tracking-[8px]">
             Service Monitor
-          </Text>
+          </OptText>
 
           <div className="flex flex-col gap-6">
             {/* Username */}
@@ -71,9 +71,9 @@ const LoginPage = () => {
                 }}
               />
               {errors.username && (
-                <Text size={200} className="mt-1 text-red-500">
+                <OptText size={200} className="mt-1 text-red-500">
                   {errors.username.message}
-                </Text>
+                </OptText>
               )}
             </div>
 
@@ -110,21 +110,21 @@ const LoginPage = () => {
                 }}
               />
               {errors.password && (
-                <Text size={200} className="mt-1 text-red-500">
+                <OptText size={200} className="mt-1 text-red-500">
                   {errors.password.message}
-                </Text>
+                </OptText>
               )}
             </div>
           </div>
 
-          <Button
+          <OptButton
             type="submit"
             appearance="primary"
             shape="circular"
             className="mt-2 h-[54px] w-full rounded-[50px] text-lg font-bold"
           >
             Login
-          </Button>
+          </OptButton>
         </form>
       </div>
     </div>

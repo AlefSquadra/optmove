@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { IDataContextMenu } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
 import { ModalSelectOfficialization } from "@features/home/components/modals/selectOfficialization/ModalSelectOfficialization";
 import { ModalSystemParams } from "@features/home/components/modals/systemParams/ModalSystemParams";
 import { ModalTrainMovements } from "@features/home/components/modals/trainMovements/ModalTrainMovements";
@@ -15,7 +14,7 @@ import {
 } from "@features/home/layouts/HomeLayout";
 import { HomeFTLayoutProvider } from "@features/home/providers/HomeFTLayoutProvider/HomeFTLayoutProvider";
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
-import { Spinner, Text } from "@fluentui/react-components";
+import { OptSpinner, OptText } from "@shared/components/fluentui";
 import type { IModalData } from "@shared/types/IModalData.type";
 
 import { useApplicationContext } from "@app/providers/ApplicationProvider/useApplication";
@@ -23,7 +22,10 @@ import {
   GHTChartProvider,
   useGHTChartContext,
 } from "@features/home/components/charts/GHTChart/provider/GHTChartProvider";
-import type { IElementEventInPlotG } from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
+import type {
+  IElementEventInPlotG,
+  TrainMovementsElementEventDataType,
+} from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
 import { GHTChartD3 } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import { ChartRestrictionsMock, ChartTrainsMock, ChartYLabelMock } from "@features/home/components/FTV/json";
 import { FTVOfficeMenu } from "@features/home/components/headerOfficeMenu/OfficeMenu";
@@ -38,7 +40,7 @@ import dayjs from "dayjs";
 const FTVLayout = () => {
   const { setCursorPointer, mouseOverInElementData, setMouseOverInElementData } = useGHTChartContext();
   const FTContentRef = useRef<HTMLDivElement>(null);
-  const [openTrainMovements, setOpenTrainMovements] = useState<IModalData<IDataContextMenu>>({
+  const [openTrainMovements, setOpenTrainMovements] = useState<IModalData<TrainMovementsElementEventDataType>>({
     isOpen: false,
   });
   const [highlightedPrefix, setHighlightedPrefix] = useState<string | null>(null);
@@ -179,9 +181,9 @@ const FTVLayout = () => {
         </FTLayoutHeader>
         <FTLayoutContent ref={FTContentRef} className="flex flex-col">
           <div className="grid w-full grid-cols-12 grid-rows-[32px] place-items-center bg-yellow-50">
-            <Text className="text-blue-primary col-span-12 col-start-1 row-start-1 flex items-center justify-center text-center !font-bold">
+            <OptText className="text-blue-primary col-span-12 col-start-1 row-start-1 flex items-center justify-center text-center !font-bold">
               ICZ_ISN Baixada conceição santos
-            </Text>
+            </OptText>
           </div>
           <div className="h-full w-full overflow-hidden">
             {fetchDataGHT.isLoading && (
@@ -194,7 +196,7 @@ const FTVLayout = () => {
                 onClose={() => {}}
               >
                 <div className="flex flex-col items-center p-1">
-                  <Spinner size="small" />
+                  <OptSpinner size="small" />
                   <div className="mt-1 text-lg text-gray-600">{loadingStage || "Carregando..."}</div>
                 </div>
               </WindowModal>
@@ -222,7 +224,7 @@ const FTVLayout = () => {
         </FTLayoutContent>
 
         <FTLayoutFooter className="row-auto flex items-center justify-center">
-          <Text className="text-center text-red-700">
+          <OptText className="text-center text-red-700">
             {mouseOverInElementData?.element === "train" && (
               <>
                 {/* {`${lineTrainSelected.name} (${lineTrainSelected.data.type}) | Chegada: ${lineTrainSelected.data?.xi} | Saída: ${lineTrainSelected?.data?.xf} Destino: ${
@@ -233,7 +235,7 @@ const FTVLayout = () => {
               </>
             )}
             {mouseOverInElementData?.element === "restriction" && <> {JSON.stringify(mouseOverInElementData?.data)}</>}
-          </Text>
+          </OptText>
         </FTLayoutFooter>
         <FTLayoutTabPanelDown>
           <div className="relative">

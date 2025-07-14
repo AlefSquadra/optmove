@@ -1,5 +1,5 @@
-import { Checkbox } from "@fluentui/react-components";
 import { MantineProvider } from "@mantine/core";
+import { OptCheckbox } from "@shared/components/fluentui";
 import { IconsGridTableIMantineToFluent } from "@styles/iconsGridTableIMantineToFluent/iconsGridTableIMantineToFluent";
 import { MantineReactTable, type MRT_RowSelectionState, type MRT_TableOptions } from "mantine-react-table";
 import { MRT_Localization_PT_BR } from "mantine-react-table/locales/pt-BR/index.cjs";
@@ -58,10 +58,6 @@ export const OptGridTable = <T extends Record<string, any>>(props: IGridTablePro
   return (
     <MantineProvider>
       <MantineReactTable
-        {...optGridProps}
-        getRowId={(row) => row[defaultId]}
-        state={{ rowSelection, ...optGridProps.state }}
-        onRowSelectionChange={setRowSelection}
         enableRowSelection
         enableSelectAll
         selectAllMode="all"
@@ -71,19 +67,23 @@ export const OptGridTable = <T extends Record<string, any>>(props: IGridTablePro
         enableBottomToolbar={false}
         enableTopToolbar={false}
         layoutMode="grid"
+        {...optGridProps}
+        getRowId={(row) => row[defaultId]}
+        state={{ rowSelection, ...optGridProps.state }}
+        onRowSelectionChange={setRowSelection}
         localization={MRT_Localization_PT_BR}
         icons={IconsGridTableIMantineToFluent}
         initialState={{ density: "xs", ...optGridProps.initialState }}
         displayColumnDefOptions={{
           "mrt-row-select": {
-            Cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onChange={row.getToggleSelectedHandler()} />,
+            Cell: ({ row }) => <OptCheckbox checked={row.getIsSelected()} onChange={row.getToggleSelectedHandler()} />,
             Header: ({ table }) => {
               const checkedProp =
                 table.getIsAllRowsSelected() ? true
                 : table.getIsSomeRowsSelected() ? "mixed"
                 : false;
               return (
-                <Checkbox
+                <OptCheckbox
                   checked={checkedProp}
                   onChange={table.getToggleAllRowsSelectedHandler()} // <-- Usar handler da própria tabela
                 />

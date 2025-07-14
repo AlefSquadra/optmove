@@ -1,7 +1,7 @@
 import { useApplicationContext } from "@app/providers/ApplicationProvider/useApplication";
-import { Button, Dropdown, Field, Input, Option } from "@fluentui/react-components";
+import { OptButton, OptDropdown, OptField, OptInput, OptOption } from "@shared/components/fluentui";
 import { Search20Regular } from "@fluentui/react-icons";
-import { DatePickerField } from "@shared/components/forms/DatePickerField";
+import { DatePickerOptField } from "@shared/components/forms/DatePickerField";
 import type { IOfficializationFormData } from "@shared/types/Officialization.type";
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
@@ -36,7 +36,7 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
     onSearch(data);
   };
 
-  const typeOptions = [
+  const typeOptOptions = [
     { key: "OFICIALIZADO", text: "OFICIALIZADO" },
     { key: "PUBLICADO", text: "PUBLICADO" },
     { key: "TODOS", text: "TODOS" },
@@ -48,7 +48,7 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
       className="flex gap-4 p-4 md:flex-row md:gap-2 md:p-2 lg:flex-col lg:gap-4 lg:p-4"
     >
       <div className="flex flex-wrap items-end gap-4 md:flex-row md:flex-nowrap md:gap-2 lg:flex-wrap lg:gap-4">
-        <DatePickerField
+        <DatePickerOptField
           name="dataInicial"
           control={control}
           placeholder="__/__/__"
@@ -57,7 +57,7 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
           className="w-[9.5rem] md:w-[10rem] lg:w-[9.5rem]"
         />
 
-        <DatePickerField
+        <DatePickerOptField
           name="dataFinal"
           control={control}
           placeholder="__/__/__"
@@ -71,9 +71,9 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
           name="prefix"
           control={control}
           render={({ field }) => (
-            <Field label="Prefixo" validationMessage={errors.prefix?.message}>
-              <Input {...field} placeholder="Digite o prefixo" className="w-[9.5rem] md:w-[10rem] lg:w-[9.5rem]" />
-            </Field>
+            <OptField label="Prefixo" validationMessage={errors.prefix?.message}>
+              <OptInput {...field} placeholder="Digite o prefixo" className="w-[9.5rem] md:w-[10rem] lg:w-[9.5rem]" />
+            </OptField>
           )}
         />
       </div>
@@ -83,26 +83,26 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
           name="tipo"
           control={control}
           render={({ field }) => (
-            <Field label="Tipo" validationMessage={errors.tipo?.message}>
-              <Dropdown
+            <OptField label="Tipo" validationMessage={errors.tipo?.message}>
+              <OptDropdown
                 placeholder="Selecione"
-                value={typeOptions.find((o) => o.key === field.value)?.text || ""}
+                value={typeOptOptions.find((o) => o.key === field.value)?.text || ""}
                 onOptionSelect={(_, data) => {
                   if (data.optionValue) field.onChange(data.optionValue);
                 }}
                 className="w-[9.5rem] !min-w-[9.5rem] md:w-[10rem] lg:w-[9.5rem] lg:!min-w-[9.5rem]"
               >
-                {typeOptions.map((option) => (
-                  <Option key={option.key} value={option.key}>
+                {typeOptOptions.map((option) => (
+                  <OptOption key={option.key} value={option.key}>
                     {option.text}
-                  </Option>
+                  </OptOption>
                 ))}
-              </Dropdown>
-            </Field>
+              </OptDropdown>
+            </OptField>
           )}
         />
 
-        <Button
+        <OptButton
           type="submit"
           appearance="primary"
           icon={<Search20Regular />}
@@ -113,9 +113,9 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
           name="timelineDatetime"
           control={control}
           render={({ field }) => (
-            <Field label="Linha do tempo" validationMessage={errors.timelineDatetime?.message}>
-              <Input {...field} type="datetime-local" className="w-[9.5rem] md:w-[14rem] lg:w-[12.5rem]" />
-            </Field>
+            <OptField label="Linha do tempo" validationMessage={errors.timelineDatetime?.message}>
+              <OptInput {...field} type="datetime-local" className="w-[9.5rem] md:w-[14rem] lg:w-[12.5rem]" />
+            </OptField>
           )}
         />
       </div>

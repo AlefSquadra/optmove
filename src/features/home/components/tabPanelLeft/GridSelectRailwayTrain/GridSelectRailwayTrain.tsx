@@ -1,5 +1,5 @@
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
-import { Button, Field, Input } from "@fluentui/react-components";
+import { OptButton, OptField, OptInput } from "@shared/components/fluentui";
 import { Search20Regular } from "@fluentui/react-icons";
 import { OptGridTable } from "@shared/components/gridTable/GridTable";
 import { TabWindowHeader } from "@shared/components/tabWindowHeader/tabWindowHeader";
@@ -76,9 +76,9 @@ const GridSelectRailwayTrain = () => {
             name="prefix"
             control={control}
             render={({ field }) => (
-              <Field validationMessage={errors.prefix?.message}>
-                <Input {...field} placeholder="Prefixo" style={{ width: 100 }} />
-              </Field>
+              <OptField validationMessage={errors.prefix?.message}>
+                <OptInput {...field} placeholder="Prefixo" style={{ width: 100 }} />
+              </OptField>
             )}
           />
 
@@ -86,17 +86,17 @@ const GridSelectRailwayTrain = () => {
             name="destination"
             control={control}
             render={({ field }) => (
-              <Field validationMessage={errors.destination?.message}>
-                <Input {...field} placeholder="Destino" style={{ width: 100 }} />
-              </Field>
+              <OptField validationMessage={errors.destination?.message}>
+                <OptInput {...field} placeholder="Destino" style={{ width: 100 }} />
+              </OptField>
             )}
           />
 
-          <Button type="submit" appearance="primary" icon={<Search20Regular />} />
+          <OptButton type="submit" appearance="primary" icon={<Search20Regular />} />
 
-          <Button type="button" appearance="secondary" onClick={handleUnselectAll}>
+          <OptButton type="button" appearance="secondary" onClick={handleUnselectAll}>
             Desmarcar todos
-          </Button>
+          </OptButton>
         </form>
 
         <div className="flex h-full flex-col" ref={contentRef}>

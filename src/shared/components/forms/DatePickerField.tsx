@@ -1,4 +1,4 @@
-import { Field } from "@fluentui/react-components";
+import { OptField } from "@shared/components/fluentui";
 import type { CalendarStrings, DatePickerProps } from "@fluentui/react-datepicker-compat";
 import { DatePicker, defaultDatePickerStrings } from "@fluentui/react-datepicker-compat";
 import { type Control, Controller, type FieldValues, type Path } from "react-hook-form";
@@ -39,7 +39,7 @@ const datePickerStrings: CalendarStrings = {
   closeButtonAriaLabel: "Fechar",
 };
 
-export function DatePickerField<T extends FieldValues>({
+export function DatePickerOptField<T extends FieldValues>({
   name,
   control,
   label,
@@ -53,7 +53,7 @@ export function DatePickerField<T extends FieldValues>({
       name={name}
       control={control}
       render={({ field }) => (
-        <Field label={label} size={rest.size} validationMessage={errorMessage} className={className}>
+        <OptField label={label} size={rest.size} validationMessage={errorMessage} className={className}>
           <DatePicker
             placeholder={placeholder}
             value={field.value}
@@ -68,7 +68,7 @@ export function DatePickerField<T extends FieldValues>({
             }}
             {...rest}
           />
-        </Field>
+        </OptField>
       )}
     />
   );

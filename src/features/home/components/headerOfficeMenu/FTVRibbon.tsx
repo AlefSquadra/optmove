@@ -23,21 +23,21 @@ import {
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
 import { useOfficeMenuContext } from "@features/home/providers/OfficeMenuProvider/useOfficeMenu";
 import {
-  Checkbox,
-  Dropdown,
-  Input,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  MenuPopover,
-  MenuTrigger,
-  Option,
-  Text,
-  ToolbarButton,
-  ToolbarDivider,
-  Tooltip,
-} from "@fluentui/react-components";
+  OptButton,
+  OptCheckbox,
+  OptDropdown,
+  OptInput,
+  OptMenu,
+  OptMenuItem,
+  OptMenuList,
+  OptMenuPopover,
+  OptMenuTrigger,
+  OptOption,
+  OptText,
+  OptToolbarButton,
+  OptToolbarDivider,
+  OptTooltip,
+} from "@shared/components/fluentui";
 import { SecurityComponent } from "@shared/components/securityComponent/SecurityComponent";
 import { ConditionChain } from "@shared/utils/ConditionChain";
 import { DateFormat } from "@shared/utils/DateFormat";
@@ -107,21 +107,21 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
               name="inputTimelineDatetime"
               control={control}
               render={({ field }) => (
-                <Input {...field} type="datetime-local" className="w-[9.5rem] md:w-[9rem] lg:w-[11.5rem]" />
+                <OptInput {...field} type="datetime-local" className="w-[9.5rem] md:w-[9rem] lg:w-[11.5rem]" />
               )}
             />
-            <ToolbarButton
+            <OptToolbarButton
               icon={<img src={refresh} width={24} alt="Icon" />}
               onClick={() => {
                 setOpenSelectOfficialization(true);
               }}
-            ></ToolbarButton>
+            ></OptToolbarButton>
             <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("1").result}>
               <Controller
                 name="mesa"
                 control={control}
                 render={({ field: { value, onChange } }) => (
-                  <Dropdown
+                  <OptDropdown
                     selectedOptions={value ? [value] : []}
                     onOptionSelect={(_, data) => onChange(data.optionValue)}
                     className="w-[11rem] !min-w-0 md:w-[16rem] lg:w-[13rem]"
@@ -129,13 +129,13 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
                     placeholder="Mesa"
                   >
                     {/* use keys diferentes para evitar warn de React */}
-                    <Option key="MP" value="7">
+                    <OptOption key="MP" value="7">
                       Mesa de programação
-                    </Option>
-                    <Option key="AU" value="A">
+                    </OptOption>
+                    <OptOption key="AU" value="A">
                       Automático
-                    </Option>
-                  </Dropdown>
+                    </OptOption>
+                  </OptDropdown>
                 )}
               />
             </SecurityComponent>
@@ -143,7 +143,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
           <span className="text-sm text-gray-500 md:text-xs">Ações</span>
         </div>
 
-        <ToolbarDivider />
+        <OptToolbarDivider />
 
         {/* Grupo Busca */}
         <div className="relative flex flex-col-reverse items-start justify-between gap-1 md:gap-0">
@@ -152,100 +152,102 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
               name="prefix"
               control={control}
               render={({ field }) => (
-                <Input
+                <OptInput
                   {...field}
                   placeholder="Prefixo / Tabela"
                   className="h-[1.750rem] w-[11rem] md:w-[7rem] lg:w-[8rem]"
                 />
               )}
             />
-            <ToolbarButton icon={<img src={binoculars} width={24} alt="Icon" />}></ToolbarButton>
-
-            <Tooltip withArrow content="Pesquisar por prefixo ou tabela" relationship="label">
-              <ToolbarButton
+            <OptTooltip withArrow content="Pesquisar por prefixo ou tabela" relationship="label">
+              <OptToolbarButton
                 icon={<img src={searchEye} width={24} alt="Icon" />}
                 onClick={() => {
                   if (handlePrefixSearchChange) handlePrefixSearchChange(prefix);
                 }}
               />
-            </Tooltip>
+            </OptTooltip>
 
-            <Menu>
-              <MenuTrigger disableButtonEnhancement>
-                <MenuButton
+            <OptToolbarButton icon={<img src={binoculars} width={24} alt="Icon" />}></OptToolbarButton>
+
+            <OptMenu>
+              <OptMenuTrigger disableButtonEnhancement>
+                <OptButton
                   style={{ padding: "4px", maxWidth: "32px", minWidth: "56px" }}
                   icon={<img src={windowPage} width={24} alt="Icon" />}
                 >
-                  {" "}
-                </MenuButton>
-              </MenuTrigger>
+                  {"  "}
+                </OptButton>
+              </OptMenuTrigger>
 
-              <MenuPopover>
-                <MenuList>
-                  <MenuItem onClick={() => setSelectedPanelTabBarLeft({ isOpen: true, openTabName: "trens" })}>
+              <OptMenuPopover>
+                <OptMenuList>
+                  <OptMenuItem onClick={() => setSelectedPanelTabBarLeft({ isOpen: true, openTabName: "trens" })}>
                     Trens
-                  </MenuItem>
-                  <MenuItem
+                  </OptMenuItem>
+                  <OptMenuItem
                     onClick={() => {
                       setSelectedPanelTabBarLeft({ isOpen: true, openTabName: "atividades alteradas" });
                     }}
                   >
                     Atividades alteradas
-                  </MenuItem>
-                </MenuList>
-              </MenuPopover>
-            </Menu>
+                  </OptMenuItem>
+                </OptMenuList>
+              </OptMenuPopover>
+            </OptMenu>
           </div>
           <span className="text-sm text-gray-500 md:text-xs">Busca</span>
         </div>
 
-        <ToolbarDivider />
+        <OptToolbarDivider />
 
         {/* Grupo Controle */}
         <div className="relative flex flex-col-reverse items-start justify-between gap-1 md:gap-0">
           <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("1").result}>
             <div className="flex items-center gap-1">
               <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
-                <Menu>
-                  <MenuTrigger disableButtonEnhancement>
-                    <ToolbarButton icon={<img src={pGreen} width={20} alt="Icon" />}></ToolbarButton>
-                  </MenuTrigger>
-                  <MenuPopover>
-                    <MenuList>
-                      <MenuItem onClick={() => setIsPanelOpenDown(true)}>Programar circulação (Ctrl + P)</MenuItem>
-                      <MenuItem onClick={() => setIsPanelOpenDown(true)}>Priorizar circulação</MenuItem>
-                    </MenuList>
-                  </MenuPopover>
-                </Menu>
+                <OptMenu>
+                  <OptMenuTrigger disableButtonEnhancement>
+                    <OptToolbarButton icon={<img src={pGreen} width={20} alt="Icon" />}></OptToolbarButton>
+                  </OptMenuTrigger>
+                  <OptMenuPopover>
+                    <OptMenuList>
+                      <OptMenuItem onClick={() => setIsPanelOpenDown(true)}>
+                        Programar circulação (Ctrl + P)
+                      </OptMenuItem>
+                      <OptMenuItem onClick={() => setIsPanelOpenDown(true)}>Priorizar circulação</OptMenuItem>
+                    </OptMenuList>
+                  </OptMenuPopover>
+                </OptMenu>
 
-                <ToolbarButton
+                <OptToolbarButton
                   onClick={() => setIsOpen(true)}
                   icon={<img src={cursor} width={20} alt="Icon" />}
-                ></ToolbarButton>
+                ></OptToolbarButton>
 
-                <Menu>
-                  <MenuTrigger disableButtonEnhancement>
-                    <ToolbarButton icon={<img src={warningConstruction} width={20} alt="Icon" />}></ToolbarButton>
-                  </MenuTrigger>
-                  <MenuPopover>
-                    <MenuList>
-                      <MenuItem onClick={() => setIsPanelOpenDown(true)}>Criar interdição</MenuItem>
-                      <MenuItem onClick={() => setIsPanelOpenDown(true)}>Criar retenção</MenuItem>
-                    </MenuList>
-                  </MenuPopover>
-                </Menu>
+                <OptMenu>
+                  <OptMenuTrigger disableButtonEnhancement>
+                    <OptToolbarButton icon={<img src={warningConstruction} width={20} alt="Icon" />}></OptToolbarButton>
+                  </OptMenuTrigger>
+                  <OptMenuPopover>
+                    <OptMenuList>
+                      <OptMenuItem onClick={() => setIsPanelOpenDown(true)}>Criar interdição</OptMenuItem>
+                      <OptMenuItem onClick={() => setIsPanelOpenDown(true)}>Criar retenção</OptMenuItem>
+                    </OptMenuList>
+                  </OptMenuPopover>
+                </OptMenu>
               </div>
               <div style={{ display: "flex", gap: "4px" }}>
-                <ToolbarButton icon={<img src={circleMinusRed} width={20} alt="Icon" />}></ToolbarButton>
-                <ToolbarButton icon={<img src={velocity} width={20} alt="Icon" />}></ToolbarButton>
-                <ToolbarButton icon={<img src={growingGraph} width={20} alt="Icon" />}></ToolbarButton>
-                <ToolbarButton icon={<img src={windowPage} width={20} alt="Icon" />}></ToolbarButton>
-                <ToolbarButton icon={<img src={windowPlot} width={20} alt="Icon" />}></ToolbarButton>
-                <ToolbarButton icon={<img src={saveDiskBlue} width={20} alt="Icon" />}></ToolbarButton>
-                <ToolbarButton icon={<img src={lockedRed} width={20} alt="Icon" />}></ToolbarButton>
-                <ToolbarButton icon={<img src={likeYellow} width={20} alt="Icon" />}></ToolbarButton>
-                <ToolbarButton icon={<img src={excel} width={20} alt="Icon" />}></ToolbarButton>
-                <ToolbarButton icon={<img src={lightGray} width={20} alt="Icon" />}></ToolbarButton>
+                <OptToolbarButton icon={<img src={circleMinusRed} width={20} alt="Icon" />}></OptToolbarButton>
+                <OptToolbarButton icon={<img src={velocity} width={20} alt="Icon" />}></OptToolbarButton>
+                <OptToolbarButton icon={<img src={growingGraph} width={20} alt="Icon" />}></OptToolbarButton>
+                <OptToolbarButton icon={<img src={windowPage} width={20} alt="Icon" />}></OptToolbarButton>
+                <OptToolbarButton icon={<img src={windowPlot} width={20} alt="Icon" />}></OptToolbarButton>
+                <OptToolbarButton icon={<img src={saveDiskBlue} width={20} alt="Icon" />}></OptToolbarButton>
+                <OptToolbarButton icon={<img src={lockedRed} width={20} alt="Icon" />}></OptToolbarButton>
+                <OptToolbarButton icon={<img src={likeYellow} width={20} alt="Icon" />}></OptToolbarButton>
+                <OptToolbarButton icon={<img src={excel} width={20} alt="Icon" />}></OptToolbarButton>
+                <OptToolbarButton icon={<img src={lightGray} width={20} alt="Icon" />}></OptToolbarButton>
               </div>
             </div>
           </SecurityComponent>
@@ -259,20 +261,20 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
               }}
             >
               {/* Botões de ícones */}
-              <ToolbarButton icon={<img src={growingGraph} width={20} />} />
-              <ToolbarButton icon={<img src={graphBlockSearch} width={20} />} />
-              <ToolbarButton icon={<img src={windowPlot} width={20} />} />
-              <ToolbarButton
+              <OptToolbarButton icon={<img src={growingGraph} width={20} />} />
+              <OptToolbarButton icon={<img src={graphBlockSearch} width={20} />} />
+              <OptToolbarButton icon={<img src={windowPlot} width={20} />} />
+              <OptToolbarButton
                 icon={<img src={windowFolder} width={20} />}
                 onClick={() => setOpenSystemParams({ isOpen: true })}
               />
 
-              {/* Checkboxes */}
+              {/* OptCheckboxes */}
               <Controller
                 name="infoTrem"
                 control={control}
                 render={({ field }) => (
-                  <Checkbox
+                  <OptCheckbox
                     {...field}
                     checked={selectedPanelTabBarLeft.isOpen}
                     onChange={(_, data) => {
@@ -282,7 +284,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
                         openTabName: "",
                       }));
                     }}
-                    label={<Text className="text-sm md:!text-[.7rem]">Info's do trem</Text>}
+                    label={<OptText className="text-sm md:!text-[.7rem]">Info's do trem</OptText>}
                   />
                 )}
               />
@@ -291,9 +293,9 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
                 name="exibirRealizados"
                 control={control}
                 render={({ field }) => (
-                  <Checkbox
+                  <OptCheckbox
                     {...field}
-                    label={<Text className="text-sm md:!text-[.7rem]">Exibir realizados</Text>}
+                    label={<OptText className="text-sm md:!text-[.7rem]">Exibir realizados</OptText>}
                     size="medium"
                     className="text-xs"
                     checked={showAccomplished}
@@ -308,9 +310,9 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
                 name="ateLinhaDoTempo"
                 control={control}
                 render={({ field }) => (
-                  <Checkbox
+                  <OptCheckbox
                     {...field}
-                    label={<Text className="text-sm md:!text-[.7rem]">Até linha do tempo</Text>}
+                    label={<OptText className="text-sm md:!text-[.7rem]">Até linha do tempo</OptText>}
                     checked={showTimelineView}
                     onChange={(_, data) => {
                       field.onChange(data.checked);
@@ -324,7 +326,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
           <span className="text-sm text-gray-500 md:text-xs">Controles</span>
         </div>
 
-        <ToolbarDivider />
+        <OptToolbarDivider />
 
         <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("2").result}>
           <div className="relative flex flex-col-reverse items-start justify-between gap-1 md:gap-0">
@@ -333,7 +335,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
                 name="plan"
                 control={control}
                 render={({ field }) => (
-                  <Dropdown
+                  <OptDropdown
                     {...field}
                     className="w-[11rem] !min-w-0 md:w-[15rem] lg:w-[12rem]"
                     id={"dropdown-plan"}
@@ -341,11 +343,15 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
                     onOptionSelect={(_, data) => field.onChange(data.optionText ?? "")}
                   >
                     {selectedOfficialization?.listOfficialization.map((option) => (
-                      <Option className="text-left" key={option.dateOfficialization} value={option.dateOfficialization}>
+                      <OptOption
+                        className="text-left"
+                        key={option.dateOfficialization}
+                        value={option.dateOfficialization}
+                      >
                         {DateFormat.dayjs(option.dateOfficialization, "YYYY-MM-DDTHH:mm").toDate().toLocaleString()}
-                      </Option>
+                      </OptOption>
                     ))}
-                  </Dropdown>
+                  </OptDropdown>
                 )}
               />
             </div>
@@ -353,56 +359,57 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
           </div>
         </SecurityComponent>
 
-        <div className="flex-1">{/* <ToolbarDivider /> */}</div>
-
-        <ToolbarDivider />
+        <OptToolbarDivider />
+        <div className="flex-1">{/* <OptToolbarDivider /> */}</div>
+        <OptToolbarDivider />
 
         {/* Grupo Oficialização */}
         <div className="relative flex flex-col-reverse items-start justify-between gap-1 md:gap-0">
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <Text className="text-sm md:!text-[.7rem]">16/04/2025 17:39:23</Text>
+              <OptText className="text-sm md:!text-[.7rem]">-</OptText>
               <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                 <div className="flex items-center justify-between gap-1 md:gap-0">
-                  <Text className="text-sm md:!text-[.7rem]">Mesa4</Text>
-                  <Text className="text-sm md:!text-[.7rem]">100%</Text>
+                  <OptText className="text-sm md:min-w-[4rem] md:!text-[.7rem] lg:min-w-[4.5rem]">-</OptText>
                 </div>
-                <ToolbarButton icon={<img src={windowList} width={20} alt="Icon" />}></ToolbarButton>
+                <OptToolbarButton icon={<img src={windowList} width={20} alt="Icon" />}></OptToolbarButton>
               </div>
             </div>
           </div>
           <span className="text-sm text-gray-500 md:text-xs">Oficialização</span>
         </div>
 
-        <ToolbarDivider />
+        <OptToolbarDivider />
 
         {/* Grupo Coordenadas */}
         <div className="relative flex flex-col-reverse items-start justify-between gap-1">
           <div className="flex flex-col items-start gap-1">
-            <Text className="text-sm md:!text-[.7rem]">SB: {graphTimeAndCoordinates.sbs || "Fora do painel"}</Text>
-            <Text className="text-sm md:!text-[.7rem]">
+            <OptText className="text-sm md:!text-[.7rem]">
+              SB: {graphTimeAndCoordinates.sbs || "Fora do painel"}
+            </OptText>
+            <OptText className="text-sm md:!text-[.7rem]">
               SB: {DateFormat.dayjs(graphTimeAndCoordinates.date, "YYYY-MM-DDTHH:mm").toDate().toLocaleString()}
-            </Text>
+            </OptText>
           </div>
           <span className="text-sm text-gray-500 md:text-xs">Coordenadas Gráfico</span>
         </div>
 
-        <ToolbarDivider className="!m-0 !pr-0" />
+        <OptToolbarDivider className="!m-0 !pr-0" />
 
         {/* Grupo Monitoramento */}
         {/* <SecurityComponent allowed={new ConditionChain([selectZoneParams.profileZone]).is("1").result}>
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            <Menu>
-              <MenuTrigger disableButtonEnhancement>
-                <ToolbarButton>Monitoramento</ToolbarButton>
-              </MenuTrigger>
-              <MenuPopover>
-                <MenuList>
-                  <MenuItem onClick={() => setIsPanelOpenDown(true)}>Monitoramento de planos</MenuItem>
-                  <MenuItem onClick={() => setIsPanelOpenDown(true)}>Atividades alteradas</MenuItem>
-                </MenuList>
-              </MenuPopover>
-            </Menu>
+            <OptMenu>
+              <OptMenuTrigger disableButtonEnhancement>
+                <OptToolbarButton>Monitoramento</OptToolbarButton>
+              </OptMenuTrigger>
+              <OptMenuPopover>
+                <OptMenuList>
+                  <OptMenuItem onClick={() => setIsPanelOpenDown(true)}>Monitoramento de planos</OptMenuItem>
+                  <OptMenuItem onClick={() => setIsPanelOpenDown(true)}>Atividades alteradas</OptMenuItem>
+                </OptMenuList>
+              </OptMenuPopover>
+            </OptMenu>
             <span style={{ fontSize: "11px", color: "#666" }}>Planos</span>
           </div>
         </SecurityComponent> */}

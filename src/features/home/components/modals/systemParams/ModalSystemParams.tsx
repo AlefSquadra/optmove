@@ -4,9 +4,9 @@ import {
 } from "@features/home/components/modals/systemParams/SystemParamsZod";
 import { TabQueueManagement } from "@features/home/components/modals/systemParams/TabQueueManagement";
 import { TabSimulation } from "@features/home/components/modals/systemParams/TabSimulation";
-import { Button } from "@fluentui/react-components";
+import { OptButton } from "@shared/components/fluentui";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { OptTabList } from "@shared/components/optTabList/OptTabList";
+import { OptTabList } from "@shared/components/optTabList";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import type { IModalData } from "@shared/types/IModalData.type";
 import React from "react";
@@ -72,10 +72,10 @@ const ModalSystemParams = (props: IModalSystemParamsProps) => {
 
           <WindowModal.Footer>
             <div className="flex justify-end gap-2">
-              <Button onClick={handleCloseModal}>Cancelar</Button>
-              <Button appearance="primary" type="submit">
+              <OptButton onClick={handleCloseModal}>Cancelar</OptButton>
+              <OptButton appearance="primary" type="submit">
                 Ok
-              </Button>
+              </OptButton>
             </div>
           </WindowModal.Footer>
         </WindowModal>

@@ -6,7 +6,7 @@ import {
 } from "@features/home/components/modals/selectOfficialization/DataGridSelectOfficialization";
 import { SelectOfficializationForm } from "@features/home/components/modals/selectOfficialization/SelectOfficializationForm";
 import { SelectOfficializationService } from "@features/home/services/SelectOfficializationService";
-import { Button } from "@fluentui/react-components";
+import { OptButton } from "@shared/components/fluentui";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import { useWindowSize } from "@shared/hooks/useWindowSize";
 import type { IOfficializationDataFilter, IOfficializationFormData } from "@shared/types/Officialization.type";
@@ -100,10 +100,10 @@ const ModalSelectOfficialization = (props: IModalSelectOfficializationProps) => 
 
           <WindowModal.Footer>
             <div className="flex justify-end gap-2">
-              <Button onClick={() => setOpenSelectOfficialization(false)}>Cancelar</Button>
-              <Button appearance="primary" onClick={handleCloseModal}>
+              <OptButton onClick={() => setOpenSelectOfficialization(false)}>Cancelar</OptButton>
+              <OptButton appearance="primary" onClick={handleCloseModal}>
                 Ok
-              </Button>
+              </OptButton>
             </div>
           </WindowModal.Footer>
         </WindowModal>

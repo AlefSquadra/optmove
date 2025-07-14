@@ -1,23 +1,17 @@
+import type { TrainData } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import { GridEquipage } from "@features/home/components/modals/trainMovements/GridEquipage";
-import { Divider, Text } from "@fluentui/react-components";
 import { MantineProvider } from "@mantine/core";
-import { OptTabList } from "@shared/components/optTabList/OptTabList";
+import { OptDivider, OptText } from "@shared/components/fluentui";
+import { OptTabList } from "@shared/components/optTabList";
 import { TransferList } from "@shared/components/transferList/TransferList";
 
-const TrainSheet = () => {
-  const data = {
-    prefix: "WYU5608",
-    origin: "IPG-2",
-    previsionOut: "08:00",
-    type: "Escoteira",
-    destinePlan: "IBA",
-    destineTrain: "IBA",
-    length: 0.1,
-    weight: 100,
-    VMA: 65,
-    LXA: "Não encontrado",
-    port: "04/06/2025",
-  };
+interface TrainSheetProps {
+  tremInfo?: Exclude<TrainData, "movimentos">;
+}
+
+const TrainSheet = (props: TrainSheetProps) => {
+  const { tremInfo } = props;
+
   return (
     <>
       <OptTabList
@@ -30,58 +24,52 @@ const TrainSheet = () => {
         <OptTabList.Element value="trainSheet" className="grid h-full grid-cols-1 grid-rows-[auto_auto_1fr] px-4">
           <div className="grid grid-cols-4 gap-4">
             <div className="flex gap-2">
-              <Text>Prefixo: </Text>
-              <Text weight="bold">{data.prefix} </Text>
+              <OptText>Prefixo: </OptText>
+              <OptText weight="bold">{tremInfo?.prefixo} </OptText>
             </div>
             <div className="flex gap-2">
-              <Text>Origem: </Text>
-              <Text weight="bold">{data.origin} </Text>
+              <OptText>Origem: </OptText>
+              <OptText weight="bold">{tremInfo?.origem} </OptText>
             </div>
             <div className="flex gap-2">
-              <Text>Previsão Saida: </Text>
-              <Text weight="bold">{data.previsionOut} </Text>
+              <OptText>Previsão Saida: </OptText>
+              <OptText weight="bold">{tremInfo?.previsaoSaida} </OptText>
             </div>
             <div className="flex gap-2">
-              <Text>Carga geral: </Text>
-              <Text weight="bold">Não definida </Text>
-            </div>
-
-            <div className="flex gap-2">
-              <Text>Destino Plano: </Text>
-              <Text weight="bold">{data.destinePlan} </Text>
+              <OptText>Carga geral: </OptText>
+              <OptText weight="bold">Não definida </OptText>
             </div>
             <div className="flex gap-2">
-              <Text>Destino trem: </Text>
-              <Text weight="bold">{data.destineTrain} </Text>
+              <OptText>Destino Plano: </OptText>
+              <OptText weight="bold">{tremInfo?.destino} </OptText>
             </div>
-
             <div className="flex gap-2">
-              <Text>Comprimento: </Text>
-              <Text weight="bold">{data.length} </Text>
+              <OptText>Destino trem: </OptText>
+              <OptText weight="bold">{tremInfo?.destino} </OptText>
             </div>
-
             <div className="flex gap-2">
-              <Text>Peso: </Text>
-              <Text weight="bold">{data.weight} </Text>
+              <OptText>Comprimento: </OptText>
+              <OptText weight="bold">{tremInfo?.comprimentoKm} </OptText>
             </div>
-
             <div className="flex gap-2">
-              <Text>VMA: </Text>
-              <Text weight="bold">{data.VMA} </Text>
+              <OptText>Peso: </OptText>
+              <OptText weight="bold">-</OptText>
             </div>
-
             <div className="flex gap-2">
-              <Text>LXA: </Text>
-              <Text weight="bold">{data.LXA} </Text>
+              <OptText>VMA: </OptText>
+              <OptText weight="bold">-</OptText>
             </div>
-
             <div className="flex gap-2">
-              <Text>Necessidade porto: </Text>
-              <Text weight="bold">{data.port} </Text>
+              <OptText>LXA: </OptText>
+              <OptText weight="bold">- </OptText>
+            </div>
+            <div className="flex gap-2">
+              <OptText>Necessidade porto: </OptText>
+              <OptText weight="bold">- </OptText>
             </div>
           </div>
 
-          <Divider className="mt-4" />
+          <OptDivider className="mt-4" />
 
           <OptTabList
             items={[

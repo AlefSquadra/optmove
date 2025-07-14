@@ -1,157 +1,78 @@
 import { ChartDyeing } from "@features/home/components/charts/chartDyeing/ChartDyeing";
+import type { TrainMovement } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import { Box } from "@mantine/core";
-import "@mantine/core/styles.css";
-import "@mantine/dates/styles.css";
-import { MantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
-import { MRT_Localization_PT_BR } from "mantine-react-table/locales/pt-BR/index.cjs";
-import "mantine-react-table/styles.css";
+import { OptGridTable } from "@shared/components/gridTable/GridTable";
+import type { MRT_ColumnDef } from "mantine-react-table";
 import { useMemo } from "react";
 
-const data = [
-  {
-    sb: "T123",
-    type: "Carga",
-    startOccupation: "2025-06-04 08:00",
-    endOccupation: "2025-06-04 09:30",
-    stop: "Estação Central",
-    durationPat: "01:30",
-    endPat: "2025-06-04 09:45",
-    headDepartureDate: "2025-06-04 10:00",
-    sbCbtc: "CBTC-01",
-    controlZone: "Zona A",
-    branch: "Ramal Norte",
-    subRows: [
-      {
-        sb: "T123-A",
-        type: "Manobra",
-        startOccupation: "2025-06-04 08:15",
-        endOccupation: "2025-06-04 08:45",
-        stop: "Pátio 1",
-        durationPat: "00:30",
-        endPat: "2025-06-04 08:50",
-        headDepartureDate: "2025-06-04 09:00",
-        sbCbtc: "CBTC-01-A",
-        controlZone: "Zona A1",
-        branch: "Ramal Norte",
-        subRows: [],
-      },
-    ],
-  },
-  {
-    sb: "T456",
-    type: "Passageiros",
-    startOccupation: "2025-06-04 09:00",
-    endOccupation: "2025-06-04 10:15",
-    stop: "Estação Sul",
-    durationPat: "01:15",
-    endPat: "2025-06-04 10:20",
-    headDepartureDate: "2025-06-04 10:30",
-    sbCbtc: "CBTC-02",
-    controlZone: "Zona B",
-    branch: "Ramal Sul",
-    subRows: [
-      {
-        sb: "T456-A",
-        type: "Manobra",
-        startOccupation: "2025-06-04 09:30",
-        endOccupation: "2025-06-04 09:50",
-        stop: "Pátio 2",
-        durationPat: "00:20",
-        endPat: "2025-06-04 09:55",
-        headDepartureDate: "2025-06-04 10:00",
-        sbCbtc: "CBTC-02-A",
-        controlZone: "Zona B1",
-        branch: "Ramal Sul",
-        subRows: [],
-      },
-      {
-        sb: "T456-B",
-        type: "Manutenção",
-        startOccupation: "2025-06-04 09:55",
-        endOccupation: "2025-06-04 10:10",
-        stop: "Oficina 3",
-        durationPat: "00:15",
-        endPat: "2025-06-04 10:12",
-        headDepartureDate: "2025-06-04 10:15",
-        sbCbtc: "CBTC-02-B",
-        controlZone: "Zona B2",
-        branch: "Ramal Sul",
-        subRows: [],
-      },
-    ],
-  },
-];
+type TrainMovementData = TrainMovement;
 
-const Example = () => {
-  const columns = useMemo<MRT_ColumnDef<typeof data>[]>(
+interface GridTrainMovementsProps {
+  trainMovements?: TrainMovement[];
+}
+
+const GridTrainMovements = ({ trainMovements }: GridTrainMovementsProps) => {
+  const columns = useMemo<MRT_ColumnDef<TrainMovementData>[]>(
     () => [
       {
-        accessorKey: "sb",
+        accessorKey: "idFicha",
         header: "SB",
       },
       {
-        accessorKey: "type",
+        accessorKey: "segmento",
         header: "Tipo",
       },
       {
-        accessorKey: "startOccupation",
+        accessorKey: "chegada",
         header: "Data Ocupação",
       },
       {
-        accessorKey: "endOccupation",
+        accessorKey: "fimOcupacao",
         header: "Fim Ocupação",
       },
       {
-        accessorKey: "stop",
+        accessorKey: "alias",
         header: "Parada",
       },
       {
-        accessorKey: "durationPat",
+        accessorKey: "destino",
         header: "Duração PAT",
       },
       {
-        accessorKey: "endPat",
+        accessorKey: "fimCurso",
         header: "Fim PAT",
       },
       {
-        accessorKey: "headDepartureDate",
+        accessorKey: "partida",
         header: "Data Saída Cabeça",
       },
       {
-        accessorKey: "sbCbtc",
+        accessorKey: "id",
         header: "SB CBTC",
       },
       {
-        accessorKey: "controlZone",
+        accessorKey: "segmento",
         header: "Zona Controle",
       },
       {
-        accessorKey: "branch",
+        accessorKey: "linha",
         header: "Ramal",
       },
     ],
     [],
   );
+  const tableData = trainMovements || [];
 
   return (
-    <Box
-      style={{
-        width: "100%",
-        overflow: "auto",
-      }}
-    >
-      <MantineReactTable
+    <div className="h-full w-full">
+      <OptGridTable<TrainMovementData>
         columns={columns}
-        data={data as any}
-        enableExpanding
-        enableExpandAll={false}
-        enableColumnResizing
-        columnResizeMode="onEnd"
-        selectAllMode="all"
-        enableSelectAll
+        data={tableData.map((item: any, index: number) => ({ ...item, id: item.id || `${item.sb}-${index}` }))}
+        defaultId="id"
+        enableExpandAll
         enableRowSelection={false}
+        columnResizeMode="onEnd"
         initialState={{
-          density: "xs",
           columnSizing: {
             sb: 50,
             type: 100,
@@ -166,18 +87,7 @@ const Example = () => {
             branch: 100,
           },
         }}
-        enableBottomToolbar={false}
-        enableTopToolbar={false}
-        enablePagination={false}
-        enableFilters={false}
-        layoutMode="grid"
-        localization={MRT_Localization_PT_BR}
-        mantineTableProps={{
-          style: {
-            tableLayout: "fixed",
-            width: "100%",
-          },
-        }}
+        mantineTableContainerProps={{ style: { height: "100%", flex: 1 } }}
         mantineTableHeadCellProps={{
           style: {
             overflow: "hidden",
@@ -205,8 +115,8 @@ const Example = () => {
           </Box>
         )}
       />
-    </Box>
+    </div>
   );
 };
 
-export default Example;
+export default GridTrainMovements;

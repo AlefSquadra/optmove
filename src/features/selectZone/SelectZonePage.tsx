@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 import { CustomDropdown, type DropdownOption } from "./CustomDropdown";
 
-import { Button, Field } from "@fluentui/react-components";
+import { OptButton, OptField } from "@shared/components/fluentui";
 import { useEffect } from "react";
 
 const SelectZonePage = () => {
@@ -89,7 +89,7 @@ const SelectZonePage = () => {
           control={control}
           rules={{ required: "Perfil é obrigatório" }}
           render={({ field }) => (
-            <Field label="Perfil" validationMessage={errors.perfilMesa?.message}>
+            <OptField label="Perfil" validationMessage={errors.perfilMesa?.message}>
               <CustomDropdown
                 value={field.value}
                 onOptionSelect={(selected) => {
@@ -101,7 +101,7 @@ const SelectZonePage = () => {
                 error={!!errors.perfilMesa}
                 className="perfil-dropdown"
               />
-            </Field>
+            </OptField>
           )}
         />
 
@@ -111,7 +111,7 @@ const SelectZonePage = () => {
           control={control}
           rules={{ required: "Mesa é obrigatória" }}
           render={({ field }) => (
-            <Field label="Mesa" validationMessage={errors.mesa?.message}>
+            <OptField label="Mesa" validationMessage={errors.mesa?.message}>
               <CustomDropdown
                 value={field.value || []}
                 onOptionSelect={(selected) => {
@@ -124,7 +124,7 @@ const SelectZonePage = () => {
                 error={!!errors.mesa}
                 className="mesa-dropdown"
               />
-            </Field>
+            </OptField>
           )}
         />
 
@@ -134,7 +134,7 @@ const SelectZonePage = () => {
           control={control}
           rules={{ required: "Zona é obrigatória" }}
           render={({ field }) => (
-            <Field label="Zonas selecionadas" validationMessage={errors.zona?.message}>
+            <OptField label="Zonas selecionadas" validationMessage={errors.zona?.message}>
               <CustomDropdown
                 value={field.value}
                 onOptionSelect={(selected) => {
@@ -146,14 +146,14 @@ const SelectZonePage = () => {
                 error={!!errors.zona}
                 className="zona-dropdown"
               />
-            </Field>
+            </OptField>
           )}
         />
 
         <div className="flex justify-end gap-3 border-t border-neutral-200 pt-4">
-          <Button appearance="primary" type="submit">
+          <OptButton appearance="primary" type="submit">
             OK
-          </Button>
+          </OptButton>
         </div>
       </div>
     </form>

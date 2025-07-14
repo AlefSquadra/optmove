@@ -149,7 +149,7 @@ interface GHTChartD3Props {
   onMouseMoveInElement: (data: IElementEventInPlotG | null) => void;
   onClickInElement: (data: IElementEventInPlotG | null) => void;
   onGraphTimeAndCoordenatesChange: (props: IOnGraphCoordinatesUpdateProps) => void;
-  onClickMenuContext: (data: any | null) => void;
+  onClickMenuContext: (data: IElementEventInPlotG | null) => void;
   highlightedPrefix?: string | null; // Add this new prop
 }
 
@@ -747,7 +747,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
 
       let firstVisibleMovement = true;
 
-      train.movimentos.forEach((mov) => {
+      train.movimentos.forEach((mov, movIndex) => {
         const chegadaDate = mov.chegada ? parseDateUTC(mov.chegada as string) : null;
         const fimCursoDate = mov.fimCurso ? parseDateUTC(mov.fimCurso as string) : null;
         const partidaDate = mov.partida ? parseDateUTC(mov.partida as string) : null;
@@ -765,15 +765,21 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
         if (y1 === undefined || y2 === undefined || Math.max(y1!, y2!) < yDomain[0] || Math.min(y1!, y2!) > yDomain[1])
           return;
 
-        singleTrainGroup
+        // Cria um grupo específico para este movimento
+        const movementGroup = singleTrainGroup
+          .append("g")
+          .attr("class", `movement-${movIndex}`)
+          .attr("data-movement-id", `${train.prefixo}-${movIndex}`);
+
+        // Linha invisível para capturar eventos de mouse (soluciona problema com stroke-dasharray)
+        movementGroup
           .append("line")
           .attr("x1", xScale(chegadaDate))
           .attr("y1", yScale(y1!))
           .attr("x2", xScale(fimCursoDate))
           .attr("y2", yScale(y2!))
-          .attr("stroke", trainColor)
-          .attr("stroke-width", 2)
-          .attr("stroke-dasharray", "3,2")
+          .attr("stroke", "transparent")
+          .attr("stroke-width", 8) // Linha mais grossa para facilitar captura do mouse
           .style("cursor", "pointer")
           .on("click", function (event) {
             event.stopPropagation();
@@ -795,7 +801,11 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
           })
           .on("mouseover", function (event) {
             event.stopPropagation();
-            d3.select(this).raise().attr("stroke", "steelblue").attr("stroke-width", 3);
+            // Destaca a linha visível ao fazer hover - apenas deste movimento específico
+            const movementGroup = d3.select(this.parentNode as Element);
+            const visibleLine = movementGroup.select(".train-visible-line");
+
+            visibleLine.raise().attr("stroke", "steelblue").attr("stroke-width", 3);
             onMouseMoveInRestrictionCallback({ data: { id: train.prefixo, name: train.prefixo }, element: "train" });
             tooltip
               .html(
@@ -812,7 +822,28 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
             tooltip.style("left", event.offsetX + 10 + "px").style("top", event.offsetY + 10 + "px");
           })
           .on("mouseout", function () {
-            d3.select(this).attr("stroke", trainColor).attr("stroke-width", 2);
+            // Volta ao estilo original da linha visível - agora usa o movimento específico
+            const movementGroup = d3.select(this.parentNode as Element);
+            const visibleLine = movementGroup.select(".train-visible-line");
+
+            // Usa dados diretamente do escopo (muito mais eficiente)
+            let targetColor = trainColor;
+            let targetWidth = 2;
+
+            // Verifica se este trem está sendo destacado pelo sistema de highlight
+            if (highlightedPrefix) {
+              const searchPrefix = highlightedPrefix.trim().toUpperCase();
+
+              // Se o trem está sendo destacado, mantém a cor azul
+              if (train.prefixo.toUpperCase().startsWith(searchPrefix)) {
+                targetColor = "blue";
+                targetWidth = 3;
+              }
+            }
+
+            // Aplica a cor apenas a esta linha específica
+            visibleLine.attr("stroke", targetColor).attr("stroke-width", targetWidth);
+
             tooltip.transition().duration(100).style("opacity", 0);
             onMouseMoveInRestrictionCallback(null);
           })
@@ -832,7 +863,10 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
                         label: "Movimentos trem",
                         shortcut: "Ctrl+M",
                         onClick: () => {
-                          onClickMenuContext({ data: { id: train.prefixo, name: train.prefixo }, element: "train" });
+                          onClickMenuContext({
+                            data: train,
+                            element: "trainMovements",
+                          });
                         },
                       },
                       {
@@ -868,6 +902,19 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
               },
             });
           });
+
+        // Linha visível com dash-array (sem eventos de mouse)
+        movementGroup
+          .append("line")
+          .attr("class", "train-visible-line")
+          .attr("x1", xScale(chegadaDate))
+          .attr("y1", yScale(y1!))
+          .attr("x2", xScale(fimCursoDate))
+          .attr("y2", yScale(y2!))
+          .attr("stroke", trainColor)
+          .attr("stroke-width", 2)
+          .attr("stroke-dasharray", "3,2")
+          .style("pointer-events", "none"); // Remove eventos de mouse desta linha
 
         if (firstVisibleMovement) {
           // Adiciona label para o nome do trem
@@ -1022,7 +1069,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
 
       if (trainData) {
         const originalColor = `rgb(${trainData.cor.slice(0, -1)})`;
-        singleTrainGroup.selectAll("line").attr("stroke", originalColor).attr("stroke-width", 2);
+        singleTrainGroup.selectAll(".train-visible-line").attr("stroke", originalColor).attr("stroke-width", 2);
         singleTrainGroup.selectAll("text").attr("fill", originalColor);
       }
     });
@@ -1043,13 +1090,13 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     });
 
     // Highlight matched trains
-    matchingTrains.selectAll("line").attr("stroke", "blue").attr("stroke-width", 3).raise();
+    matchingTrains.selectAll(".train-visible-line").attr("stroke", "blue").attr("stroke-width", 3).raise();
     matchingTrains.selectAll("text").attr("fill", "blue").raise();
 
     // Scroll to the first matched train
     const firstTrainNode = matchingTrains.node();
     if (firstTrainNode) {
-      const firstLine = d3.select(firstTrainNode).select("line");
+      const firstLine = d3.select(firstTrainNode).select(".train-visible-line");
       if (!firstLine.empty()) {
         const xPosition = +firstLine.attr("x1");
         if (scrollContainerRef.current) {

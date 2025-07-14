@@ -13,6 +13,7 @@ dist
 dist-ssr
 *.local
 backend-json-server/*
+.claude
 
 pocs-testes
 
@@ -27,5 +28,4 @@ pocs-testes
 *.sln
 *.sw?
 .env
-
 output.txt

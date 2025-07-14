@@ -1,5 +1,6 @@
 import type { IContextMenuProps } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
 import type { IClickableElement } from "@features/home/components/charts/GHTChart/GHTChart.types";
+import type { TrainData } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import type { TrainEditFormData } from "@features/home/components/tabPanelLeft/TrainEditForm/TrainEditForm";
 
 export interface IGHTChartContext {
@@ -30,7 +31,13 @@ export interface SbEventData {
   color: string;
 }
 
+export type TrainElementEventDataType = { element: "train"; data: TrainElementEventData };
+export type TrainMovementsElementEventDataType = { element: "trainMovements"; data: TrainData };
+export type RestrictionElementEventDataType = { element: "restriction"; data: RestrictionElementEventData };
+export type SbEventDataType = { element: "sb"; data: SbEventData };
+
 export type IElementEventInPlotG =
-  | { element: "train"; data: TrainElementEventData }
-  | { element: "restriction"; data: RestrictionElementEventData }
-  | { element: "sb"; data: SbEventData };
+  | TrainElementEventDataType
+  | RestrictionElementEventDataType
+  | SbEventDataType
+  | TrainMovementsElementEventDataType;

@@ -1,4 +1,4 @@
-import { Button } from "@fluentui/react-components";
+import { OptButton } from "@shared/components/fluentui";
 import {
   ChevronDoubleLeftRegular,
   ChevronDoubleRightRegular,
@@ -168,7 +168,7 @@ export const TransferList: React.FC<TransferListProps> = ({
       {showButtonsControl && (
         <div className="flex w-20 flex-col items-center justify-center gap-2 px-2">
           <div className="flex flex-col gap-2">
-            <Button
+            <OptButton
               icon={<ChevronDoubleRightRegular />}
               appearance="subtle"
               size="small"
@@ -177,7 +177,7 @@ export const TransferList: React.FC<TransferListProps> = ({
               title="Mover todos para direita"
             />
 
-            <Button
+            <OptButton
               icon={<ChevronRight24Regular />}
               appearance="primary"
               size="small"
@@ -186,7 +186,7 @@ export const TransferList: React.FC<TransferListProps> = ({
               title="Mover selecionados para direita"
             />
 
-            <Button
+            <OptButton
               icon={<ChevronLeft24Regular />}
               appearance="primary"
               size="small"
@@ -195,7 +195,7 @@ export const TransferList: React.FC<TransferListProps> = ({
               title="Mover selecionados para esquerda"
             />
 
-            <Button
+            <OptButton
               icon={<ChevronDoubleLeftRegular />}
               appearance="subtle"
               size="small"
