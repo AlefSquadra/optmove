@@ -1,4 +1,4 @@
-export const normalizeShortcut = (shortcut) => {
+export const normalizeShortcut = (shortcut: string) => {
   if (!shortcut) return "";
 
   const parts = shortcut.split("+").map((s) => s.trim());

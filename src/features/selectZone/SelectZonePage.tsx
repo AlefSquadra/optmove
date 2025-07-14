@@ -100,7 +100,9 @@ const SelectZonePage = () => {
                 }}
                 multiple={false}
                 disabled={!isFetchedPerfil}
-                options={perfilData?.map((perfil) => ({ id: perfil?.id, name: perfil?.name })) || []}
+                options={
+                  perfilData ? perfilData.map((perfil) => ({ id: perfil?.id || "", name: perfil?.name || "" })) : []
+                }
                 placeholder="Selecione um perfil"
                 error={!!errors.perfilMesa}
                 className="perfil-dropdown"
@@ -121,7 +123,7 @@ const SelectZonePage = () => {
                   field.onChange(selected as DropdownOption[]);
                 }}
                 disabled={!isFetchedMesa}
-                options={mesaData ? [{ id: mesaData.id, name: mesaData.name }] : []}
+                options={mesaData ? [{ id: mesaData.id || "", name: mesaData.name || "" }] : []}
                 placeholder="Selecione uma ou mais mesas"
                 multiple={false}
                 error={!!errors.mesa}
@@ -143,7 +145,7 @@ const SelectZonePage = () => {
                   field.onChange(selected as DropdownOption);
                 }}
                 disabled={!isFetchedZonas}
-                options={zonasData ? [{ id: zonasData.id, name: zonasData.name }] : []}
+                options={zonasData ? [{ id: zonasData.id || "", name: zonasData.name || "" }] : []}
                 placeholder="Selecione uma zona"
                 error={!!errors.zona}
                 className="zona-dropdown"

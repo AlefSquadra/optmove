@@ -15,7 +15,7 @@ export const GHTChartMainService = {
         DateOfficializationList: data.officializations,
       },
 
-      paramsSerializer: (p) => {
+      paramsSerializer: (p: Record<string, any>) => {
         const sp = new URLSearchParams();
         Object.entries(p).forEach(([k, v]) =>
           Array.isArray(v) ? v.forEach((item) => sp.append(k, item)) : sp.append(k, String(v)),
@@ -34,7 +34,7 @@ export const GHTChartMainService = {
         DateOfficializationList: data.officializations,
       },
 
-      paramsSerializer: (p) => {
+      paramsSerializer: (p: Record<string, any>) => {
         const sp = new URLSearchParams();
         Object.entries(p).forEach(([k, v]) =>
           Array.isArray(v) ? v.forEach((item) => sp.append(k, item)) : sp.append(k, String(v)),
