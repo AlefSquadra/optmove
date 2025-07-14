@@ -138,7 +138,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
           }}
         >
           <div className="flex min-h-[20px] flex-1 flex-wrap items-center gap-1">
-            {multiple && currentValue.length > 0 ?
+            {multiple && currentValue.length > 0 && (
               <>
                 {currentValue.map((item) => (
                   <span
@@ -157,7 +157,9 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
                 ))}
                 {currentValue.length === 0 && <span className="text-sm text-gray-500">{placeholder}</span>}
               </>
-            : <span
+            )}
+            {(!multiple || currentValue.length === 0) && (
+              <span
                 className={`truncate text-sm ${
                   currentValue.length === 0 ?
                     disabled ? "text-gray-400"
@@ -168,7 +170,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
               >
                 {getDisplayText()}
               </span>
-            }
+            )}
           </div>
 
           <ChevronDown20Regular
@@ -203,9 +205,9 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
       {/* Dropdown Menu */}
       {isOpen && !disabled && (
         <div className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-sm border border-gray-200 bg-white shadow-lg">
-          {options.length === 0 ?
-            <div className="px-3 py-2 text-sm text-gray-500">Nenhuma opção disponível</div>
-          : options.map((option) => {
+          {options.length === 0 && <div className="px-3 py-2 text-sm text-gray-500">Nenhuma opção disponível</div>}
+          {options.length > 0 &&
+            options.map((option) => {
               const isSelected = isOptionSelected(option);
               return (
                 <button
@@ -222,8 +224,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
                   </div>
                 </button>
               );
-            })
-          }
+            })}
         </div>
       )}
     </div>
