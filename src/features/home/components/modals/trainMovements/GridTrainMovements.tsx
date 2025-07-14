@@ -63,11 +63,18 @@ const GridTrainMovements = ({ trainMovements }: GridTrainMovementsProps) => {
   );
   const tableData = trainMovements || [];
 
+  const processedData = useMemo(() => {
+    return tableData.map((item: any, index: number) => {
+      const itemId = item.id || `${item.sb || "item"}-${index}`;
+      return { ...item, id: itemId };
+    });
+  }, [tableData]);
+
   return (
     <div className="h-full w-full">
       <OptGridTable<TrainMovementData>
         columns={columns}
-        data={tableData.map((item: any, index: number) => ({ ...item, id: item.id || `${item.sb}-${index}` }))}
+        data={processedData}
         defaultId="id"
         enableExpandAll
         enableRowSelection={false}

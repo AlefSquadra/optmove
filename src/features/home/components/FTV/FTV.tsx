@@ -75,13 +75,13 @@ const FTVLayout = () => {
 
       setLoadingStage("Buscando restrições");
 
-      const rectangles = await GHTChartMainService.getRectangles(parameters);
+      // const rectangles = await GHTChartMainService.getRectangles(parameters);
 
       setTrainsInGhtChart(trains);
       setLoadingStage("");
       return {
         trains,
-        rectangles,
+        rectangles: ChartRestrictionsMock,
         sbs,
       };
     },
