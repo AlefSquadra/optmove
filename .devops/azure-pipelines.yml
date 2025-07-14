@@ -15,7 +15,7 @@ variables:
   - name: DOCKER_BUILDKIT
     value: '1'
   - group: general-pipeline
-  - ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/release') }}:
+  - ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release') }}:
     - group: optmove-front-build-prd
   - ${{ else }}:
     - group: optmove-front-build-dev
