@@ -1,7 +1,10 @@
 import { Dropdown, type DropdownProps } from "@fluentui/react-components";
+import { forwardRef } from "react";
 
-const OptDropdown = (props: DropdownProps) => {
-  return <Dropdown {...props} />;
-};
+const OptDropdown = forwardRef<HTMLButtonElement, DropdownProps>((props, ref) => {
+  return <Dropdown {...props} ref={ref} />;
+});
+
+OptDropdown.displayName = "OptDropdown";
 
 export { OptDropdown };

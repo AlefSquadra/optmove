@@ -4,13 +4,18 @@ import {
   ToolbarDivider,
   type ToolbarDividerProps,
 } from "@fluentui/react-components";
+import { forwardRef } from "react";
 
-const OptToolbarButton = (props: ToolbarButtonProps) => {
-  return <ToolbarButton {...props} />;
-};
+const OptToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>((props, ref) => {
+  return <ToolbarButton {...props} ref={ref} />;
+});
 
-const OptToolbarDivider = (props: ToolbarDividerProps) => {
-  return <ToolbarDivider {...props} />;
-};
+OptToolbarButton.displayName = "OptToolbarButton";
+
+const OptToolbarDivider = forwardRef<HTMLDivElement, ToolbarDividerProps>((props, ref) => {
+  return <ToolbarDivider {...props} ref={ref} />;
+});
+
+OptToolbarDivider.displayName = "OptToolbarDivider";
 
 export { OptToolbarButton, OptToolbarDivider };
