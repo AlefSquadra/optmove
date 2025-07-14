@@ -15,9 +15,7 @@ variables:
   - name: DOCKER_BUILDKIT
     value: '1'
   - group: general-pipeline
-  - ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/homolog') }}:
-    - group: optmove-front-build-hom
-  - ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+  - ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/release') }}:
     - group: optmove-front-build-prd
   - ${{ else }}:
     - group: optmove-front-build-dev
@@ -41,8 +39,7 @@ stages:
         displayName: 'Build and Package FRONT'
         condition: |
           or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'),
-             eq(variables['Build.SourceBranch'], 'refs/heads/homolog'),
-             eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+             eq(variables['Build.SourceBranch'], 'refs/heads/release'))
         steps:
           - template: azure-pipelines-templates/front-build.yml
 
