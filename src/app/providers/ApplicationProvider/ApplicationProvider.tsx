@@ -2,18 +2,21 @@ import { ApplicationContext } from "@app/providers/ApplicationProvider/Applicati
 import type { TrainData } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import type { IOfficializationApplicationData } from "@shared/types/Officialization.type";
 import type { ISelectZoneConfig } from "@shared/types/SelectedZone.type";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const ApplicationProvider = ({ children }: { children: React.ReactNode }) => {
-  const [selectZoneParams, setSelectZoneParams] = useState<ISelectZoneConfig>({
-    profileZone: "2",
-    mesaZone: "BaixadaSantista",
-    mesaZoneId: "BaixadaSantista",
-  });
+  const selectZoneParamsInStorage =
+    localStorage.getItem("selectZoneParams") ? JSON.parse(localStorage.getItem("selectZoneParams") as string) : {};
+
+  const [selectZoneParams, setSelectZoneParams] = useState<ISelectZoneConfig>(selectZoneParamsInStorage);
   const [selectedOfficialization, setSelectedOfficialization] = useState<IOfficializationApplicationData | undefined>(
     undefined,
   );
   const [trainsInGhtChart, setTrainsInGhtChart] = useState<TrainData[]>([]);
+
+  useEffect(() => {
+    localStorage.setItem("selectZoneParams", JSON.stringify(selectZoneParams));
+  }, [selectZoneParams]);
 
   return (
     <ApplicationContext.Provider

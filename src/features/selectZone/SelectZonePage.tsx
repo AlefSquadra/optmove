@@ -18,11 +18,15 @@ const SelectZonePage = () => {
   const {
     control,
     handleSubmit,
-
     setValue,
     formState: { errors },
-  } = useForm<SelectZoneFormValuesZod>({
+  } = useForm({
     resolver: zodResolver(SelectZoneFormSchemaZod),
+    defaultValues: {
+      perfilMesa: { id: "", name: "" },
+      mesa: { id: "", name: "" },
+      zona: { id: "", name: "" },
+    },
   });
 
   const { data: zonasData, isFetched: isFetchedZonas } = useQuery({
@@ -41,12 +45,12 @@ const SelectZonePage = () => {
   });
 
   const onSubmit = (data: SelectZoneFormValuesZod) => {
+    navigate("/home");
     setSelectZoneParams({
       profileZone: data.perfilMesa.id as "1" | "2",
-      mesaZone: data.mesa.map((i) => i.id).join(","),
-      mesaZoneId: data.mesa.map((i) => i.id).join(","),
+      mesaZone: data.mesa.id,
+      mesaZoneId: data.zona.id,
     });
-    navigate("/home");
   };
 
   const perfilSelecionado = useWatch({
@@ -61,13 +65,13 @@ const SelectZonePage = () => {
 
   useEffect(() => {
     if (perfilSelecionado) {
-      setValue("mesa", []);
-      setValue("zona", {} as DropdownOption);
+      setValue("mesa", { id: "", name: "" });
+      setValue("zona", { id: "", name: "" });
     }
   }, [perfilSelecionado, setValue]);
 
   useEffect(() => {
-    if (mesaSelecionada?.find((t) => t?.id == "7") && zonasData) {
+    if (mesaSelecionada.id == "7" && zonasData) {
       setValue("zona", zonasData);
     }
   }, [mesaSelecionada, setValue, zonasData]);
@@ -87,7 +91,6 @@ const SelectZonePage = () => {
         <Controller
           name="perfilMesa"
           control={control}
-          rules={{ required: "Perfil é obrigatório" }}
           render={({ field }) => (
             <OptField label="Perfil" validationMessage={errors.perfilMesa?.message}>
               <CustomDropdown
@@ -95,6 +98,7 @@ const SelectZonePage = () => {
                 onOptionSelect={(selected) => {
                   field.onChange(selected as DropdownOption);
                 }}
+                multiple={false}
                 disabled={!isFetchedPerfil}
                 options={perfilData?.map((perfil) => ({ id: perfil?.id, name: perfil?.name })) || []}
                 placeholder="Selecione um perfil"
@@ -109,7 +113,6 @@ const SelectZonePage = () => {
         <Controller
           name="mesa"
           control={control}
-          rules={{ required: "Mesa é obrigatória" }}
           render={({ field }) => (
             <OptField label="Mesa" validationMessage={errors.mesa?.message}>
               <CustomDropdown
@@ -118,9 +121,9 @@ const SelectZonePage = () => {
                   field.onChange(selected as DropdownOption[]);
                 }}
                 disabled={!isFetchedMesa}
-                options={[mesaData!]!.map((mesa) => ({ id: mesa?.id, name: mesa?.name })) || []}
+                options={mesaData ? [mesaData].map((mesa) => ({ id: mesa?.id, name: mesa?.name })) : []}
                 placeholder="Selecione uma ou mais mesas"
-                multiple={true}
+                multiple={false}
                 error={!!errors.mesa}
                 className="mesa-dropdown"
               />
@@ -132,7 +135,6 @@ const SelectZonePage = () => {
         <Controller
           name="zona"
           control={control}
-          rules={{ required: "Zona é obrigatória" }}
           render={({ field }) => (
             <OptField label="Zonas selecionadas" validationMessage={errors.zona?.message}>
               <CustomDropdown
@@ -141,7 +143,7 @@ const SelectZonePage = () => {
                   field.onChange(selected as DropdownOption);
                 }}
                 disabled={!isFetchedZonas}
-                options={[zonasData!]?.map((zona) => ({ id: zona?.id, name: zona?.name })) || []}
+                options={zonasData ? [zonasData].map((zona) => ({ id: zona?.id, name: zona?.name })) : []}
                 placeholder="Selecione uma zona"
                 error={!!errors.zona}
                 className="zona-dropdown"
