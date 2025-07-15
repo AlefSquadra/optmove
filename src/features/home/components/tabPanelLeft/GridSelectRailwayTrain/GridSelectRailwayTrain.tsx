@@ -1,20 +1,14 @@
+import { useApplicationContext } from "@app/providers/ApplicationProvider/useApplication";
+import type { TrainData } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
-import { OptButton, OptField, OptInput } from "@shared/components/fluentui";
 import { Search20Regular } from "@fluentui/react-icons";
+import { OptButton, OptField, OptInput } from "@shared/components/fluentui";
 import { OptGridTable } from "@shared/components/gridTable/GridTable";
 import { TabWindowHeader } from "@shared/components/tabWindowHeader/tabWindowHeader";
-import { useQuery } from "@tanstack/react-query";
 import type { MRT_ColumnDef } from "mantine-react-table";
 import { MRT_Localization_PT_BR } from "mantine-react-table/locales/pt-BR/index.cjs";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-
-interface IRailwayTrainData {
-  id: string;
-  prefix: string;
-  type: string;
-  destination: string;
-}
 
 interface ISearchFormData {
   prefix: string;
@@ -22,15 +16,35 @@ interface ISearchFormData {
 }
 
 const columns = [
-  { accessorKey: "prefix", header: "Prefixo" },
-  { accessorKey: "type", header: "Tipo" },
-  { accessorKey: "destination", header: "Destino" },
-] as MRT_ColumnDef<IRailwayTrainData>[];
+  {
+    accessorKey: "prefixo",
+    header: "Prefixo",
+    size: 100,
+    minSize: 80,
+    maxSize: 120,
+  },
+  {
+    accessorKey: "tipoTrem",
+    header: "Tipo",
+    size: 80,
+    minSize: 70,
+    maxSize: 100,
+  },
+  {
+    accessorKey: "destino",
+    header: "Destino",
+    size: 150,
+    minSize: 100,
+    grow: true,
+  },
+] as MRT_ColumnDef<TrainData>[];
 
 const GridSelectRailwayTrain = () => {
-  const [selectedRows, setSelectedRows] = useState<IRailwayTrainData[]>([]);
+  const [selectedRows, setSelectedRows] = useState<TrainData[]>([]);
   const { setSelectedPanelTabBarLeft } = useFTLayout();
+  const { trainsInGhtChart, setTrainsInGhtChart } = useApplicationContext();
   const contentRef = useRef<HTMLDivElement>(null);
+  const lastSelectionRef = useRef<Set<string>>(new Set());
 
   const {
     control,
@@ -40,37 +54,65 @@ const GridSelectRailwayTrain = () => {
     defaultValues: { prefix: "", destination: "" },
   });
 
-  const [globalFilter, setGlobalFilter] = useState<string>("");
+  const [filteredData, setFilteredData] = useState<TrainData[]>([]);
 
-  const { data } = useQuery({
-    queryKey: ["gridSelectRailwayTrain"],
-    queryFn: async () => [
-      { id: "1", prefix: "123", type: "123", destination: "123" },
-      { id: "2", prefix: "prefix1", type: "prefix1type", destination: "destination" },
-    ],
-  });
+  useEffect(() => {
+    setFilteredData(trainsInGhtChart ?? []);
+  }, [trainsInGhtChart]);
 
-  const onSelectionChange = (rows: IRailwayTrainData[]) => {
-    setSelectedRows(rows);
-  };
+  const onSelectionChange = useCallback(
+    (rows: TrainData[]) => {
+      const currentSelectionIds = new Set(rows.map((row) => row.id));
+
+      const lastSelection = lastSelectionRef.current;
+      const hasChanged =
+        currentSelectionIds.size !== lastSelection.size ||
+        ![...currentSelectionIds].every((id) => lastSelection.has(id));
+
+      if (!hasChanged) {
+        return;
+      }
+
+      lastSelectionRef.current = currentSelectionIds;
+      setSelectedRows(rows);
+
+      setTimeout(() => {
+        setTrainsInGhtChart((prevTrains) =>
+          prevTrains.map((train) => ({
+            ...train,
+            showTrain: currentSelectionIds.has(train.id),
+          })),
+        );
+      }, 0);
+    },
+    [setTrainsInGhtChart],
+  );
 
   const handleUnselectAll = () => setSelectedRows([]);
 
   const onSearch = (formData: ISearchFormData) => {
-    // Junta os campos do formulário em uma string só para o filtro global
-    const filtro = `${formData.prefix ?? ""} ${formData.destination ?? ""}`.trim();
-    setGlobalFilter(filtro);
+    if (!trainsInGhtChart) return;
+
+    const filtered = trainsInGhtChart.filter((item) => {
+      const prefixMatch = !formData.prefix || item.prefixo.toLowerCase().includes(formData.prefix.toLowerCase());
+      const destinationMatch =
+        !formData.destination || item.destino.toLowerCase().includes(formData.destination.toLowerCase());
+
+      return prefixMatch && destinationMatch;
+    });
+
+    setFilteredData(filtered);
   };
 
   return (
-    <div className="box-border flex h-full w-[500px] flex-col">
+    <div className="box-border flex h-full w-full max-w-[500px] flex-col">
       <TabWindowHeader
         title={"Trens"}
         onClose={() => {
           setSelectedPanelTabBarLeft((prev) => ({ ...prev, openTabName: "" }));
         }}
       />
-      <div className="flex h-full w-auto flex-col gap-4 border p-4">
+      <div className="flex h-full w-full flex-col gap-4 overflow-hidden border p-4">
         <form onSubmit={handleSubmit(onSearch)} className="flex flex-wrap items-end gap-2">
           <Controller
             name="prefix"
@@ -99,18 +141,26 @@ const GridSelectRailwayTrain = () => {
           </OptButton>
         </form>
 
-        <div className="flex h-full flex-col" ref={contentRef}>
+        <div className="flex h-full min-h-0 flex-col overflow-hidden" ref={contentRef}>
           <OptGridTable
             defaultId="id"
             columns={columns}
-            data={data ?? []}
+            data={filteredData}
             preSelectedItems={selectedRows}
             onSelectionChange={onSelectionChange}
             localization={MRT_Localization_PT_BR}
-            mantineTableContainerProps={{ style: { height: contentRef.current?.clientHeight + "px", flex: 1 } }}
-            // O ponto principal:
-            state={{ globalFilter }}
-            onGlobalFilterChange={setGlobalFilter}
+            mantineTableContainerProps={{
+              style: {
+                height: contentRef.current?.clientHeight + "px",
+                flex: 1,
+                overflowX: "hidden",
+                width: "100%",
+                maxWidth: "100%",
+              },
+            }}
+            enableColumnResizing={true}
+            columnResizeMode="onChange"
+            layoutMode="grid-no-grow"
           />
         </div>
       </div>

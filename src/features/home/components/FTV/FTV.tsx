@@ -73,7 +73,11 @@ const FTVLayout = () => {
       setLoadingStage("Buscando trens...");
 
       const trains = await GHTChartMainService.getTrains(parameters);
+      trains.forEach((train) => {
+        train.showTrain = true;
+      });
 
+      alert(JSON.stringify(trains));
       setLoadingStage("Buscando restrições");
 
       // const rectangles = await GHTChartMainService.getRectangles(parameters);
