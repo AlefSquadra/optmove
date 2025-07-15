@@ -52,15 +52,15 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
   const { handlePrefixSearchChange } = props;
   const { setIsOpen, setIsPanelOpenDown, prefix, setPrefix } = useOfficeMenuContext();
   const {
-    selectedPanelTabBarLeft,
     setSelectedPanelTabBarLeft,
-    showAccomplished,
     setShowAccomplished,
     showTimelineView,
     setShowTimelineView,
     setOpenSelectOfficialization,
     setOpenSystemParams,
     graphTimeAndCoordinates,
+
+    showInfoTrainRef,
   } = useFTLayout();
   const { selectZoneParams, selectedOfficialization } = useApplicationContext();
 
@@ -70,7 +70,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
       mesa: "7",
       prefix: "",
       plan: "",
-      infoTrem: "",
+      infoTrem: false,
       exibirRealizados: "",
       ateLinhaDoTempo: "",
     },
@@ -78,6 +78,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
 
   const { control, setValue, watch } = methods;
   const prefixValue = watch("prefix");
+  const hasInfoTrem = watch("infoTrem");
 
   useEffect(() => {
     if (selectedOfficialization?.officializationForm.timelineDatetime) {
@@ -95,7 +96,8 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
 
   useEffect(() => {
     setPrefix(prefixValue);
-  }, [prefixValue, setPrefix]);
+    showInfoTrainRef.current = !!hasInfoTrem;
+  }, [prefixValue, setPrefix, hasInfoTrem]);
 
   return (
     <FormProvider {...methods}>
@@ -275,14 +277,9 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
                 control={control}
                 render={({ field }) => (
                   <OptCheckbox
-                    {...field}
-                    checked={selectedPanelTabBarLeft.isOpen}
+                    checked={field.value}
                     onChange={(_, data) => {
                       field.onChange(data.checked);
-                      setSelectedPanelTabBarLeft(() => ({
-                        isOpen: data.checked as boolean,
-                        openTabName: "",
-                      }));
                     }}
                     label={<OptText className="text-sm md:!text-[.7rem]">Info's do trem</OptText>}
                   />
@@ -298,7 +295,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
                     label={<OptText className="text-sm md:!text-[.7rem]">Exibir realizados</OptText>}
                     size="medium"
                     className="text-xs"
-                    checked={showAccomplished}
+                    checked={field.value as any}
                     onChange={(_, data) => {
                       field.onChange(data.checked);
                       setShowAccomplished(data.checked as boolean);

@@ -288,8 +288,8 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     };
   }
 
-  const onMouseMoveInRestrictionCallback = useCallback(
-    (element) => {
+  const onMouseMoveInElementCallback = useCallback(
+    (element: IElementEventInPlotG | null) => {
       onMouseMoveInElement(element);
     },
     [onMouseMoveInElement],
@@ -521,7 +521,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
         onGraphCoordenatesChange(coords);
       })
       .on("mouseover", function () {
-        onMouseMoveInRestrictionCallback(null);
+        onMouseMoveInElementCallback(null);
       })
       .on("contextmenu", function (event: MouseEvent) {
         event.preventDefault();
@@ -687,7 +687,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
         .on("mouseover", function (event) {
           event.preventDefault();
           event.stopPropagation();
-          onMouseMoveInRestrictionCallback({ data: res, element: "restriction" });
+          onMouseMoveInElementCallback({ data: res, element: "restriction" });
           tooltip
             .html(
               `<strong>Restrição:</strong> ${res.name}<br/>` +
@@ -701,7 +701,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
         })
         .on("mouseout", function () {
           tooltip.transition().duration(100).style("opacity", 0);
-          onMouseMoveInRestrictionCallback(null);
+          onMouseMoveInElementCallback(null);
         })
         .on("contextmenu", function (event: MouseEvent) {
           event.preventDefault();
@@ -784,18 +784,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
           .on("click", function (event) {
             event.stopPropagation();
             onClickInElement({
-              data: {
-                id: train.id,
-                prefix: train.prefixo,
-                table: train.tabela,
-                tipo: train.tipoTrem,
-                length: train.comprimentoKm.toString(),
-                lotation: "",
-                segmentCut: mov.linha,
-                segmentEnd: mov.destino,
-                groupVPM: "",
-                vma: "",
-              },
+              data: { actualMovement: mov, train },
               element: "train",
             });
           })
@@ -806,7 +795,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
             const visibleLine = movementGroup.select(".train-visible-line");
 
             visibleLine.raise().attr("stroke", "steelblue").attr("stroke-width", 3);
-            onMouseMoveInRestrictionCallback({ data: { id: train.prefixo, name: train.prefixo }, element: "train" });
+            onMouseMoveInElementCallback({ data: { actualMovement: mov, train }, element: "train" });
             tooltip
               .html(
                 `<strong>Prefixo:</strong> ${train.prefixo}<br/><strong>Segmento:</strong> ${mov.segmento}<br/><strong>Chegada:</strong> ${mov.chegada}<br/><strong>Partida:</strong> ${mov.partida}`,
@@ -845,7 +834,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
             visibleLine.attr("stroke", targetColor).attr("stroke-width", targetWidth);
 
             tooltip.transition().duration(100).style("opacity", 0);
-            onMouseMoveInRestrictionCallback(null);
+            onMouseMoveInElementCallback(null);
           })
           .on("contextmenu", function (event: MouseEvent) {
             event.preventDefault();
@@ -1050,7 +1039,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     dateTimeLine,
     restrictions,
     keyPressCtrl,
-    onMouseMoveInRestrictionCallback,
+    onMouseMoveInElementCallback,
   ]);
 
   useEffect(() => {

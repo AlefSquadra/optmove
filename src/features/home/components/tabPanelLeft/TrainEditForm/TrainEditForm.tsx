@@ -1,3 +1,4 @@
+import type { IOpenPanelTabBarLeftTrainEditGeneral } from "@features/home/providers/HomeFTLayoutProvider/HomeFTLayoutProvider.types";
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
 import { OptDropdown, OptField, OptInput, OptOption, OptRadio, OptRadioGroup } from "@shared/components/fluentui";
 import { TabWindowHeader } from "@shared/components/tabWindowHeader/tabWindowHeader";
@@ -47,10 +48,21 @@ const TrainEditForm = () => {
   });
 
   useEffect(() => {
+    const tabBarLeft = selectedPanelTabBarLeft as IOpenPanelTabBarLeftTrainEditGeneral;
     if (selectedPanelTabBarLeft.data && selectedPanelTabBarLeft.isOpen) {
-      reset(selectedPanelTabBarLeft.data);
+      reset({
+        groupVPM: "-",
+        length: "-",
+        lotation: "empty",
+        prefix: tabBarLeft.data?.train?.prefixo,
+        table: tabBarLeft.data?.train?.tabela,
+        tipo: tabBarLeft.data?.train?.tipoTrem,
+        vma: "",
+        segmentCut: "",
+        segmentEnd: "",
+      });
     }
-  }, [selectedPanelTabBarLeft?.isOpen, reset]);
+  }, [selectedPanelTabBarLeft?.isOpen, selectedPanelTabBarLeft.data, reset]);
 
   return (
     <div className="flex h-full w-[300px] flex-col">

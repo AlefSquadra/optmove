@@ -50,6 +50,7 @@ const FTVLayout = () => {
     setOpenSystemParams,
     openSystemParams,
     setGraphTimeAndCoordinates,
+    showInfoTrainRef,
   } = useFTLayout();
   const [loadingStage, setLoadingStage] = useState<string>("");
   const { selectedOfficialization, setTrainsInGhtChart, trainsInGhtChart } = useApplicationContext();
@@ -127,7 +128,7 @@ const FTVLayout = () => {
   const handleOnClickInElement = useCallback(
     (elementEvent: IElementEventInPlotG | null) => {
       if (elementEvent !== null) {
-        if (elementEvent.element === "train") {
+        if (elementEvent.element === "train" && showInfoTrainRef.current) {
           setSelectedPanelTabBarLeft(() => ({
             isOpen: true,
             openTabName: "editando o trem",
@@ -136,7 +137,7 @@ const FTVLayout = () => {
         }
       }
     },
-    [setSelectedPanelTabBarLeft],
+    [setSelectedPanelTabBarLeft, showInfoTrainRef],
   );
 
   const handleOnClickMenuContext = useCallback((data: IElementEventInPlotG | null) => {
@@ -263,11 +264,8 @@ const FTVLayout = () => {
           <OptText className="text-center text-red-700">
             {mouseOverInElementData?.element === "train" && (
               <>
-                {/* {`${lineTrainSelected.name} (${lineTrainSelected.data.type}) | Chegada: ${lineTrainSelected.data?.xi} | Saída: ${lineTrainSelected?.data?.xf} Destino: ${
-                lineTrainSelected.data?.info.find((x: { label: string; value: string }) => x?.label === "Destino")
-                  ?.value
-              }`} */}
-                {JSON.stringify(mouseOverInElementData?.data)}
+                {`${mouseOverInElementData?.data?.train?.prefixo} (${mouseOverInElementData?.data?.train?.tipoTrem}) | Chegada: ${mouseOverInElementData?.data?.actualMovement?.chegada} | Saída: ${mouseOverInElementData?.data?.actualMovement?.linha} Destino: ${mouseOverInElementData?.data?.actualMovement?.destino}
+                `}
               </>
             )}
             {mouseOverInElementData?.element === "restriction" && <> {JSON.stringify(mouseOverInElementData?.data)}</>}
