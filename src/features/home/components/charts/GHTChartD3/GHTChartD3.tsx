@@ -46,6 +46,7 @@ export interface TrainData {
   zonaOficial: string;
   movimentos: TrainMovement[];
   nomeSbl: string;
+  showTrain?: boolean;
 }
 
 export interface RestrictionInfo {
@@ -288,8 +289,8 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     };
   }
 
-  const onMouseMoveInRestrictionCallback = useCallback(
-    (element) => {
+  const onMouseMoveInElementCallback = useCallback(
+    (element: IElementEventInPlotG | null) => {
       onMouseMoveInElement(element);
     },
     [onMouseMoveInElement],
@@ -521,7 +522,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
         onGraphCoordenatesChange(coords);
       })
       .on("mouseover", function () {
-        onMouseMoveInRestrictionCallback(null);
+        onMouseMoveInElementCallback(null);
       })
       .on("contextmenu", function (event: MouseEvent) {
         event.preventDefault();
@@ -687,7 +688,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
         .on("mouseover", function (event) {
           event.preventDefault();
           event.stopPropagation();
-          onMouseMoveInRestrictionCallback({ data: res, element: "restriction" });
+          onMouseMoveInElementCallback({ data: res, element: "restriction" });
           tooltip
             .html(
               `<strong>Restrição:</strong> ${res.name}<br/>` +
@@ -701,7 +702,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
         })
         .on("mouseout", function () {
           tooltip.transition().duration(100).style("opacity", 0);
-          onMouseMoveInRestrictionCallback(null);
+          onMouseMoveInElementCallback(null);
         })
         .on("contextmenu", function (event: MouseEvent) {
           event.preventDefault();
@@ -743,7 +744,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
 
     trains.forEach((train) => {
       const singleTrainGroup = trainGroup.append("g").attr("class", `train-path train-prefix-${train.prefixo}`);
-      const trainColor = `rgb(${train.cor.slice(0, -1)})`;
+      const trainColor = train.cor; // Usa a cor real do trem
 
       let firstVisibleMovement = true;
 
@@ -765,203 +766,194 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
         if (y1 === undefined || y2 === undefined || Math.max(y1!, y2!) < yDomain[0] || Math.min(y1!, y2!) > yDomain[1])
           return;
 
-        // Cria um grupo específico para este movimento
-        const movementGroup = singleTrainGroup
-          .append("g")
-          .attr("class", `movement-${movIndex}`)
-          .attr("data-movement-id", `${train.prefixo}-${movIndex}`);
+        if (train.showTrain) {
+          // Cria um grupo específico para este movimento
+          const movementGroup = singleTrainGroup
+            .append("g")
+            .attr("class", `movement-${movIndex}`)
+            .attr("data-movement-id", `${train.prefixo}-${movIndex}`);
 
-        // Linha invisível para capturar eventos de mouse (soluciona problema com stroke-dasharray)
-        movementGroup
-          .append("line")
-          .attr("x1", xScale(chegadaDate))
-          .attr("y1", yScale(y1!))
-          .attr("x2", xScale(fimCursoDate))
-          .attr("y2", yScale(y2!))
-          .attr("stroke", "transparent")
-          .attr("stroke-width", 8) // Linha mais grossa para facilitar captura do mouse
-          .style("cursor", "pointer")
-          .on("click", function (event) {
-            event.stopPropagation();
-            onClickInElement({
-              data: {
-                id: train.id,
-                prefix: train.prefixo,
-                table: train.tabela,
-                tipo: train.tipoTrem,
-                length: train.comprimentoKm.toString(),
-                lotation: "",
-                segmentCut: mov.linha,
-                segmentEnd: mov.destino,
-                groupVPM: "",
-                vma: "",
-              },
-              element: "train",
-            });
-          })
-          .on("mouseover", function (event) {
-            event.stopPropagation();
-            // Destaca a linha visível ao fazer hover - apenas deste movimento específico
-            const movementGroup = d3.select(this.parentNode as Element);
-            const visibleLine = movementGroup.select(".train-visible-line");
+          // Linha invisível para capturar eventos de mouse (soluciona problema com stroke-dasharray)
+          movementGroup
+            .append("line")
+            .attr("x1", xScale(chegadaDate))
+            .attr("y1", yScale(y1!))
+            .attr("x2", xScale(fimCursoDate))
+            .attr("y2", yScale(y2!))
+            .attr("stroke", "transparent")
+            .attr("stroke-width", 8) // Linha mais grossa para facilitar captura do mouse
+            .style("cursor", "pointer")
+            .on("click", function (event) {
+              event.stopPropagation();
+              onClickInElement({
+                data: { actualMovement: mov, train },
+                element: "train",
+              });
+            })
+            .on("mouseover", function (event) {
+              event.stopPropagation();
+              // Destaca a linha visível ao fazer hover - apenas deste movimento específico
+              const movementGroup = d3.select(this.parentNode as Element);
+              const visibleLine = movementGroup.select(".train-visible-line");
 
-            visibleLine.raise().attr("stroke", "steelblue").attr("stroke-width", 3);
-            onMouseMoveInRestrictionCallback({ data: { id: train.prefixo, name: train.prefixo }, element: "train" });
-            tooltip
-              .html(
-                `<strong>Prefixo:</strong> ${train.prefixo}<br/><strong>Segmento:</strong> ${mov.segmento}<br/><strong>Chegada:</strong> ${mov.chegada}<br/><strong>Partida:</strong> ${mov.partida}`,
-              )
-              .style("left", event.offsetX + 10 + "px")
-              .style("top", event.offsetY + 10 + "px")
-              .transition()
-              .duration(200)
-              .style("opacity", 1);
-          })
-          .on("mousemove", function (event) {
-            event.stopPropagation();
-            tooltip.style("left", event.offsetX + 10 + "px").style("top", event.offsetY + 10 + "px");
-          })
-          .on("mouseout", function () {
-            // Volta ao estilo original da linha visível - agora usa o movimento específico
-            const movementGroup = d3.select(this.parentNode as Element);
-            const visibleLine = movementGroup.select(".train-visible-line");
+              visibleLine.raise().attr("stroke", "steelblue").attr("stroke-width", 3);
+              onMouseMoveInElementCallback({ data: { actualMovement: mov, train }, element: "train" });
+              tooltip
+                .html(
+                  `<strong>Prefixo:</strong> ${train.prefixo}<br/><strong>Segmento:</strong> ${mov.segmento}<br/><strong>Chegada:</strong> ${mov.chegada}<br/><strong>Partida:</strong> ${mov.partida}`,
+                )
+                .style("left", event.offsetX + 10 + "px")
+                .style("top", event.offsetY + 10 + "px")
+                .transition()
+                .duration(200)
+                .style("opacity", 1);
+            })
+            .on("mousemove", function (event) {
+              event.stopPropagation();
+              tooltip.style("left", event.offsetX + 10 + "px").style("top", event.offsetY + 10 + "px");
+            })
+            .on("mouseout", function () {
+              // Volta ao estilo original da linha visível - agora usa o movimento específico
+              const movementGroup = d3.select(this.parentNode as Element);
+              const visibleLine = movementGroup.select(".train-visible-line");
 
-            // Usa dados diretamente do escopo (muito mais eficiente)
-            let targetColor = trainColor;
-            let targetWidth = 2;
+              // Usa dados diretamente do escopo (muito mais eficiente)
+              let targetColor = trainColor;
+              let targetWidth = 2;
 
-            // Verifica se este trem está sendo destacado pelo sistema de highlight
-            if (highlightedPrefix) {
-              const searchPrefix = highlightedPrefix.trim().toUpperCase();
+              // Verifica se este trem está sendo destacado pelo sistema de highlight
+              if (highlightedPrefix) {
+                const searchPrefix = highlightedPrefix.trim().toUpperCase();
 
-              // Se o trem está sendo destacado, mantém a cor azul
-              if (train.prefixo.toUpperCase().startsWith(searchPrefix)) {
-                targetColor = "blue";
-                targetWidth = 3;
+                // Se o trem está sendo destacado, mantém a cor azul
+                if (train.prefixo.toUpperCase().startsWith(searchPrefix)) {
+                  targetColor = "blue";
+                  targetWidth = 3;
+                }
               }
-            }
 
-            // Aplica a cor apenas a esta linha específica
-            visibleLine.attr("stroke", targetColor).attr("stroke-width", targetWidth);
+              // Aplica a cor apenas a esta linha específica
+              visibleLine.attr("stroke", targetColor).attr("stroke-width", targetWidth);
 
-            tooltip.transition().duration(100).style("opacity", 0);
-            onMouseMoveInRestrictionCallback(null);
-          })
-          .on("contextmenu", function (event: MouseEvent) {
-            event.preventDefault();
-            setContextMenuData({
-              isOpen: true,
-              data: {
-                x: event.clientX,
-                y: event.clientY,
-                menuGroup: [
-                  {
-                    section: "Trens",
-                    items: [
-                      {
-                        id: "train_movements",
-                        label: "Movimentos trem",
-                        shortcut: "Ctrl+M",
-                        onClick: () => {
-                          onClickMenuContext({
-                            data: train,
-                            element: "trainMovements",
-                          });
+              tooltip.transition().duration(100).style("opacity", 0);
+              onMouseMoveInElementCallback(null);
+            })
+            .on("contextmenu", function (event: MouseEvent) {
+              event.preventDefault();
+              setContextMenuData({
+                isOpen: true,
+                data: {
+                  x: event.clientX,
+                  y: event.clientY,
+                  menuGroup: [
+                    {
+                      section: "Trens",
+                      items: [
+                        {
+                          id: "train_movements",
+                          label: "Movimentos trem",
+                          shortcut: "Ctrl+M",
+                          onClick: () => {
+                            onClickMenuContext({
+                              data: train,
+                              element: "trainMovements",
+                            });
+                          },
                         },
-                      },
-                      {
-                        id: "train_ficha",
-                        label: "Ficha do trem",
-                        onClick: () => {},
-                      },
-                    ],
-                  },
-                  {
-                    section: "Atividade do trem",
-                    items: [
-                      {
-                        id: "train_activities",
-                        label: "Atividades trem",
-                        shortcut: "F2",
-                        onClick: () => {},
-                      },
-                    ],
-                  },
-                  {
-                    section: "Trazer trem pra frente",
-                    items: [
-                      {
-                        id: "train_front",
-                        label: "Trazer trem pra frente",
-                        shortcut: "F9",
-                        onClick: () => {},
-                      },
-                    ],
-                  },
-                ],
-              },
+                        {
+                          id: "train_ficha",
+                          label: "Ficha do trem",
+                          onClick: () => {},
+                        },
+                      ],
+                    },
+                    {
+                      section: "Atividade do trem",
+                      items: [
+                        {
+                          id: "train_activities",
+                          label: "Atividades trem",
+                          shortcut: "F2",
+                          onClick: () => {},
+                        },
+                      ],
+                    },
+                    {
+                      section: "Trazer trem pra frente",
+                      items: [
+                        {
+                          id: "train_front",
+                          label: "Trazer trem pra frente",
+                          shortcut: "F9",
+                          onClick: () => {},
+                        },
+                      ],
+                    },
+                  ],
+                },
+              });
             });
-          });
 
-        // Linha visível com dash-array (sem eventos de mouse)
-        movementGroup
-          .append("line")
-          .attr("class", "train-visible-line")
-          .attr("x1", xScale(chegadaDate))
-          .attr("y1", yScale(y1!))
-          .attr("x2", xScale(fimCursoDate))
-          .attr("y2", yScale(y2!))
-          .attr("stroke", trainColor)
-          .attr("stroke-width", 2)
-          .attr("stroke-dasharray", "3,2")
-          .style("pointer-events", "none"); // Remove eventos de mouse desta linha
+          // Linha visível com dash-array (sem eventos de mouse)
+          movementGroup
+            .append("line")
+            .attr("class", "train-visible-line")
+            .attr("x1", xScale(chegadaDate))
+            .attr("y1", yScale(y1!))
+            .attr("x2", xScale(fimCursoDate))
+            .attr("y2", yScale(y2!))
+            .attr("stroke", trainColor)
+            .attr("stroke-width", 2)
+            .attr("stroke-dasharray", "3,2")
+            .style("pointer-events", "none"); // Remove eventos de mouse desta linha
 
-        if (firstVisibleMovement) {
-          // Adiciona label para o nome do trem
-          singleTrainGroup
-            .append("text")
-            .attr("x", xScale(chegadaDate) - 5)
-            .attr("y", yScale(y1!) + 4)
-            .attr("text-anchor", "end")
-            .attr("font-size", "10px")
-            .attr("font-weight", "bold")
-            .attr("fill", trainColor)
-            .text(train.prefixo);
-          firstVisibleMovement = false;
-        }
+          if (firstVisibleMovement) {
+            // Adiciona label para o nome do trem
+            singleTrainGroup
+              .append("text")
+              .attr("x", xScale(chegadaDate) - 5)
+              .attr("y", yScale(y1!) + 4)
+              .attr("text-anchor", "end")
+              .attr("font-size", "10px")
+              .attr("font-weight", "bold")
+              .attr("fill", trainColor)
+              .text(train.prefixo);
+            firstVisibleMovement = false;
+          }
 
-        const centerX = (xScale(chegadaDate) + xScale(fimCursoDate)) / 2;
-        const centerY = (yScale(y1!) + yScale(y2!)) / 2 - 10;
+          const centerX = (xScale(chegadaDate) + xScale(fimCursoDate)) / 2;
+          const centerY = (yScale(y1!) + yScale(y2!)) / 2 - 10;
 
-        const desiredIconHeight = 16;
-        const scale = desiredIconHeight / 106;
+          const desiredIconHeight = 16;
+          const scale = desiredIconHeight / 106;
 
-        if (mov.activity && mov.activity.length > 0) {
-          const iconGroup = singleTrainGroup
-            .append("g")
-            .attr(
-              "transform",
-              `translate(${centerX - (79 * scale) / 2}, ${centerY - (106 * scale) / 2}) scale(${scale})`,
-            );
+          if (mov.activity && mov.activity.length > 0) {
+            const iconGroup = singleTrainGroup
+              .append("g")
+              .attr(
+                "transform",
+                `translate(${centerX - (79 * scale) / 2}, ${centerY - (106 * scale) / 2}) scale(${scale})`,
+              );
 
-          iconGroup
-            .append("g")
-            .attr("transform", "translate(0,106) scale(0.1,-0.1)")
-            .append("path")
-            .attr(
-              "d",
-              "M230 1020 c0 -39 -1 -40 -35 -40 l-35 0 0 -225 0 -225 35 0 c33 0 35 -2 35 -35 l0 -35 55 0 55 0 0 -230 0 -230 40 0 40 0 0 230 0 230 55 0 55 0 0 35 c0 33 2 35 35 35 l35 0 0 225 0 225 -35 0 c-34 0 -35 1 -35 40 l0 40 -150 0 -150 0 0 -40z",
-            )
-            .attr("fill", "#000")
-            .attr("stroke", "none");
+            iconGroup
+              .append("g")
+              .attr("transform", "translate(0,106) scale(0.1,-0.1)")
+              .append("path")
+              .attr(
+                "d",
+                "M230 1020 c0 -39 -1 -40 -35 -40 l-35 0 0 -225 0 -225 35 0 c33 0 35 -2 35 -35 l0 -35 55 0 55 0 0 -230 0 -230 40 0 40 0 0 230 0 230 55 0 55 0 0 35 c0 33 2 35 35 35 l35 0 0 225 0 225 -35 0 c-34 0 -35 1 -35 40 l0 40 -150 0 -150 0 0 -40z",
+              )
+              .attr("fill", "#000")
+              .attr("stroke", "none");
 
-          iconGroup
-            .append("rect")
-            .attr("x", 0.3 * 79)
-            .attr("y", 0.05 * 106)
-            .attr("width", 0.35 * 79)
-            .attr("height", 0.45 * 106)
-            .attr("fill", "#ffb335");
+            iconGroup
+              .append("rect")
+              .attr("x", 0.3 * 79)
+              .attr("y", 0.05 * 106)
+              .attr("width", 0.35 * 79)
+              .attr("height", 0.45 * 106)
+              .attr("fill", "#ffb335");
+          }
         }
       });
     });
@@ -1036,8 +1028,8 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     }
 
     timelinePlot.raise();
-    trainGroup.raise();
     restrictionsGroup.raise();
+    trainGroup.raise();
   }, [
     hourWidth,
     height,
@@ -1050,7 +1042,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     dateTimeLine,
     restrictions,
     keyPressCtrl,
-    onMouseMoveInRestrictionCallback,
+    onMouseMoveInElementCallback,
   ]);
 
   useEffect(() => {
@@ -1068,7 +1060,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
       const trainData = trains.find((t) => t.prefixo === prefix);
 
       if (trainData) {
-        const originalColor = `rgb(${trainData.cor.slice(0, -1)})`;
+        const originalColor = trainData.cor; // A cor já está em formato hexadecimal
         singleTrainGroup.selectAll(".train-visible-line").attr("stroke", originalColor).attr("stroke-width", 2);
         singleTrainGroup.selectAll("text").attr("fill", originalColor);
       }

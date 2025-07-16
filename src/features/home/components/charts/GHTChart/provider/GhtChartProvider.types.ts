@@ -1,6 +1,6 @@
 import type { IContextMenuProps } from "@features/home/components/charts/GHTChart/elements/GHTChartContextMenu/contextMenu.types";
 import type { IClickableElement } from "@features/home/components/charts/GHTChart/GHTChart.types";
-import type { TrainData } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
+import type { RestrictionData, TrainData, TrainMovement } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import type { TrainEditFormData } from "@features/home/components/tabPanelLeft/TrainEditForm/TrainEditForm";
 
 export interface IGHTChartContext {
@@ -22,16 +22,21 @@ export interface TrainElementEventData extends TrainEditFormData {
   id: string;
 }
 
-export interface RestrictionElementEventData {
-  code: string;
-  description: string;
+export interface RestrictionElementEventData extends RestrictionData {
+  code?: string;
+  description?: string;
 }
 
 export interface SbEventData {
   color: string;
 }
 
-export type TrainElementEventDataType = { element: "train"; data: TrainElementEventData };
+export interface ITrainMovementsElementEvent {
+  actualMovement: TrainMovement;
+  train: TrainData;
+}
+
+export type TrainElementEventDataType = { element: "train"; data: ITrainMovementsElementEvent };
 export type TrainMovementsElementEventDataType = { element: "trainMovements"; data: TrainData };
 export type RestrictionElementEventDataType = { element: "restriction"; data: RestrictionElementEventData };
 export type SbEventDataType = { element: "sb"; data: SbEventData };

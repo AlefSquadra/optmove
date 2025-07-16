@@ -34,6 +34,7 @@ import { OfficeMenuProvider } from "@features/home/providers/OfficeMenuProvider/
 import { GHTChartMainService } from "@features/home/services/GHTChartMainService";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import { DateFormat } from "@shared/utils/DateFormat";
+import { RgbStringToHex } from "@shared/utils/RgbToHex";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 
@@ -50,6 +51,7 @@ const FTVLayout = () => {
     setOpenSystemParams,
     openSystemParams,
     setGraphTimeAndCoordinates,
+    showInfoTrainRef,
   } = useFTLayout();
   const [loadingStage, setLoadingStage] = useState<string>("");
   const { selectedOfficialization, setTrainsInGhtChart, trainsInGhtChart } = useApplicationContext();
@@ -72,6 +74,10 @@ const FTVLayout = () => {
       setLoadingStage("Buscando trens...");
 
       const trains = await GHTChartMainService.getTrains(parameters);
+      trains.forEach((train) => {
+        train.cor = RgbStringToHex(train.cor);
+        train.showTrain = true;
+      });
 
       setLoadingStage("Buscando restrições");
 
@@ -127,7 +133,7 @@ const FTVLayout = () => {
   const handleOnClickInElement = useCallback(
     (elementEvent: IElementEventInPlotG | null) => {
       if (elementEvent !== null) {
-        if (elementEvent.element === "train") {
+        if (elementEvent.element === "train" && showInfoTrainRef.current) {
           setSelectedPanelTabBarLeft(() => ({
             isOpen: true,
             openTabName: "editando o trem",
@@ -136,7 +142,7 @@ const FTVLayout = () => {
         }
       }
     },
-    [setSelectedPanelTabBarLeft],
+    [setSelectedPanelTabBarLeft, showInfoTrainRef],
   );
 
   const handleOnClickMenuContext = useCallback((data: IElementEventInPlotG | null) => {
@@ -263,11 +269,8 @@ const FTVLayout = () => {
           <OptText className="text-center text-red-700">
             {mouseOverInElementData?.element === "train" && (
               <>
-                {/* {`${lineTrainSelected.name} (${lineTrainSelected.data.type}) | Chegada: ${lineTrainSelected.data?.xi} | Saída: ${lineTrainSelected?.data?.xf} Destino: ${
-                lineTrainSelected.data?.info.find((x: { label: string; value: string }) => x?.label === "Destino")
-                  ?.value
-              }`} */}
-                {JSON.stringify(mouseOverInElementData?.data)}
+                {`${mouseOverInElementData?.data?.train?.prefixo} (${mouseOverInElementData?.data?.train?.tipoTrem}) | Chegada: ${mouseOverInElementData?.data?.actualMovement?.chegada} | Saída: ${mouseOverInElementData?.data?.actualMovement?.linha} Destino: ${mouseOverInElementData?.data?.actualMovement?.destino}
+                `}
               </>
             )}
             {mouseOverInElementData?.element === "restriction" && <> {JSON.stringify(mouseOverInElementData?.data)}</>}
