@@ -614,35 +614,6 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
           .map((d) => d.indexGraficoI!)
       : segmentData.filter((seg) => seg.startY >= yDomain[0] && seg.startY <= yDomain[1]).map((seg) => seg.startY);
 
-    plotG
-      .append("g")
-      .selectAll("line.y-grid")
-      .data(gridYValues)
-      .enter()
-      .append("line")
-      .attr("class", "y-grid")
-      .attr("x1", 0)
-      .attr("x2", plotWidth)
-      .attr("y1", (d) => yScale(d))
-      .attr("y2", (d) => yScale(d))
-      .attr("stroke", "#ccc")
-      .attr("stroke-width", 1)
-      .attr("opacity", 0.8);
-    plotG
-      .append("g")
-      .selectAll("line.x-grid")
-      .data(innerHourTicks)
-      .enter()
-      .append("line")
-      .attr("class", "x-grid")
-      .attr("x1", (d) => xScale(d))
-      .attr("x2", (d) => xScale(d))
-      .attr("y1", 0)
-      .attr("y2", innerH)
-      .attr("stroke", "#ccc")
-      .attr("stroke-width", 1)
-      .attr("opacity", 0.8);
-
     // --- INÍCIO: LÓGICA DE PLOTAGEM DAS RESTRIÇÕES ---
     const restrictionsGroup = plotG.append("g").attr("class", "restrictions-group");
 
@@ -958,6 +929,40 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
       });
     });
 
+    // Create grid lines group and add horizontal and vertical grid lines
+    const gridLinesY = plotG.append("g").attr("class", "grid-lines-y");
+    const gridLinesX = plotG.append("g").attr("class", "grid-lines-x");
+
+    // Horizontal grid lines
+    gridLinesY
+      .selectAll("line.y-grid")
+      .data(gridYValues)
+      .enter()
+      .append("line")
+      .attr("class", "y-grid")
+      .attr("x1", 0)
+      .attr("x2", plotWidth)
+      .attr("y1", (d) => yScale(d))
+      .attr("y2", (d) => yScale(d))
+      .attr("stroke", "#ccc")
+      .attr("stroke-width", 1)
+      .attr("opacity", 0.8);
+
+    // Vertical grid lines
+    gridLinesX
+      .selectAll("line.x-grid")
+      .data(innerHourTicks)
+      .enter()
+      .append("line")
+      .attr("class", "x-grid")
+      .attr("x1", (d) => xScale(d))
+      .attr("x2", (d) => xScale(d))
+      .attr("y1", 0)
+      .attr("y2", innerH)
+      .attr("stroke", "#9f9e9e")
+      .attr("stroke-width", 1)
+      .attr("opacity", 0.8);
+
     const timelinePlot = plotG.append("line");
 
     timelinePlot
@@ -1027,7 +1032,9 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
       segBgGroup.raise();
     }
 
+    // Ensure proper layering order: grid lines should appear over backgrounds but under content
     timelinePlot.raise();
+    gridLinesX.raise();
     restrictionsGroup.raise();
     trainGroup.raise();
   }, [
