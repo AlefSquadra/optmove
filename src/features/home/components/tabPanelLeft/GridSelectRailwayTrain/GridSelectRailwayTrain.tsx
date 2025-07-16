@@ -80,7 +80,7 @@ const GridSelectRailwayTrain = () => {
         setTrainsInGhtChart((prevTrains) =>
           prevTrains.map((train) => ({
             ...train,
-            showTrain: currentSelectionIds.has(train.id),
+            showTrain: currentSelectionIds.size > 0 ? currentSelectionIds.has(train.id) : true,
           })),
         );
       }, 0);

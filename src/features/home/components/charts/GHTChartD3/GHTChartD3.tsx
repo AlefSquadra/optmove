@@ -744,7 +744,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
 
     trains.forEach((train) => {
       const singleTrainGroup = trainGroup.append("g").attr("class", `train-path train-prefix-${train.prefixo}`);
-      const trainColor = `rgb(${train.cor.slice(0, -1)})`;
+      const trainColor = train.cor; // Usa a cor real do trem
 
       let firstVisibleMovement = true;
 
@@ -1028,8 +1028,8 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     }
 
     timelinePlot.raise();
-    trainGroup.raise();
     restrictionsGroup.raise();
+    trainGroup.raise();
   }, [
     hourWidth,
     height,
@@ -1060,7 +1060,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
       const trainData = trains.find((t) => t.prefixo === prefix);
 
       if (trainData) {
-        const originalColor = `rgb(${trainData.cor.slice(0, -1)})`;
+        const originalColor = trainData.cor; // A cor já está em formato hexadecimal
         singleTrainGroup.selectAll(".train-visible-line").attr("stroke", originalColor).attr("stroke-width", 2);
         singleTrainGroup.selectAll("text").attr("fill", originalColor);
       }

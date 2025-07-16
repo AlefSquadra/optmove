@@ -34,6 +34,7 @@ import { OfficeMenuProvider } from "@features/home/providers/OfficeMenuProvider/
 import { GHTChartMainService } from "@features/home/services/GHTChartMainService";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import { DateFormat } from "@shared/utils/DateFormat";
+import { RgbStringToHex } from "@shared/utils/RgbToHex";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 
@@ -74,10 +75,10 @@ const FTVLayout = () => {
 
       const trains = await GHTChartMainService.getTrains(parameters);
       trains.forEach((train) => {
+        train.cor = RgbStringToHex(train.cor);
         train.showTrain = true;
       });
 
-      alert(JSON.stringify(trains));
       setLoadingStage("Buscando restrições");
 
       // const rectangles = await GHTChartMainService.getRectangles(parameters);
