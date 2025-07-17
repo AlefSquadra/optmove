@@ -50,7 +50,7 @@ export interface IFTVRibbonProps {
 
 export const FTVRibbon = (props: IFTVRibbonProps) => {
   const { handlePrefixSearchChange } = props;
-  const { setIsOpen, setIsPanelOpenDown, prefix, setPrefix } = useOfficeMenuContext();
+  const { setIsOpen, prefix, setPrefix } = useOfficeMenuContext();
   const {
     setSelectedPanelTabBarLeft,
     setShowAccomplished,
@@ -59,7 +59,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
     setOpenSelectOfficialization,
     setOpenSystemParams,
     graphTimeAndCoordinates,
-
+    setIsPanelOpenDown,
     showInfoTrainRef,
   } = useFTLayout();
   const { selectZoneParams, selectedOfficialization } = useApplicationContext();
@@ -265,7 +265,7 @@ export const FTVRibbon = (props: IFTVRibbonProps) => {
               {/* Botões de ícones */}
               <OptToolbarButton icon={<img src={growingGraph} width={20} />} />
               <OptToolbarButton icon={<img src={graphBlockSearch} width={20} />} />
-              <OptToolbarButton icon={<img src={windowPlot} width={20} />} />
+              <OptToolbarButton icon={<img src={windowPlot} width={20} />} onClick={() => setIsPanelOpenDown(true)} />
               <OptToolbarButton
                 icon={<img src={windowFolder} width={20} />}
                 onClick={() => setOpenSystemParams({ isOpen: true })}

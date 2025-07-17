@@ -1,29 +1,12 @@
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
-import {
-  OptButton,
-  OptDataGrid,
-  OptDataGridBody,
-  OptDataGridCell,
-  OptDataGridHeader,
-  OptDataGridHeaderCell,
-  OptDataGridRow,
-  OptField,
-  OptInput,
-  OptMenu,
-  OptMenuItem,
-  OptMenuList,
-  OptMenuPopover,
-  OptMenuTrigger,
-  OptTableCellLayout,
-  optCreateTableColumn,
-  type OptDataGridProps,
-  type OptTableColumnDefinition,
-  type OptTableRowId,
-} from "@shared/components/fluentui";
-import { ArrowSyncRegular, Search20Regular } from "@fluentui/react-icons";
+import { Search20Regular } from "@fluentui/react-icons";
+import { OptButton, OptField, OptInput } from "@shared/components/fluentui";
+import { OptGridTable } from "@shared/components/gridTable/GridTable";
 import { TabWindowHeader } from "@shared/components/tabWindowHeader/tabWindowHeader";
 import { useQuery } from "@tanstack/react-query";
-import React, { useState } from "react";
+import type { MRT_ColumnDef } from "mantine-react-table";
+import { MRT_Localization_PT_BR } from "mantine-react-table/locales/pt-BR/index.cjs";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 interface IActivitiesAltersData {
@@ -39,108 +22,119 @@ interface ISearchFormData {
   destination: string;
 }
 
-const columns: OptTableColumnDefinition<IActivitiesAltersData>[] = [
-  optCreateTableColumn<IActivitiesAltersData>({
-    columnId: "trem",
-    compare: (a, b) => {
-      return a.trem.localeCompare(b.trem);
-    },
-    renderHeaderCell: () => {
-      return "Trem";
-    },
-    renderCell: (item) => {
-      return <OptTableCellLayout truncate>{item.trem}</OptTableCellLayout>;
-    },
-  }),
-  optCreateTableColumn<IActivitiesAltersData>({
-    columnId: "location",
-    compare: (a, b) => {
-      return a.location.localeCompare(b.location);
-    },
-    renderHeaderCell: () => {
-      return "location";
-    },
-    renderCell: (item) => {
-      return <OptTableCellLayout truncate>{item.location}</OptTableCellLayout>;
-    },
-  }),
-  optCreateTableColumn<IActivitiesAltersData>({
-    columnId: "duration",
-    compare: (a, b) => {
-      return a.duration.localeCompare(b.duration);
-    },
-    renderHeaderCell: () => {
-      return "duration";
-    },
-    renderCell: (item) => {
-      return <OptTableCellLayout truncate>{item.duration}</OptTableCellLayout>;
-    },
-  }),
-  optCreateTableColumn<IActivitiesAltersData>({
-    columnId: "endDate",
-    compare: (a, b) => {
-      return a.endDate.localeCompare(b.endDate);
-    },
-    renderHeaderCell: () => {
-      return "Destino";
-    },
-    renderCell: (item) => {
-      return <OptTableCellLayout truncate>{item.endDate}</OptTableCellLayout>;
-    },
-  }),
-];
+const columns = [
+  {
+    accessorKey: "trem",
+    header: "Trem",
+    size: 100,
+    minSize: 80,
+    maxSize: 120,
+  },
+  {
+    accessorKey: "location",
+    header: "Local",
+    size: 120,
+    minSize: 100,
+    maxSize: 150,
+  },
+  {
+    accessorKey: "duration",
+    header: "Duração",
+    size: 100,
+    minSize: 80,
+    maxSize: 120,
+  },
+  {
+    accessorKey: "endDate",
+    header: "Data Fim",
+    size: 120,
+    minSize: 100,
+    grow: true,
+  },
+] as MRT_ColumnDef<IActivitiesAltersData>[];
 
 const GridChangedActivities = () => {
-  const [selectedRows, setSelectedRows] = useState(new Set<OptTableRowId>([]));
+  const [selectedRows, setSelectedRows] = useState<IActivitiesAltersData[]>([]);
   const { setSelectedPanelTabBarLeft } = useFTLayout();
-  const refMap = React.useRef<Record<string, HTMLElement | null>>({});
+  const contentRef = useRef<HTMLDivElement>(null);
+  const lastSelectionRef = useRef<Set<string>>(new Set());
 
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<ISearchFormData>({
-    defaultValues: {
-      prefix: "",
-      destination: "",
-    },
+    defaultValues: { prefix: "", destination: "" },
   });
 
-  const { data, refetch } = useQuery({
+  const { data } = useQuery({
     queryKey: ["GridActivitiesAlters"],
     queryFn: async () => {
       return [
         {
           id: "1",
-          prefix: "123",
-          type: "123",
-          dateOfficialization: "123",
+          trem: "T123",
+          location: "Estação A",
+          endDate: "2024-01-15",
+          duration: "2h 30m",
+        },
+        {
+          id: "2",
+          trem: "T456",
+          location: "Estação B",
+          endDate: "2024-01-15",
+          duration: "1h 45m",
         },
       ];
     },
   });
 
-  const stabilizedData = data || [];
+  const [filteredData, setFilteredData] = useState<IActivitiesAltersData[]>([]);
 
-  const onSelectionChange: OptDataGridProps["onSelectionChange"] = (_, data) => {
-    setSelectedRows(data.selectedItems);
-  };
+  useEffect(() => {
+    setFilteredData(data || []);
+  }, [data]);
+
+  const onSelectionChange = useCallback((rows: IActivitiesAltersData[]) => {
+    const currentSelectionIds = new Set(rows.map((row) => row.id));
+
+    const lastSelection = lastSelectionRef.current;
+    const hasChanged =
+      currentSelectionIds.size !== lastSelection.size || ![...currentSelectionIds].every((id) => lastSelection.has(id));
+
+    if (!hasChanged) {
+      return;
+    }
+
+    lastSelectionRef.current = currentSelectionIds;
+    setSelectedRows(rows);
+  }, []);
+
+  const handleUnselectAll = () => setSelectedRows([]);
 
   const onSearch = (formData: ISearchFormData) => {
-    console.log("Search data:", formData);
-    // Implementar lógica de busca aqui
-    refetch();
+    if (!data) return;
+
+    const filtered = data.filter((item) => {
+      const prefixMatch = !formData.prefix || item.trem.toLowerCase().includes(formData.prefix.toLowerCase());
+      const destinationMatch =
+        !formData.destination || item.location.toLowerCase().includes(formData.destination.toLowerCase());
+
+      return prefixMatch && destinationMatch;
+    });
+
+    setFilteredData(filtered);
   };
 
   return (
-    <div className="box-border flex h-full w-[500px] flex-col bg-white">
+    <div className="box-border flex h-full w-full max-w-[500px] flex-col">
       <TabWindowHeader
         title={"Atividades alteradas"}
         onClose={() => {
           setSelectedPanelTabBarLeft((prev) => ({ ...prev, openTabName: "" }));
         }}
       />
-      <div className="flex h-full w-auto flex-col gap-4 border p-4">
+      <div className="flex h-full w-full flex-col gap-4 overflow-hidden border p-4">
         <form onSubmit={handleSubmit(onSearch)} className="flex flex-wrap items-end gap-2">
           <Controller
             name="prefix"
@@ -157,69 +151,39 @@ const GridChangedActivities = () => {
             control={control}
             render={({ field }) => (
               <OptField validationMessage={errors.destination?.message}>
-                <OptInput {...field} placeholder="local" style={{ width: 100 }} />
+                <OptInput {...field} placeholder="Local" style={{ width: 100 }} />
               </OptField>
             )}
           />
 
           <OptButton type="submit" appearance="primary" icon={<Search20Regular />} />
 
-          <OptButton type="button" appearance="secondary" onClick={() => {}} icon={<ArrowSyncRegular />}></OptButton>
+          <OptButton type="button" appearance="secondary" onClick={handleUnselectAll}>
+            Desmarcar todos
+          </OptButton>
         </form>
 
-        <div style={{ height: "100%", overflow: "auto" }}>
-          <OptDataGrid
-            items={stabilizedData}
+        <div className="flex h-full min-h-0 flex-col overflow-hidden" ref={contentRef}>
+          <OptGridTable
+            defaultId="id"
             columns={columns}
-            sortable
-            getRowId={(item) => item.id}
-            selectionMode="multiselect"
-            resizableColumns
-            resizableColumnsOptions={{
-              autoFitColumns: true,
-            }}
-            selectedItems={selectedRows}
+            data={filteredData}
+            preSelectedItems={selectedRows}
             onSelectionChange={onSelectionChange}
-          >
-            <OptDataGridHeader>
-              <OptDataGridRow
-                selectionCell={{
-                  checkboxIndicator: { "aria-label": "Select all rows" },
-                }}
-              >
-                {({ renderHeaderCell, columnId }, dataGrid) =>
-                  dataGrid.resizableColumns ?
-                    <OptMenu openOnContext>
-                      <OptMenuTrigger>
-                        <OptDataGridHeaderCell>
-                          <div ref={(el: any) => (refMap.current[columnId] = el)}>{renderHeaderCell()}</div>
-                        </OptDataGridHeaderCell>
-                      </OptMenuTrigger>
-                      <OptMenuPopover>
-                        <OptMenuList>
-                          <OptMenuItem onClick={dataGrid.columnSizing_unstable.enableKeyboardMode(columnId)}>
-                            Keyboard Column Resizing
-                          </OptMenuItem>
-                        </OptMenuList>
-                      </OptMenuPopover>
-                    </OptMenu>
-                  : <OptDataGridHeaderCell>{renderHeaderCell()}</OptDataGridHeaderCell>
-                }
-              </OptDataGridRow>
-            </OptDataGridHeader>
-            <OptDataGridBody>
-              {({ item, rowId }) => (
-                <OptDataGridRow
-                  key={rowId}
-                  selectionCell={{
-                    checkboxIndicator: { "aria-label": "Select row" },
-                  }}
-                >
-                  {({ renderCell }) => <OptDataGridCell>{renderCell(item)}</OptDataGridCell>}
-                </OptDataGridRow>
-              )}
-            </OptDataGridBody>
-          </OptDataGrid>
+            localization={MRT_Localization_PT_BR}
+            mantineTableContainerProps={{
+              style: {
+                height: contentRef.current?.clientHeight + "px",
+                flex: 1,
+                overflowX: "hidden",
+                width: "100%",
+                maxWidth: "100%",
+              },
+            }}
+            enableColumnResizing={true}
+            columnResizeMode="onChange"
+            layoutMode="grid-no-grow"
+          />
         </div>
       </div>
     </div>

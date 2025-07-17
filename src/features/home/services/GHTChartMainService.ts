@@ -45,4 +45,22 @@ export const GHTChartMainService = {
       notRequiresAuth: false,
     });
   },
+
+  getChangedActivities(data: { officializations: string[] }) {
+    return apiClientMock.get<any[]>(`/v1/ght/altividadesAlteradas`, {
+      params: {
+        DateOfficializationList: data.officializations,
+      },
+
+      paramsSerializer: (p: Record<string, any>) => {
+        const sp = new URLSearchParams();
+        Object.entries(p).forEach(([k, v]) =>
+          Array.isArray(v) ? v.forEach((item) => sp.append(k, item)) : sp.append(k, String(v)),
+        );
+        return sp.toString();
+      },
+
+      notRequiresAuth: false,
+    });
+  },
 };

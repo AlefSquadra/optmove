@@ -27,11 +27,18 @@ import type {
   TrainMovementsElementEventDataType,
 } from "@features/home/components/charts/GHTChart/provider/GhtChartProvider.types";
 import { GHTChartD3 } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
+import {
+  YardOccupancy,
+  generateMockYardOccupancies,
+  mockYardLines,
+} from "@features/home/components/charts/YardOccupancy";
 import { ChartRestrictionsMock, ChartTrainsMock, ChartYLabelMock } from "@features/home/components/FTV/json";
 import { FTVOfficeMenu } from "@features/home/components/headerOfficeMenu/OfficeMenu";
 import { ModalSearchTrainChartGhtForTable } from "@features/home/components/modals/modalSearchTrainChartGhtTable/ModalSearchTrainChartGhtTable";
 import { OfficeMenuProvider } from "@features/home/providers/OfficeMenuProvider/OfficeMenuProvider";
 import { GHTChartMainService } from "@features/home/services/GHTChartMainService";
+import { Button, DrawerBody, DrawerHeader, DrawerHeaderTitle, OverlayDrawer } from "@fluentui/react-components";
+import { Dismiss24Regular } from "@fluentui/react-icons";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import { DateFormat } from "@shared/utils/DateFormat";
 import { RgbStringToHex } from "@shared/utils/RgbToHex";
@@ -277,19 +284,39 @@ const FTVLayout = () => {
           </OptText>
         </FTLayoutFooter>
         <FTLayoutTabPanelDown>
-          <div className="relative">
-            <div className="flex flex-row gap-0">
-              {["Monitoramento de planos", "Atividades alteradas"].map((label, index) => (
-                <div
-                  key={index}
-                  className="group relative flex cursor-pointer items-center justify-center rounded-t-2xl border-2 border-gray-200 bg-white p-3"
-                >
-                  <div className="text-sm text-black">{label}</div>
+          <OverlayDrawer position={"bottom"} open={true} modalType="non-modal">
+            <DrawerHeader>
+              <DrawerHeaderTitle
+                action={<Button appearance="subtle" aria-label="Close" icon={<Dismiss24Regular />} />}
+              ></DrawerHeaderTitle>
+            </DrawerHeader>
+
+            <DrawerBody>
+              <div className="relative">
+                <div className="flex flex-row gap-0 bg-gray-100 p-2">
+                  <h3 className="text-sm font-semibold">Ocupação de Pátios</h3>
                 </div>
-              ))}
-            </div>
-            <div className="absolute top-full left-0 w-full bg-red-100 p-2">teste</div>
-          </div>
+                <div className="w-full">
+                  <YardOccupancy
+                    hourWidth={42}
+                    height={300}
+                    yAxisWidth={120}
+                    initialDate={initialDate}
+                    dateTimeLine={dateTimeLine}
+                    finalDate={finalDate}
+                    lines={mockYardLines}
+                    occupancies={generateMockYardOccupancies(dateTimeLine)}
+                    onOccupancyClick={(occupancy) => {
+                      console.log("Clicked on occupancy:", occupancy);
+                    }}
+                    onOccupancyHover={(occupancy) => {
+                      console.log("Hovering occupancy:", occupancy);
+                    }}
+                  />
+                </div>
+              </div>
+            </DrawerBody>
+          </OverlayDrawer>
         </FTLayoutTabPanelDown>
       </FTLayoutRoot>
       <ModalSelectOfficialization

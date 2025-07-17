@@ -3,7 +3,6 @@ import { OfficeMenuContext } from "./OfficeMenuContext";
 
 export const OfficeMenuProvider = ({ children }: { children: React.ReactNode }) => {
   const [selectedTab, setSelectedTab] = useState("ftv");
-  const [isPanelOpenDown, setIsPanelOpenDown] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [prefix, setPrefix] = useState("");
 
@@ -12,8 +11,6 @@ export const OfficeMenuProvider = ({ children }: { children: React.ReactNode }) 
       value={{
         selectedTab,
         setSelectedTab,
-        isPanelOpenDown,
-        setIsPanelOpenDown,
         isOpen,
         setIsOpen,
         prefix,
