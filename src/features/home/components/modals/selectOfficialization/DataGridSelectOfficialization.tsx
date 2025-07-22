@@ -110,7 +110,7 @@ const DataGridSelectOfficialization = (props: ISelectOfficializationDataGridProp
         state={{ isLoading }}
         localization={MRT_Localization_PT_BR}
         onSelectionChange={handleSelectionChange}
-        mantineTableContainerProps={{ style: { height: contentRef.current?.clientHeight + "px", flex: 1 } }}
+        mantineTableContainerProps={{ style: { height: "400px", flex: 1 } }}
       />
     </div>
   );

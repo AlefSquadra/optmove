@@ -57,6 +57,7 @@ const GridSelectRailwayTrain = () => {
   const [filteredData, setFilteredData] = useState<TrainData[]>([]);
 
   useEffect(() => {
+    alert(JSON.stringify(trainsInGhtChart, null, 2));
     setFilteredData(trainsInGhtChart ?? []);
   }, [trainsInGhtChart]);
 

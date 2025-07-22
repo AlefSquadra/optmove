@@ -1,9 +1,9 @@
+import { ChartTrainsMock } from "@features/home/components/FTV/json";
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
 import { Search20Regular } from "@fluentui/react-icons";
 import { OptButton, OptField, OptInput } from "@shared/components/fluentui";
 import { OptGridTable } from "@shared/components/gridTable/GridTable";
 import { TabWindowHeader } from "@shared/components/tabWindowHeader/tabWindowHeader";
-import { useQuery } from "@tanstack/react-query";
 import type { MRT_ColumnDef } from "mantine-react-table";
 import { MRT_Localization_PT_BR } from "mantine-react-table/locales/pt-BR/index.cjs";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -67,29 +67,22 @@ const GridChangedActivities = () => {
     defaultValues: { prefix: "", destination: "" },
   });
 
-  const { data } = useQuery({
-    queryKey: ["GridActivitiesAlters"],
-    queryFn: async () => {
-      return [
-        {
-          id: "1",
-          trem: "T123",
-          location: "Estação A",
-          endDate: "2024-01-15",
-          duration: "2h 30m",
-        },
-        {
-          id: "2",
-          trem: "T456",
-          location: "Estação B",
-          endDate: "2024-01-15",
-          duration: "1h 45m",
-        },
-      ];
-    },
-  });
-
   const [filteredData, setFilteredData] = useState<IActivitiesAltersData[]>([]);
+
+  const data = [] as IActivitiesAltersData[];
+
+  ChartTrainsMock.filter((x) => x.movimentos.some((x) => x.atividade.length > 0)).map((x) => {
+    x.movimentos.forEach((movimento) => {
+      if (movimento.atividade.length > 0 && movimento.atividade[0].source === "USER") {
+        data.push({
+          trem: x.prefixo,
+          location: movimento.linha,
+          duration: movimento.atividade[0].activityDurationTPFormatted,
+          endDate: "",
+        } as IActivitiesAltersData);
+      }
+    });
+  });
 
   useEffect(() => {
     setFilteredData(data || []);

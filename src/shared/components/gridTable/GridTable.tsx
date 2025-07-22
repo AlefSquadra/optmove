@@ -66,6 +66,7 @@ export const OptGridTable = <T extends Record<string, any>>(props: IGridTablePro
         enablePagination={false}
         enableBottomToolbar={false}
         enableTopToolbar={false}
+        enableRowVirtualization
         layoutMode="grid"
         {...optGridProps}
         getRowId={(row) => row[defaultId]}

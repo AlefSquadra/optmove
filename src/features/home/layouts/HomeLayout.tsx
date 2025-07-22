@@ -1,6 +1,7 @@
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
 import clsx from "clsx";
 import { forwardRef } from "react";
+import { FTLayoutResizableTabPanelDown } from "./FTLayoutResizableTabPanelDown";
 
 const FTLayoutRoot = (props: { children?: React.ReactNode }) => {
   const { isOpenPanelTabBarDown } = useFTLayout();
@@ -59,20 +60,7 @@ const FTLayoutTabPanelLeft = (props: { children?: React.ReactNode; className?: s
   );
 };
 
-const FTLayoutTabPanelDown = (props: { children?: React.ReactNode; className?: string }) => {
-  const { isOpenPanelTabBarDown: isPanelOpen } = useFTLayout();
-  return (
-    isPanelOpen && (
-      <div
-        className={clsx(
-          "relative z-50 col-span-12 col-start-1 row-span-3 row-start-4 flex w-full bg-transparent",
-          props.className,
-        )}
-      >
-        {props.children}
-      </div>
-    )
-  );
-};
+// Using the resizable component as FTLayoutTabPanelDown
+const FTLayoutTabPanelDown = FTLayoutResizableTabPanelDown;
 
 export { FTLayoutContent, FTLayoutFooter, FTLayoutHeader, FTLayoutRoot, FTLayoutTabPanelDown, FTLayoutTabPanelLeft };

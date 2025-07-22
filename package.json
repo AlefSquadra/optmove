@@ -17,6 +17,7 @@
   "dependencies": {
     "@azure/msal-browser": "^4.13.0",
     "@azure/msal-react": "^3.0.12",
+    "@fluentui-contrib/react-resize-handle": "0.7.1",
     "@fluentui/react-components": "^9.64.0",
     "@fluentui/react-datepicker-compat": "^0.5.7",
     "@fluentui/react-icons": "^2.0.302",

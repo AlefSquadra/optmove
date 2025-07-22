@@ -41,7 +41,6 @@ import { Button, DrawerBody, DrawerHeader, DrawerHeaderTitle, OverlayDrawer } fr
 import { Dismiss24Regular } from "@fluentui/react-icons";
 import { WindowModal } from "@shared/components/windowModal/WindowModal";
 import { DateFormat } from "@shared/utils/DateFormat";
-import { RgbStringToHex } from "@shared/utils/RgbToHex";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 
@@ -60,46 +59,66 @@ const FTVLayout = () => {
     setGraphTimeAndCoordinates,
     showInfoTrainRef,
   } = useFTLayout();
-  const [loadingStage, setLoadingStage] = useState<string>("");
   const { selectedOfficialization, setTrainsInGhtChart, trainsInGhtChart } = useApplicationContext();
   const { setSelectedPanelTabBarLeft } = useFTLayout();
-  const fetchDataGHT = useQuery({
-    queryKey: ["ghtData", selectedOfficialization],
-    queryFn: async () => {
-      const parameters = {
-        dateGhtTimeline: selectedOfficialization?.officializationForm.timelineDatetime as string,
-        officializations:
-          selectedOfficialization?.listOfficialization.map((o) =>
-            DateFormat.isoToSpace(o.dateOfficialization).toString(),
-          ) ?? [],
-      };
 
-      setLoadingStage("Carregando lista de SBS...");
+  const parameters = useMemo(
+    () => ({
+      dateGhtTimeline: selectedOfficialization?.officializationForm.timelineDatetime as string,
+      officializations:
+        selectedOfficialization?.listOfficialization.map((o) =>
+          DateFormat.isoToSpace(o.dateOfficialization).toString(),
+        ) ?? [],
+    }),
+    [selectedOfficialization],
+  );
 
-      const sbs = await GHTChartMainService.getSbs("ICZ-ISN Baixada Conceição-Santos");
+  const isEnabled = Object.keys(selectedOfficialization || {}).length > 0;
 
-      setLoadingStage("Buscando trens...");
-
-      const trains = await GHTChartMainService.getTrains(parameters);
-      trains.forEach((train) => {
-        train.cor = RgbStringToHex(train.cor);
-        train.showTrain = true;
-      });
-
-      setLoadingStage("Buscando restrições");
-
-      // const rectangles = await GHTChartMainService.getRectangles(parameters);
-
-      setTrainsInGhtChart(trains);
-      setLoadingStage("");
-      return {
-        trains,
-        rectangles: ChartRestrictionsMock,
-        sbs,
-      };
-    },
-    enabled: Object.keys(selectedOfficialization || {}).length > 0,
+  const sbsQuery = useQuery({
+    queryKey: ["sbs", "ICZ-ISN Baixada Conceição-Santos"],
+    queryFn: () => GHTChartMainService.getSbs("ICZ-ISN Baixada Conceição-Santos"),
+    enabled: isEnabled,
+    staleTime: 10 * 60 * 1000, // 10 minutes cache
+    refetchOnWindowFocus: false,
   });
+
+  const trainsQuery = useQuery({
+    queryKey: [
+      "trains",
+      selectedOfficialization?.officializationForm.timelineDatetime,
+      selectedOfficialization?.listOfficialization?.map((o) => o.dateOfficialization).join(","),
+    ],
+    queryFn: async () => await GHTChartMainService.getTrains(parameters),
+    enabled: isEnabled,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  const restrictionsQuery = useQuery({
+    queryKey: [
+      "restrictions",
+      selectedOfficialization?.officializationForm.timelineDatetime,
+      selectedOfficialization?.listOfficialization?.map((o) => o.dateOfficialization).join(","),
+    ],
+    queryFn: () => Promise.resolve(ChartRestrictionsMock),
+    enabled: isEnabled,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  const isLoading = sbsQuery.isLoading || trainsQuery.isLoading || restrictionsQuery.isLoading;
+  const isError = sbsQuery.isError || trainsQuery.isError || restrictionsQuery.isError;
+
+  useEffect(() => {
+    if (trainsQuery.data) {
+      setTrainsInGhtChart(trainsQuery.data);
+    }
+  }, [trainsQuery.data, setTrainsInGhtChart]);
+
   const [openModalSearchTrainChartGhtForTable, setOpenModalSearchTrainChartGhtForTable] = useState<IModalData<any>>({
     isOpen: false,
   });
@@ -212,7 +231,7 @@ const FTVLayout = () => {
             </OptText>
           </div>
           <div className="h-full w-full overflow-hidden">
-            {fetchDataGHT.isLoading && (
+            {isLoading && (
               <WindowModal
                 showButtonsHeader={false}
                 open={true}
@@ -223,33 +242,35 @@ const FTVLayout = () => {
               >
                 <div className="flex flex-col items-center p-1">
                   <OptSpinner size="small" />
-                  <div className="mt-1 text-lg text-gray-600">{loadingStage || "Carregando..."}</div>
+                  <div className="mt-1 text-lg text-gray-600">
+                    {sbsQuery.isLoading && "Carregando lista de SBS, "}
+                    {trainsQuery.isLoading && "Buscando trens, "}
+                    {restrictionsQuery.isLoading && "Buscando restrições, "}
+                    {!sbsQuery.isLoading && !trainsQuery.isLoading && !restrictionsQuery.isLoading && "Carregando..."}
+                  </div>
                 </div>
               </WindowModal>
             )}
-            {!fetchDataGHT.isLoading &&
-              fetchDataGHT.data &&
-              fetchDataGHT.data?.sbs.length > 0 &&
-              fetchDataGHT.data?.rectangles.length > 0 && (
-                <GHTChartD3
-                  trains={trainsInGhtChart as any}
-                  yLabels={fetchDataGHT.data?.sbs as any}
-                  restrictions={fetchDataGHT.data?.rectangles as any}
-                  height={FTContentRef?.current?.offsetHeight ? FTContentRef.current.offsetHeight - 47 : 0}
-                  hourWidth={42}
-                  yAxisWidth={80}
-                  initialDate={initialDate}
-                  dateTimeLine={dateTimeLine}
-                  finalDate={finalDate}
-                  onGraphTimeAndCoordenatesChange={handleGraphTimeChange}
-                  onMouseMoveInElement={handleMouseMoveInRestriction}
-                  onClickInElement={handleOnClickInElement}
-                  onClickMenuContext={handleOnClickMenuContext}
-                  highlightedPrefix={highlightedPrefix}
-                />
-              )}
+            {!isLoading && (
+              <GHTChartD3
+                trains={trainsInGhtChart as any}
+                yLabels={sbsQuery.data as any}
+                restrictions={restrictionsQuery.data as any}
+                height={FTContentRef?.current?.offsetHeight ? FTContentRef.current.offsetHeight - 47 : 0}
+                hourWidth={42}
+                yAxisWidth={80}
+                initialDate={initialDate}
+                dateTimeLine={dateTimeLine}
+                finalDate={finalDate}
+                onGraphTimeAndCoordenatesChange={handleGraphTimeChange}
+                onMouseMoveInElement={handleMouseMoveInRestriction}
+                onClickInElement={handleOnClickInElement}
+                onClickMenuContext={handleOnClickMenuContext}
+                highlightedPrefix={highlightedPrefix}
+              />
+            )}
 
-            {fetchDataGHT.isError && (
+            {isError && (
               <>
                 <GHTChartD3
                   trains={ChartTrainsMock as any}

@@ -2,7 +2,7 @@ import { ApplicationContext } from "@app/providers/ApplicationProvider/Applicati
 import type { TrainData } from "@features/home/components/charts/GHTChartD3/GHTChartD3";
 import type { IOfficializationApplicationData } from "@shared/types/Officialization.type";
 import type { ISelectZoneConfig } from "@shared/types/SelectedZone.type";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export const ApplicationProvider = ({ children }: { children: React.ReactNode }) => {
   const selectZoneParamsInStorage =
@@ -18,18 +18,17 @@ export const ApplicationProvider = ({ children }: { children: React.ReactNode })
     localStorage.setItem("selectZoneParams", JSON.stringify(selectZoneParams));
   }, [selectZoneParams]);
 
-  return (
-    <ApplicationContext.Provider
-      value={{
-        selectZoneParams,
-        setSelectZoneParams,
-        selectedOfficialization,
-        setSelectedOfficialization,
-        trainsInGhtChart,
-        setTrainsInGhtChart,
-      }}
-    >
-      {children}
-    </ApplicationContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      selectZoneParams,
+      setSelectZoneParams,
+      selectedOfficialization,
+      setSelectedOfficialization,
+      trainsInGhtChart,
+      setTrainsInGhtChart,
+    }),
+    [selectZoneParams, selectedOfficialization, trainsInGhtChart],
   );
+
+  return <ApplicationContext.Provider value={contextValue}>{children}</ApplicationContext.Provider>;
 };

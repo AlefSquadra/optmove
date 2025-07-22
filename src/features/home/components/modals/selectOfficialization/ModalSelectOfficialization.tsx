@@ -31,7 +31,7 @@ const ModalSelectOfficialization = (props: IModalSelectOfficializationProps) => 
     defaultValues: {
       dataInicial: new Date(),
       dataFinal: new Date(),
-      tipo: "TODOS",
+      tipo: "PUBLICADO",
       timelineDatetime: "",
       prefix: "",
     },

@@ -1,6 +1,6 @@
 import { useApplicationContext } from "@app/providers/ApplicationProvider/useApplication";
-import { OptButton, OptDropdown, OptField, OptInput, OptOption } from "@shared/components/fluentui";
 import { Search20Regular } from "@fluentui/react-icons";
+import { OptButton, OptDropdown, OptField, OptInput, OptOption } from "@shared/components/fluentui";
 import { DatePickerOptField } from "@shared/components/forms/DatePickerField";
 import type { IOfficializationFormData } from "@shared/types/Officialization.type";
 import React, { useEffect } from "react";
@@ -25,7 +25,7 @@ const SelectOfficializationForm: React.FC<IOfficializationFormProps> = ({ onSear
     reset({
       dataInicial: new Date(),
       dataFinal: new Date(),
-      tipo: "TODOS",
+      tipo: "PUBLICADO",
       timelineDatetime: "",
       prefix: "",
       ...selectedOfficialization?.officializationForm,

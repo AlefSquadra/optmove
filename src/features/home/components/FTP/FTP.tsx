@@ -52,10 +52,20 @@ const FTVLayout = () => {
     setGraphTimeAndCoordinates,
   } = useFTLayout();
   const [loadingStage, setLoadingStage] = useState<string>("");
-  const { selectedOfficialization, setTrainsInGhtChart, trainsInGhtChart } = useApplicationContext();
+  const { selectedOfficialization, trainsInGhtChart } = useApplicationContext();
   const { setSelectedPanelTabBarLeft } = useFTLayout();
+
+  const queryKey = useMemo(
+    () => [
+      "ghtData",
+      selectedOfficialization?.officializationForm.timelineDatetime,
+      selectedOfficialization?.listOfficialization?.map((o) => o.dateOfficialization).join(","),
+    ],
+    [selectedOfficialization?.officializationForm.timelineDatetime, selectedOfficialization?.listOfficialization],
+  );
+
   const fetchDataGHT = useQuery({
-    queryKey: ["ghtData", selectedOfficialization],
+    queryKey,
     queryFn: async () => {
       const parameters = {
         dateGhtTimeline: selectedOfficialization?.officializationForm.timelineDatetime as string,
@@ -77,7 +87,6 @@ const FTVLayout = () => {
 
       const rectangles = await GHTChartMainService.getRectangles(parameters);
 
-      setTrainsInGhtChart(trains);
       setLoadingStage("");
       return {
         trains,
@@ -86,6 +95,8 @@ const FTVLayout = () => {
       };
     },
     enabled: Object.keys(selectedOfficialization || {}).length > 0,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
   const [openModalSearchTrainChartGhtForTable, setOpenModalSearchTrainChartGhtForTable] = useState<IModalData<any>>({
     isOpen: false,

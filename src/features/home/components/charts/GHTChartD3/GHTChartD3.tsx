@@ -874,8 +874,8 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
             .attr("x2", xScale(fimCursoDate))
             .attr("y2", yScale(y2!))
             .attr("stroke", trainColor)
-            .attr("stroke-width", 2)
-            .attr("stroke-dasharray", "3,2")
+            .attr("stroke-width", 1)
+            .attr("stroke-dasharray", "4,1")
             .style("pointer-events", "none"); // Remove eventos de mouse desta linha
 
           if (firstVisibleMovement) {
@@ -1028,9 +1028,9 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
       .attr("stroke", "#000000")
       .attr("stroke-width", 1);
 
-    if (keyPressCtrl !== "Control") {
-      segBgGroup.raise();
-    }
+    // if (keyPressCtrl !== "Control") {
+    //   segBgGroup.raise();
+    // }
 
     // Ensure proper layering order: grid lines should appear over backgrounds but under content
     timelinePlot.raise();
