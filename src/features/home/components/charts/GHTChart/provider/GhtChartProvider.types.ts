@@ -12,6 +12,8 @@ export interface IGHTChartContext {
   setOpenContextMenu: React.Dispatch<React.SetStateAction<Omit<IContextMenuProps, "onAction" | "onClose"> | null>>;
   mouseOverInElementData: IElementEventInPlotG | null;
   setMouseOverInElementData: React.Dispatch<React.SetStateAction<IElementEventInPlotG | null>>;
+  highlightedPrefix: string | null;
+  setHighlightedPrefix: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export interface IGHTChartProviderProps {

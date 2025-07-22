@@ -36,6 +36,18 @@ export const OptGridTable = <T extends Record<string, any>>(props: IGridTablePro
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>(initialRowSelection);
 
+  // Update row selection when preSelectedItems changes
+  useEffect(() => {
+    const newRowSelection =
+      preSelectedItems?.length ?
+        preSelectedItems.reduce((acc, item) => {
+          acc[String(item[defaultId])] = true;
+          return acc;
+        }, {} as MRT_RowSelectionState)
+      : {};
+    setRowSelection(newRowSelection);
+  }, [preSelectedItems, defaultId]);
+
   // Lookup para converter id em row data
   const dataLookup = useMemo(() => {
     const map = new Map<string, T>();

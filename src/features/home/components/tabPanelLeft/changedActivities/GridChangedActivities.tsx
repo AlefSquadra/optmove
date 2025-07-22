@@ -1,3 +1,4 @@
+import { useGHTChartContext } from "@features/home/components/charts/GHTChart/provider/GHTChartProvider";
 import { ChartTrainsMock } from "@features/home/components/FTV/json";
 import { useFTLayout } from "@features/home/providers/HomeFTLayoutProvider/useFtLayout";
 import { Search20Regular } from "@fluentui/react-icons";
@@ -6,7 +7,7 @@ import { OptGridTable } from "@shared/components/gridTable/GridTable";
 import { TabWindowHeader } from "@shared/components/tabWindowHeader/tabWindowHeader";
 import type { MRT_ColumnDef } from "mantine-react-table";
 import { MRT_Localization_PT_BR } from "mantine-react-table/locales/pt-BR/index.cjs";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 interface IActivitiesAltersData {
@@ -58,6 +59,7 @@ const GridChangedActivities = () => {
   const { setSelectedPanelTabBarLeft } = useFTLayout();
   const contentRef = useRef<HTMLDivElement>(null);
   const lastSelectionRef = useRef<Set<string>>(new Set());
+  const { setHighlightedPrefix } = useGHTChartContext();
 
   const {
     control,
@@ -69,23 +71,29 @@ const GridChangedActivities = () => {
 
   const [filteredData, setFilteredData] = useState<IActivitiesAltersData[]>([]);
 
-  const data = [] as IActivitiesAltersData[];
+  const data = useMemo(() => {
+    const result: IActivitiesAltersData[] = [];
+    let idCounter = 0;
 
-  ChartTrainsMock.filter((x) => x.movimentos.some((x) => x.atividade.length > 0)).map((x) => {
-    x.movimentos.forEach((movimento) => {
-      if (movimento.atividade.length > 0 && movimento.atividade[0].source === "USER") {
-        data.push({
-          trem: x.prefixo,
-          location: movimento.linha,
-          duration: movimento.atividade[0].activityDurationTPFormatted,
-          endDate: "",
-        } as IActivitiesAltersData);
-      }
+    ChartTrainsMock.filter((x) => x.movimentos.some((x) => x.atividade.length > 0)).forEach((x) => {
+      x.movimentos.forEach((movimento) => {
+        if (movimento.atividade.length > 0 && movimento.atividade[0].source === "USER") {
+          result.push({
+            id: `${x.prefixo}-${idCounter++}`,
+            trem: x.prefixo,
+            location: movimento.linha,
+            duration: movimento.atividade[0].activityDurationTPFormatted,
+            endDate: "",
+          });
+        }
+      });
     });
-  });
+
+    return result;
+  }, []);
 
   useEffect(() => {
-    setFilteredData(data || []);
+    setFilteredData(data);
   }, [data]);
 
   const onSelectionChange = useCallback((rows: IActivitiesAltersData[]) => {
@@ -103,30 +111,52 @@ const GridChangedActivities = () => {
     setSelectedRows(rows);
   }, []);
 
-  const handleUnselectAll = () => setSelectedRows([]);
+  const handleUnselectAll = useCallback(() => setSelectedRows([]), []);
 
-  const onSearch = (formData: ISearchFormData) => {
-    if (!data) return;
+  const onSearch = useCallback(
+    (formData: ISearchFormData) => {
+      if (!data) return;
 
-    const filtered = data.filter((item) => {
-      const prefixMatch = !formData.prefix || item.trem.toLowerCase().includes(formData.prefix.toLowerCase());
-      const destinationMatch =
-        !formData.destination || item.location.toLowerCase().includes(formData.destination.toLowerCase());
+      const filtered = data.filter((item) => {
+        const prefixMatch = !formData.prefix || item.trem.toLowerCase().includes(formData.prefix.toLowerCase());
+        const destinationMatch =
+          !formData.destination || item.location.toLowerCase().includes(formData.destination.toLowerCase());
 
-      return prefixMatch && destinationMatch;
-    });
+        return prefixMatch && destinationMatch;
+      });
 
-    setFilteredData(filtered);
-  };
+      setFilteredData(filtered);
+    },
+    [data],
+  );
+
+  const handleClose = useCallback(() => {
+    setSelectedPanelTabBarLeft((prev) => ({ ...prev, openTabName: "" }));
+  }, [setSelectedPanelTabBarLeft]);
+
+  const tableContainerProps = useMemo(
+    () => ({
+      style: {
+        height: contentRef.current?.clientHeight + "px",
+        flex: 1,
+        overflowX: "hidden" as const,
+        width: "100%",
+        maxWidth: "100%",
+      },
+    }),
+    [],
+  );
+  const handleRowClick = useCallback(
+    ({ row }) => ({
+      onClick: () => setHighlightedPrefix(row.original.trem),
+      style: { cursor: "pointer" },
+    }),
+    [],
+  );
 
   return (
     <div className="box-border flex h-full w-full max-w-[500px] flex-col">
-      <TabWindowHeader
-        title={"Atividades alteradas"}
-        onClose={() => {
-          setSelectedPanelTabBarLeft((prev) => ({ ...prev, openTabName: "" }));
-        }}
-      />
+      <TabWindowHeader title="Atividades alteradas" onClose={handleClose} />
       <div className="flex h-full w-full flex-col gap-4 overflow-hidden border p-4">
         <form onSubmit={handleSubmit(onSearch)} className="flex flex-wrap items-end gap-2">
           <Controller
@@ -164,18 +194,13 @@ const GridChangedActivities = () => {
             preSelectedItems={selectedRows}
             onSelectionChange={onSelectionChange}
             localization={MRT_Localization_PT_BR}
-            mantineTableContainerProps={{
-              style: {
-                height: contentRef.current?.clientHeight + "px",
-                flex: 1,
-                overflowX: "hidden",
-                width: "100%",
-                maxWidth: "100%",
-              },
-            }}
+            mantineTableContainerProps={tableContainerProps}
             enableColumnResizing={true}
             columnResizeMode="onChange"
             layoutMode="grid-no-grow"
+            enableSelectAll={false}
+            enableRowSelection={false}
+            mantineTableBodyRowProps={handleRowClick}
           />
         </div>
       </div>

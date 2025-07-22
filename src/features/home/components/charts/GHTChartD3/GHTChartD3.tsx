@@ -179,6 +179,9 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     highlightedPrefix,
   } = props;
 
+  // Constante para padronizar espessura das linhas de trem
+  const TRAIN_LINE_WIDTH = 2;
+
   const svgLeftRef = useRef<SVGSVGElement | null>(null);
   const svgPlotRef = useRef<SVGSVGElement | null>(null);
   const svgRightRef = useRef<SVGSVGElement | null>(null);
@@ -195,7 +198,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
 
   const processData = (data: YLabel[]) => {
     const flatData: (YLabel | Child)[] = [];
-    data.forEach((parent) => {
+    data?.forEach((parent) => {
       flatData.push(parent);
       if (parent.childs && parent.childs.length > 0) {
         parent.childs.forEach((child) => {
@@ -204,7 +207,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
       }
     });
 
-    flatData.sort((a, b) => {
+    flatData?.sort((a, b) => {
       const seqA = a.seqSegment;
       const seqB = b.seqSegment;
       if (seqA !== seqB) return seqB - seqA;
@@ -215,7 +218,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     let segmentoAtual = "";
     const segmentMap = new Map<string, { startY: number; length: number }>();
 
-    flatData.forEach((item) => {
+    flatData?.forEach((item) => {
       if (segmentoAtual !== item.cdSgmt) {
         segmentoAtual = item.cdSgmt;
         const maxCpkmDoSegmento = flatData
@@ -229,7 +232,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
       }
     });
 
-    flatData.forEach((item) => {
+    flatData?.forEach((item) => {
       const segmentInfo = segmentMap.get(item.cdSgmt);
       if (!segmentInfo) return;
 
@@ -767,7 +770,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
               const movementGroup = d3.select(this.parentNode as Element);
               const visibleLine = movementGroup.select(".train-visible-line");
 
-              visibleLine.raise().attr("stroke", "steelblue").attr("stroke-width", 3);
+              visibleLine.raise().attr("stroke", "steelblue").attr("stroke-width", TRAIN_LINE_WIDTH);
               onMouseMoveInElementCallback({ data: { actualMovement: mov, train }, element: "train" });
               tooltip
                 .html(
@@ -790,7 +793,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
 
               // Usa dados diretamente do escopo (muito mais eficiente)
               let targetColor = trainColor;
-              let targetWidth = 2;
+              let targetWidth = TRAIN_LINE_WIDTH;
 
               // Verifica se este trem está sendo destacado pelo sistema de highlight
               if (highlightedPrefix) {
@@ -799,7 +802,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
                 // Se o trem está sendo destacado, mantém a cor azul
                 if (train.prefixo.toUpperCase().startsWith(searchPrefix)) {
                   targetColor = "blue";
-                  targetWidth = 3;
+                  targetWidth = TRAIN_LINE_WIDTH;
                 }
               }
 
@@ -874,7 +877,7 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
             .attr("x2", xScale(fimCursoDate))
             .attr("y2", yScale(y2!))
             .attr("stroke", trainColor)
-            .attr("stroke-width", 1)
+            .attr("stroke-width", TRAIN_LINE_WIDTH)
             .attr("stroke-dasharray", "4,1")
             .style("pointer-events", "none"); // Remove eventos de mouse desta linha
 
@@ -1068,7 +1071,10 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
 
       if (trainData) {
         const originalColor = trainData.cor; // A cor já está em formato hexadecimal
-        singleTrainGroup.selectAll(".train-visible-line").attr("stroke", originalColor).attr("stroke-width", 2);
+        singleTrainGroup
+          .selectAll(".train-visible-line")
+          .attr("stroke", originalColor)
+          .attr("stroke-width", TRAIN_LINE_WIDTH);
         singleTrainGroup.selectAll("text").attr("fill", originalColor);
       }
     });
@@ -1089,7 +1095,11 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
     });
 
     // Highlight matched trains
-    matchingTrains.selectAll(".train-visible-line").attr("stroke", "blue").attr("stroke-width", 3).raise();
+    matchingTrains
+      .selectAll(".train-visible-line")
+      .attr("stroke", "blue")
+      .attr("stroke-width", TRAIN_LINE_WIDTH)
+      .raise();
     matchingTrains.selectAll("text").attr("fill", "blue").raise();
 
     // Scroll to the first matched train
@@ -1107,6 +1117,10 @@ const GHTChartD3 = memo((props: GHTChartD3Props) => {
       }
     }
   }, [highlightedPrefix, trains]);
+
+  if (yLabels?.length === 0 || !yLabels) {
+    return;
+  }
 
   return (
     <div

@@ -45,12 +45,17 @@ import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 
 const FTVLayout = () => {
-  const { setCursorPointer, mouseOverInElementData, setMouseOverInElementData } = useGHTChartContext();
+  const {
+    setCursorPointer,
+    mouseOverInElementData,
+    setMouseOverInElementData,
+    highlightedPrefix,
+    setHighlightedPrefix,
+  } = useGHTChartContext();
   const FTContentRef = useRef<HTMLDivElement>(null);
   const [openTrainMovements, setOpenTrainMovements] = useState<IModalData<TrainMovementsElementEventDataType>>({
     isOpen: false,
   });
-  const [highlightedPrefix, setHighlightedPrefix] = useState<string | null>(null);
   const {
     setOpenSelectOfficialization,
     openSelectOfficialization,
@@ -351,7 +356,6 @@ const FTVLayout = () => {
         open={openModalSearchTrainChartGhtForTable.isOpen}
         onClose={() => setOpenModalSearchTrainChartGhtForTable({ isOpen: false })}
         HandleOkChange={(selected) => {
-          console.log(selected);
           if (selected?.prefixo) {
             setHighlightedPrefix(selected.prefixo);
           }

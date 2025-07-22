@@ -7,7 +7,7 @@ import { OptGridTable } from "@shared/components/gridTable/GridTable";
 import { TabWindowHeader } from "@shared/components/tabWindowHeader/tabWindowHeader";
 import type { MRT_ColumnDef } from "mantine-react-table";
 import { MRT_Localization_PT_BR } from "mantine-react-table/locales/pt-BR/index.cjs";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 interface ISearchFormData {
@@ -39,8 +39,19 @@ const columns = [
   },
 ] as MRT_ColumnDef<TrainData>[];
 
+const STORAGE_KEY = "gridSelectRailwayTrain_selectedItems";
+
 const GridSelectRailwayTrain = () => {
-  const [selectedRows, setSelectedRows] = useState<TrainData[]>([]);
+  // Initialize gridSelectedItems from localStorage
+  const [gridSelectedItems, setGridSelectedItems] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const { setSelectedPanelTabBarLeft } = useFTLayout();
   const { trainsInGhtChart, setTrainsInGhtChart } = useApplicationContext();
   const contentRef = useRef<HTMLDivElement>(null);
@@ -57,31 +68,46 @@ const GridSelectRailwayTrain = () => {
   const [filteredData, setFilteredData] = useState<TrainData[]>([]);
 
   useEffect(() => {
-    alert(JSON.stringify(trainsInGhtChart, null, 2));
     setFilteredData(trainsInGhtChart ?? []);
   }, [trainsInGhtChart]);
 
+  // Save gridSelectedItems to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(gridSelectedItems));
+    } catch (error) {
+      console.warn("Failed to save selected items to localStorage:", error);
+    }
+  }, [gridSelectedItems]);
+
+  // Create preSelectedItems based on gridSelectedItems
+  const preSelectedItems = useMemo(() => {
+    if (!filteredData?.length || !gridSelectedItems?.length) return [];
+    return filteredData.filter((train) => gridSelectedItems.includes(train.id));
+  }, [filteredData, gridSelectedItems]);
+
   const onSelectionChange = useCallback(
     (rows: TrainData[]) => {
-      const currentSelectionIds = new Set(rows.map((row) => row.id));
+      const currentSelectionIds = rows.map((row) => row.id);
+      const currentSelectionSet = new Set(currentSelectionIds);
 
       const lastSelection = lastSelectionRef.current;
       const hasChanged =
-        currentSelectionIds.size !== lastSelection.size ||
-        ![...currentSelectionIds].every((id) => lastSelection.has(id));
+        currentSelectionSet.size !== lastSelection.size ||
+        ![...currentSelectionSet].every((id) => lastSelection.has(id));
 
       if (!hasChanged) {
         return;
       }
 
-      lastSelectionRef.current = currentSelectionIds;
-      setSelectedRows(rows);
+      lastSelectionRef.current = currentSelectionSet;
+      setGridSelectedItems(currentSelectionIds);
 
       setTimeout(() => {
         setTrainsInGhtChart((prevTrains) =>
           prevTrains.map((train) => ({
             ...train,
-            showTrain: currentSelectionIds.size > 0 ? currentSelectionIds.has(train.id) : true,
+            showTrain: currentSelectionSet.size > 0 ? currentSelectionSet.has(train.id) : true,
           })),
         );
       }, 0);
@@ -89,7 +115,9 @@ const GridSelectRailwayTrain = () => {
     [setTrainsInGhtChart],
   );
 
-  const handleUnselectAll = () => setSelectedRows([]);
+  const handleUnselectAll = () => {
+    setGridSelectedItems([]);
+  };
 
   const onSearch = (formData: ISearchFormData) => {
     if (!trainsInGhtChart) return;
@@ -147,7 +175,7 @@ const GridSelectRailwayTrain = () => {
             defaultId="id"
             columns={columns}
             data={filteredData}
-            preSelectedItems={selectedRows}
+            preSelectedItems={preSelectedItems}
             onSelectionChange={onSelectionChange}
             localization={MRT_Localization_PT_BR}
             mantineTableContainerProps={{

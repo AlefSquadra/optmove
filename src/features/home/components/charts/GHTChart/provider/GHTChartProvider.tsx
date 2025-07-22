@@ -14,6 +14,7 @@ const GHTChartProvider = (props: IGHTChartProviderProps) => {
   const [selectedElementClickable, setSelectedElementClickable] = useState<IClickableElement>({} as IClickableElement);
   const [openContextMenu, setOpenContextMenu] = useState<Omit<IContextMenuProps, "onAction" | "onClose"> | null>(null);
   const [onMouseOverInElementData, setOnMouseOverInElementData] = useState<IElementEventInPlotG | null>(null);
+  const [highlightedPrefix, setHighlightedPrefix] = useState<string | null>(null);
 
   return (
     <GHTChartContext.Provider
@@ -26,6 +27,8 @@ const GHTChartProvider = (props: IGHTChartProviderProps) => {
         setSelectedElementClickable,
         mouseOverInElementData: onMouseOverInElementData,
         setMouseOverInElementData: setOnMouseOverInElementData,
+        highlightedPrefix,
+        setHighlightedPrefix,
       }}
     >
       {props.children}
